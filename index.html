@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- HTML2PDF CDN untuk Fungsi Cetak ke PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- SheetJS CDN untuk Parsing Fail Excel/CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @keyframes modalPop {
             0% { transform: scale(0.95); opacity: 0; }
@@ -369,15 +371,37 @@
             </div>
             <div class="p-5 space-y-3">
                 <div class="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-800">
-                    <p class="font-bold mb-1">Format (Pisahkan dengan koma atau tab):</p>
-                    <p class="font-mono">Nama Guru, No. Kad Pengenalan, ID DELIMa</p>
+                    <p class="font-bold mb-1">Pengecaman Pintar (Smart Parsing):</p>
+                    <p>Sistem ini akan mengecam <b>Nama</b>, <b>No. IC</b>, dan <b>ID DELIMa</b> secara automatik tanpa mengira apa jua susunan lajur / kolum anda.</p>
                 </div>
-                <p class="text-[11px] text-slate-500">Salin terus jadual (3 lajur) dari Excel dan tampal di bawah, atau taip secara manual.</p>
-                <textarea id="textareaPukalGuru" rows="6" placeholder="Cth:&#10;Ahmad bin Ali, 801010-01-1234, g-123456@moe-dl.edu.my&#10;Siti binti Abu, 850202-14-5678, g-654321@moe-dl.edu.my" class="w-full text-xs border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                
+                <!-- Kaedah 1: Tampal (Paste) -->
+                <div>
+                    <label class="text-[11px] font-bold text-slate-700 block mb-1">Kaedah 1: Salin & Tampal</label>
+                    <p class="text-[10px] text-slate-500 mb-1.5">Salin terus jadual dari Excel dan tampal di bawah.</p>
+                    <textarea id="textareaPukalGuru" rows="4" placeholder="Cth:&#10;Ahmad bin Ali, 801010-01-1234, g-123456@moe-dl.edu.my" class="w-full text-xs border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                    <button onclick="prosesTambahPukalGuru()" class="mt-2 w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan Teks Tampalan</button>
+                </div>
+
+                <div class="flex items-center gap-4 py-1">
+                    <div class="flex-1 border-t border-slate-200"></div>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">ATAU</span>
+                    <div class="flex-1 border-t border-slate-200"></div>
+                </div>
+
+                <!-- Kaedah 2: Muat Naik Fail -->
+                <div>
+                    <label class="text-[11px] font-bold text-slate-700 block mb-1">Kaedah 2: Muat Naik Fail (Excel / CSV)</label>
+                    <label class="block w-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-300 border-dashed rounded-lg p-4 text-center cursor-pointer transition">
+                        <span class="block text-xl mb-1">📂</span>
+                        <span class="block text-xs font-bold text-indigo-600">Pilih Fail Excel / CSV</span>
+                        <span class="block text-[10px] text-slate-500 mt-1">.xlsx, .xls, .csv disokong</span>
+                        <input type="file" id="fileUploadPukal" accept=".xlsx, .xls, .csv, .tsv" onchange="prosesFailPukalGuru(event)" class="hidden">
+                    </label>
+                </div>
             </div>
-            <div class="flex justify-end gap-2 p-5 border-t shrink-0">
-                <button onclick="tutupModalPukalGuru()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Batal</button>
-                <button onclick="prosesTambahPukalGuru()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan Pukal</button>
+            <div class="flex justify-end gap-2 p-4 border-t shrink-0">
+                <button onclick="tutupModalPukalGuru()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition w-full">Tutup</button>
             </div>
         </div>
     </div>
@@ -763,6 +787,34 @@
             document.getElementById('modalPukalGuru').classList.remove('flex');
         };
 
+        // FUNGSI PENGECAMAN DATA PINTAR (SMART PARSER)
+        window.parseTeacherData = function(rowArray) {
+            let nama = "";
+            let ic = "";
+            let delima = "";
+
+            rowArray.forEach(cell => {
+                if (cell === null || cell === undefined) return;
+                let val = cell.toString().trim();
+                let valLower = val.toLowerCase();
+
+                // 1. Pengecaman Email / ID DELIMa (Mengandungi simbol '@')
+                if (val.includes('@')) {
+                    delima = val;
+                }
+                // 2. Pengecaman No Kad Pengenalan (12 digit, dengan atau tanpa sengkang '-')
+                else if (/^\d{6}-?\d{2}-?\d{4}$/.test(val)) {
+                    ic = val;
+                }
+                // 3. Pengecaman Nama (Bukan IC, bukan email, bukan nombor siri bulat, bukan pengepala)
+                else if (val.length > 2 && !/^\d+$/.test(val) && !['nama', 'nama guru', 'bil', 'bil.', 'no', 'name', 'ic', 'no kad pengenalan', 'id', 'id delima', 'email'].includes(valLower)) {
+                    nama = val;
+                }
+            });
+
+            return { nama, ic, delima };
+        };
+
         window.prosesTambahPukalGuru = function() {
             let rawText = document.getElementById('textareaPukalGuru').value;
             if(!rawText.trim()) {
@@ -782,11 +834,11 @@
             lines.forEach(line => {
                 if(!line.trim()) return;
                 let parts = line.split(/,|\t/).map(s => s.trim());
-                let cleanName = parts[0];
-                let ic = parts[1] || "";
-                let delima = parts[2] || "";
-
-                if (cleanName.toLowerCase() === 'nama' || cleanName.toLowerCase() === 'bil' || cleanName.toLowerCase() === 'name') return;
+                
+                let extracted = window.parseTeacherData(parts);
+                let cleanName = extracted.nama;
+                let ic = extracted.ic;
+                let delima = extracted.delima;
 
                 if(cleanName && !window.appState.guru.includes(cleanName)) {
                     window.appState.guru.push(cleanName);
@@ -802,6 +854,71 @@
             refreshUIAll();
             tutupModalPukalGuru();
             window.customDialog("Berjaya", `<p>Seramai <b>${addedCount}</b> guru baru berjaya ditambah secara pukal.</p>`);
+        };
+
+        // FUNGSI MUAT NAIK FAIL (EXCEL/CSV/TSV)
+        window.prosesFailPukalGuru = function(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+
+            // Pastikan butang dimatikan semasa memproses
+            window.customDialog("Memproses Fail...", "<p class='text-center py-3'>Membaca data dari fail, sila tunggu ⏳</p>");
+
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let data = new Uint8Array(e.target.result);
+                try {
+                    // Gunakan SheetJS untuk menukar Excel ke JSON
+                    let workbook = XLSX.read(data, {type: 'array'});
+                    let firstSheetName = workbook.SheetNames[0];
+                    let worksheet = workbook.Sheets[firstSheetName];
+                    let json = XLSX.utils.sheet_to_json(worksheet, {header: 1}); // Baca sebagai Array bersarang
+                    
+                    let addedCount = 0;
+                    if(!window.appState.guru) window.appState.guru = [];
+                    if(!window.appState.guruKod) window.appState.guruKod = {};
+                    if(!window.appState.guruSesi) window.appState.guruSesi = {};
+                    if(!window.appState.guruIC) window.appState.guruIC = {};
+                    if(!window.appState.guruDelima) window.appState.guruDelima = {};
+
+                    json.forEach((row, index) => {
+                        if (!row || row.length === 0) return;
+                        
+                        let extracted = window.parseTeacherData(row);
+                        let rawName = extracted.nama;
+                        let ic = extracted.ic;
+                        let delima = extracted.delima;
+
+                        // Langkau jika tiada nama dijumpai (mungkin baris kosong atau pengepala)
+                        if (!rawName) return;
+
+                        if(!window.appState.guru.includes(rawName)) {
+                            window.appState.guru.push(rawName);
+                            window.appState.guruKod[rawName] = rawName.substring(0, 3).toUpperCase();
+                            window.appState.guruSesi[rawName] = 'pagi';
+                            window.appState.guruIC[rawName] = ic;
+                            window.appState.guruDelima[rawName] = delima;
+                            addedCount++;
+                        }
+                    });
+
+                    simpanData();
+                    refreshUIAll();
+                    tutupModalPukalGuru();
+                    
+                    // Reset File Input supaya boleh muat naik fail yang sama berkali-kali jika perlu
+                    document.getElementById('fileUploadPukal').value = "";
+                    
+                    window.customDialog("Berjaya", `<p>Seramai <b>${addedCount}</b> guru baru berjaya diimport dari fail <b>${file.name}</b>.</p>`);
+                } catch(err) {
+                    console.error("Ralat membaca fail Excel/CSV:", err);
+                    document.getElementById('fileUploadPukal').value = "";
+                    window.customDialog("Ralat", "<p>Gagal membaca fail. Pastikan format fail adalah Excel atau CSV yang sah dan tidak rosak.</p>");
+                }
+            };
+            
+            // Baca fail sebagai rentetan bait (byte stream) untuk dihurai (parse) oleh SheetJS
+            reader.readAsArrayBuffer(file);
         };
 
         window.editGuru = function(oldName) {
