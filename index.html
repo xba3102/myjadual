@@ -110,10 +110,11 @@
                                 <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2"><span>🏫</span> Kelas Sekolah</h3>
                                 <span id="countKelas" class="bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-indigo-100">0</span>
                             </div>
-                            <div class="flex gap-2 mb-3">
-                                <input type="text" id="inputKelas" placeholder="Nama Kelas (Cth: 4 Amanah)" class="flex-1 text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                <button onclick="tambahData('kelas')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah</button>
+                            <div class="flex flex-col gap-2 mb-3">
+                                <input type="text" id="inputKelas" placeholder="Nama Kelas / Formula (Cth: 1 - 6 atau 3A,3B)" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <button onclick="tambahData('kelas')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah Kelas / Formula</button>
                             </div>
+                            <p class="text-[10px] text-slate-400 italic mb-2">Formula disokong: <b>1 - 6</b> atau <b>3A, 3B, 4A</b></p>
                         </div>
                         <button onclick="window.paparSenarai('kelas')" class="w-full mt-2 bg-slate-50 hover:bg-slate-100 text-indigo-600 font-bold text-xs py-2 rounded-lg border border-slate-200 transition flex items-center justify-center gap-1.5">
                             <span>👁️</span> Papar Senarai Kelas
@@ -127,9 +128,14 @@
                                 <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2"><span>📚</span> Mata Pelajaran</h3>
                                 <span id="countSubjek" class="bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-indigo-100">0</span>
                             </div>
-                            <div class="flex gap-2 mb-3">
-                                <input type="text" id="inputSubjek" placeholder="Subjek (Cth: Matematik)" class="flex-1 text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                <button onclick="tambahData('subjek')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah</button>
+                            <div class="flex flex-col gap-2 mb-3">
+                                <div class="flex gap-2">
+                                    <input type="text" id="inputSubjek" placeholder="Subjek (Cth: Matematik)" class="flex-1 text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                    <button onclick="tambahData('subjek')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah</button>
+                                </div>
+                                <button onclick="janaSubjekSK()" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs py-2 rounded-lg border border-amber-200 transition flex items-center justify-center gap-1.5 mt-1">
+                                    <span>🪄</span> Jana Automatik Subjek Rendah
+                                </button>
                             </div>
                         </div>
                         <button onclick="window.paparSenarai('subjek')" class="w-full mt-2 bg-slate-50 hover:bg-slate-100 text-indigo-600 font-bold text-xs py-2 rounded-lg border border-slate-200 transition flex items-center justify-center gap-1.5">
@@ -372,13 +378,13 @@
             <div class="p-5 space-y-3">
                 <div class="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-800">
                     <p class="font-bold mb-1">Pengecaman Pintar (Smart Parsing):</p>
-                    <p>Sistem ini akan mengecam <b>Nama</b>, <b>No. IC</b>, dan <b>ID DELIMa</b> secara automatik tanpa mengira apa jua susunan lajur / kolum anda. Jika nama sudah wujud, sistem akan mengemas kini IC & ID DELIMa tersebut.</p>
+                    <p>Sistem ini mengecam <b>Nama</b>, <b>No. IC</b>, dan <b>ID DELIMa</b> secara automatik. Jika nama sudah wujud, sistem akan mengemas kini IC & ID DELIMa tersebut.</p>
                 </div>
                 
                 <!-- Kaedah 1: Tampal (Paste) -->
                 <div>
                     <label class="text-[11px] font-bold text-slate-700 block mb-1">Kaedah 1: Salin & Tampal</label>
-                    <p class="text-[10px] text-slate-500 mb-1.5">Salin terus jadual dari Excel dan tampal di bawah.</p>
+                    <p class="text-[10px] text-slate-500 mb-1.5">Salin jadual dari Excel dan tampal di bawah.</p>
                     <textarea id="textareaPukalGuru" rows="4" placeholder="Cth:&#10;Ahmad bin Ali, 801010-01-1234, g-123456@moe-dl.edu.my" class="w-full text-xs border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
                     <button onclick="prosesTambahPukalGuru()" class="mt-2 w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan Teks Tampalan</button>
                 </div>
@@ -481,8 +487,14 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Guru Pengajar:</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Guru Pengajar (Guru Utama):</label>
                     <select id="editManualGuru" class="w-full text-xs border rounded-lg px-3 py-2 bg-white font-bold text-indigo-700">
+                        <option value="">-- Tiada Guru --</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Guru Bersama (Co-Teacher):</label>
+                    <select id="editManualCoTeacher" class="w-full text-xs border rounded-lg px-3 py-2 bg-white font-bold text-indigo-700">
                         <option value="">-- Tiada Guru --</option>
                     </select>
                 </div>
@@ -572,30 +584,30 @@
             guru: [
                 { id: 'g_elak_2_awal', label: 'Elak 2 Masa Pertama', desc: 'Guru tidak boleh mengajar pada 2 waktu terawal.', inputs: ['guru'] },
                 { id: 'g_elak_2_akhir', label: 'Elak 2 Masa Terakhir', desc: 'Guru tidak boleh mengajar pada 2 waktu terakhir.', inputs: ['guru'] },
-                { id: 'g_seimbang_hari', label: 'Beban Harian Seimbang', desc: 'Waktu mengajar diagihkan seimbang secara automatik sepanjang minggu.', inputs: ['guru'] },
-                { id: 'g_seimbang_rehat', label: 'Sebelum & Selepas Rehat Seimbang', desc: 'Sistem cuba menyeimbangkan beban mengajar sebelum dan selepas waktu rehat.', inputs: ['guru'] },
-                { id: 'g_jarak_double_period', label: 'Slot Kosong Selepas Double Period', desc: 'Sistem memastikan ada 1 slot kosong/rehat selepas guru mengajar kelas secara berterusan (double period).', inputs: ['guru'] },
-                { id: 'g_max_sehari', label: 'Had Maksimum Waktu Sehari', desc: 'Had maksimum waktu mengajar guru dalam sehari.', inputs: ['guru', 'number'] },
+                { id: 'g_seimbang_hari', label: 'Beban Harian Seimbang', desc: 'Waktu mengajar diagihkan seimbang secara automatik.', inputs: ['guru'] },
+                { id: 'g_seimbang_rehat', label: 'Sebelum & Selepas Rehat Seimbang', desc: 'Sistem cuba menyeimbangkan beban mengajar sebelum/selepas rehat.', inputs: ['guru'] },
+                { id: 'g_jarak_double_period', label: 'Slot Kosong Selepas Double Period', desc: 'Mesti ada 1 slot rehat/kosong selepas double period.', inputs: ['guru'] },
+                { id: 'g_max_sehari', label: 'Had Maksimum Waktu Sehari', desc: 'Had maksimum waktu mengajar guru sehari.', inputs: ['guru', 'number'] },
                 { id: 'g_max_turut', label: 'Had Waktu Berturut-turut', desc: 'Had maksimum waktu mengajar berturut-turut.', inputs: ['guru', 'number'] },
                 { id: 'g_min_rehat', label: 'Jarak Rehat Minimum', desc: 'Had minimum rehat antara dua sesi mengajar.', inputs: ['guru', 'number'] },
                 { id: 'g_tidak_tersedia', label: 'Guru Tidak Tersedia (Slot)', desc: 'Guru dikunci daripada mengajar pada hari dan waktu tertentu.', inputs: ['guru', 'hari', 'slot_masa'] },
                 { id: 'g_co_teacher', label: 'Guru Bersama (Co-Teacher)', desc: 'Guru ini mesti mengajar bersama Guru Kedua untuk subjek kelas ini.', inputs: ['guru', 'guru2', 'subjek', 'kelas'] },
-                { id: 'g_keutamaan_slot', label: 'Keutamaan Slot (Priority)', desc: 'Guru ini diutamakan untuk mengajar pada hari dan slot ini.', inputs: ['guru', 'hari', 'slot_masa'] }
+                { id: 'g_keutamaan_slot', label: 'Keutamaan Slot (Priority)', desc: 'Guru ini diutamakan untuk mengajar pada hari/slot ini.', inputs: ['guru', 'hari', 'slot_masa'] }
             ],
             kelas: [
                 { id: 'k_max_subjek_sehari', label: 'Max Waktu Subjek Sehari', desc: 'Kelas tidak boleh mengambil subjek yang sama melebihi had sehari.', inputs: ['kelas', 'subjek', 'number'] },
-                { id: 'm_01_kepelbagaian_subjek', label: 'Kepelbagaian Subjek Harian (Daily Subject Diversity)', desc: 'Memastikan murid menerima kombinasi subjek pelbagai dalam sehari.', inputs: ['kelas'] },
-                { id: 'm_02_subjek_seimbang', label: 'Subjek Seimbang Sepanjang Minggu', desc: 'Mengagihkan subjek secara seimbang sepanjang minggu.', inputs: ['kelas'] }
+                { id: 'm_01_kepelbagaian_subjek', label: 'Kepelbagaian Subjek Harian', desc: 'Memastikan murid menerima kombinasi subjek pelbagai dalam sehari.', inputs: ['kelas'] },
+                { id: 'm_02_subjek_seimbang', label: 'Subjek Seimbang Sepanjang Minggu', desc: 'Mengagihkan subjek secara seimbang.', inputs: ['kelas'] }
             ],
             subjek: [
                 { id: 's_sebelum_rehat', label: 'Sebelum Rehat Sahaja', desc: 'Subjek ini mesti diletakkan sebelum waktu rehat.', inputs: ['subjek'] },
                 { id: 's_selepas_rehat', label: 'Selepas Rehat Sahaja', desc: 'Subjek ini mesti diletakkan selepas waktu rehat.', inputs: ['subjek'] },
-                { id: 's_awal_pagi', label: 'Waktu Awal Pagi Sahaja', desc: 'Subjek ini hanya sesuai pada Slot 1 atau Slot 2 pagi.', inputs: ['subjek'] },
+                { id: 's_awal_pagi', label: 'Waktu Awal Pagi Sahaja', desc: 'Subjek ini hanya sesuai pada Slot 1 atau 2 pagi.', inputs: ['subjek'] },
                 { id: 's_lewat_petang', label: 'Waktu Lewat Petang Sahaja', desc: 'Subjek ini hanya sesuai pada 2 slot terakhir sesi.', inputs: ['subjek'] },
-                { id: 's_double_period', label: 'Galakkan Double Period', desc: 'Mengutamakan subjek disusun 2 waktu berturut-turut untuk kelas yang sama.', inputs: ['subjek'] },
-                { id: 's_elak_ulang_hari', label: 'Elak Ulangan (Max 1 Sesi/Hari)', desc: 'Subjek ini hanya boleh diajar 1 sesi sehari untuk kelas yang sama.', inputs: ['subjek'] },
-                { id: 's_solo_sahaja', label: 'Slot Solo Sahaja (Single Period Only)', desc: 'Subjek ini hanya boleh diagihkan 1 waktu sehari. Maksimum 5 waktu seminggu.', inputs: ['subjek'] },
-                { id: 's_elak_pisah_rehat', label: 'Elak Terpisah Oleh Rehat', desc: 'Jika Double Period, elakkan subjek diajar separuh sebelum dan separuh selepas waktu rehat.', inputs: ['subjek'] }
+                { id: 's_double_period', label: 'Galakkan Double Period', desc: 'Mengutamakan subjek disusun 2 waktu berturut-turut.', inputs: ['subjek'] },
+                { id: 's_elak_ulang_hari', label: 'Elak Ulangan (Max 1 Sesi/Hari)', desc: 'Hanya boleh diajar 1 sesi sehari untuk kelas yang sama.', inputs: ['subjek'] },
+                { id: 's_solo_sahaja', label: 'Slot Solo Sahaja (Single Period Only)', desc: 'Maksimum 1 waktu sehari, 5 waktu seminggu.', inputs: ['subjek'] },
+                { id: 's_elak_pisah_rehat', label: 'Elak Terpisah Oleh Rehat', desc: 'Elakkan subjek diajar separuh sebelum dan separuh selepas waktu rehat.', inputs: ['subjek'] }
             ]
         };
 
@@ -604,15 +616,12 @@
             if (currentUser && currentUser.uid !== "lokal_offline") {
                 try {
                     await signOut(auth);
-                } catch(e) {
-                    console.error("Ralat log keluar", e);
-                }
+                } catch(e) { console.error(e); }
             } else {
                 try {
                     const provider = new GoogleAuthProvider();
                     await signInWithPopup(auth, provider);
                 } catch(e) {
-                    console.error("Ralat log masuk", e);
                     window.customDialog("Ralat Log Masuk", "<p>Log masuk dibatalkan atau disekat oleh pelayar.</p>");
                 }
             }
@@ -620,20 +629,15 @@
 
         if (auth) {
             onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    currentUser = user;
-                    onUserLoggedIn();
-                } else {
-                    currentUser = { uid: "lokal_offline" };
-                    onUserLoggedIn();
-                }
+                if (user) { currentUser = user; window.onUserLoggedIn(); } 
+                else { currentUser = { uid: "lokal_offline" }; window.onUserLoggedIn(); }
             });
         } else {
             currentUser = { uid: "lokal_offline" };
-            onUserLoggedIn();
+            setTimeout(() => window.onUserLoggedIn(), 100);
         }
 
-        function onUserLoggedIn() {
+        window.onUserLoggedIn = function() {
             document.getElementById('appContent').classList.remove('hidden');
             const userNameEl = document.getElementById('userName');
             const userEmailEl = document.getElementById('userEmail');
@@ -655,11 +659,11 @@
                 userEmailEl.innerText = "Disimpan di memori pelayar";
                 authBtnText.innerText = "Log Masuk Awan";
             }
-            loadUserData();
-            muatSenaraiVersi();
-        }
+            window.loadUserData();
+            window.muatSenaraiVersi();
+        };
 
-        async function loadUserData() {
+        window.loadUserData = async function() {
             let activeUid = currentUser ? currentUser.uid : "lokal_offline";
             const storageKey = `jadualOfflineState_${activeUid}`;
             let saved = localStorage.getItem(storageKey);
@@ -670,15 +674,13 @@
                 try {
                     const docRef = doc(db, "artifacts", "sistem-jadual", "users", activeUid, "data", "state");
                     const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) {
-                        window.appState = docSnap.data();
-                    }
-                } catch(e) { console.warn("Cloud pull warning:", e); }
+                    if (docSnap.exists()) window.appState = docSnap.data();
+                } catch(e) {}
             }
-            refreshUIAll();
-        }
+            window.refreshUIAll();
+        };
 
-        async function simpanData() {
+        window.simpanData = async function() {
             let activeUid = currentUser ? currentUser.uid : "lokal_offline";
             const storageKey = `jadualOfflineState_${activeUid}`;
             localStorage.setItem(storageKey, JSON.stringify(window.appState));
@@ -687,9 +689,9 @@
                 try {
                     const docRef = doc(db, "artifacts", "sistem-jadual", "users", activeUid, "data", "state");
                     await setDoc(docRef, window.appState);
-                } catch(e) { console.warn("Cloud push warning:", e); }
+                } catch(e) {}
             }
-        }
+        };
 
         window.customDialog = function(title, messageHTML, isConfirm = false, onConfirm = null) {
             const modal = document.getElementById('customModal');
@@ -724,26 +726,26 @@
             const btn = document.getElementById(`tab-${tabId}`);
             btn.classList.add('border-indigo-600', 'text-indigo-600');
             btn.classList.remove('border-transparent', 'text-slate-500');
-            if(tabId === 'agihan') { renderGuruSesi(); renderConfigMasa(); }
+            if(tabId === 'agihan') { window.renderGuruSesi(); window.renderConfigMasa(); }
         };
 
-        function refreshUIAll() {
+        window.refreshUIAll = function() {
             document.getElementById('countGuru').innerText = (window.appState.guru || []).length;
             document.getElementById('countKelas').innerText = (window.appState.kelas || []).length;
             document.getElementById('countSubjek').innerText = (window.appState.subjek || []).length;
             document.getElementById('inputNamaSekolah').value = window.appState.schoolName || "";
             document.getElementById('jenisSesiSekolah').value = window.appState.jenisSesiSekolah || "pagi";
-            renderConfigMasa();
-            renderAgihanDropdowns();
-            renderSenaraiAgihan();
-            renderKekanganList();
-            renderJadualDropdowns();
-            renderGuruSesi();
-        }
+            window.renderConfigMasa();
+            window.renderAgihanDropdowns();
+            window.renderSenaraiAgihan();
+            window.renderKekanganList();
+            window.renderJadualDropdowns();
+            window.renderGuruSesi();
+        };
 
         window.getColorForSubjek = function(subjek) {
             if(!subjek) return '#ffffff';
-            let colors = ['#fecaca', '#fef08a', '#bbf7d0', '#bfdbfe', '#e9d5ff', '#fed7aa', '#99f6e4', '#fbcfe8', '#e2e8f0', '#c7d2fe', '#fecdd3', '#d9f99d', '#bbf7d0', '#a7f3d0', '#fde047', '#cbd5e1'];
+            let colors = ['#fecaca', '#fef08a', '#bbf7d0', '#bfdbfe', '#e9d5ff', '#fed7aa', '#99f6e4', '#fbcfe8', '#e2e8f0', '#c7d2fe', '#fecdd3', '#d9f99d', '#a7f3d0', '#fde047', '#cbd5e1'];
             let hash = 0;
             for (let i = 0; i < subjek.length; i++) { hash = subjek.charCodeAt(i) + ((hash << 5) - hash); }
             return colors[Math.abs(hash) % colors.length];
@@ -751,26 +753,98 @@
 
         window.tambahData = function(jenis) {
             let inputEl = document.getElementById(`input${jenis.charAt(0).toUpperCase() + jenis.slice(1)}`);
-            let val = inputEl.value.trim();
-            if(!val) return;
+            let rawVal = inputEl.value.trim();
+            if(!rawVal) return;
             if(!window.appState[jenis]) window.appState[jenis] = [];
-            if(window.appState[jenis].includes(val)) {
-                window.customDialog("Ralat", `<p>Maklumat "${val}" sudah wujud.</p>`);
+
+            if (jenis === 'kelas') {
+                let kelasBaharuList = [];
+                let rangeMatch = rawVal.match(/^(.*?)\s*(\d+)\s*-\s*(\d+)$/);
+                
+                if (rangeMatch) {
+                    let prefix = rangeMatch[1].trim();
+                    let startNum = parseInt(rangeMatch[2]);
+                    let endNum = parseInt(rangeMatch[3]);
+                    if (startNum <= endNum) {
+                        for (let i = startNum; i <= endNum; i++) {
+                            let namaKelas = prefix ? `${prefix} ${i}` : `${i}`;
+                            kelasBaharuList.push(namaKelas);
+                        }
+                    }
+                } else if (rawVal.includes(',')) {
+                    let parts = rawVal.split(',').map(s => s.trim()).filter(s => s);
+                    let prefixTemp = "";
+                    parts.forEach(p => {
+                        let isNumOnly = /^\d+$/.test(p);
+                        let hasAlphabet = /[a-zA-Z]/.test(p);
+                        if (!isNumOnly && hasAlphabet) {
+                            let m = p.match(/^(.+?)\s*(\d+[a-zA-Z]*)$/);
+                            if (m) prefixTemp = m[1].trim();
+                        }
+                    });
+
+                    parts.forEach(p => {
+                        let isNumOnly = /^\d+$/.test(p);
+                        kelasBaharuList.push((isNumOnly && prefixTemp) ? `${prefixTemp} ${p}` : p);
+                    });
+                } else {
+                    kelasBaharuList.push(rawVal);
+                }
+
+                let totalAdded = 0;
+                kelasBaharuList.forEach(kName => {
+                    if (!window.appState.kelas.includes(kName)) {
+                        window.appState.kelas.push(kName);
+                        totalAdded++;
+                    }
+                });
+
+                inputEl.value = "";
+                window.simpanData();
+                window.refreshUIAll();
                 return;
             }
-            window.appState[jenis].push(val);
+
+            if(window.appState[jenis].includes(rawVal)) {
+                window.customDialog("Ralat", `<p>Maklumat "${rawVal}" sudah wujud.</p>`);
+                return;
+            }
+            
+            window.appState[jenis].push(rawVal);
             if(jenis === 'guru') {
                 let kodInput = document.getElementById('inputKodGuru');
                 let kodVal = kodInput ? kodInput.value.trim().toUpperCase() : "";
                 if(!window.appState.guruKod) window.appState.guruKod = {};
-                window.appState.guruKod[val] = kodVal || val.substring(0,3).toUpperCase();
+                window.appState.guruKod[rawVal] = kodVal || rawVal.substring(0,3).toUpperCase();
                 if(kodInput) kodInput.value = "";
                 if(!window.appState.guruSesi) window.appState.guruSesi = {};
-                window.appState.guruSesi[val] = 'pagi';
+                window.appState.guruSesi[rawVal] = 'pagi';
             }
             inputEl.value = "";
-            simpanData();
-            refreshUIAll();
+            window.simpanData();
+            window.refreshUIAll();
+        };
+
+        window.janaSubjekSK = function() {
+            let subjekSK = [
+                "Bahasa Melayu", "Bahasa Inggeris", "Matematik", "Sains", 
+                "Pendidikan Islam", "Pendidikan Moral", "Pendidikan Jasmani", 
+                "Pendidikan Kesihatan", "Pendidikan Seni Visual", "Pendidikan Muzik", 
+                "Sejarah", "Reka Bentuk dan Teknologi", "Bahasa Arab"
+            ];
+            let addedCount = 0;
+            if(!window.appState.subjek) window.appState.subjek = [];
+            
+            subjekSK.forEach(sub => {
+                if(!window.appState.subjek.includes(sub)) {
+                    window.appState.subjek.push(sub);
+                    addedCount++;
+                }
+            });
+            
+            window.simpanData();
+            window.refreshUIAll();
+            window.customDialog("Berjaya", `<p><b>${addedCount}</b> mata pelajaran teras sekolah rendah telah ditambahkan secara automatik.</p>`);
         };
 
         window.bukaModalPukalGuru = function() {
@@ -784,17 +858,12 @@
             document.getElementById('modalPukalGuru').classList.remove('flex');
         };
 
-        // PENGECAMAN DATA PINTAR (SMART PARSER)
         window.parseTeacherData = function(rowArray) {
-            let nama = "";
-            let ic = "";
-            let delima = "";
-
+            let nama = "", ic = "", delima = "";
             rowArray.forEach(cell => {
                 if (cell === null || cell === undefined) return;
                 let val = cell.toString().trim();
                 let valLower = val.toLowerCase();
-
                 if (val.includes('@')) {
                     delima = val;
                 } else if (/^\d{6}-?\d{2}-?\d{4}$/.test(val)) {
@@ -803,21 +872,16 @@
                     nama = val;
                 }
             });
-
             return { nama, ic, delima };
         };
 
         window.prosesTambahPukalGuru = function() {
             let rawText = document.getElementById('textareaPukalGuru').value;
-            if(!rawText.trim()) {
-                window.customDialog("Ralat", "<p>Sila masukkan senarai nama guru terlebih dahulu.</p>");
-                return;
-            }
-
+            if(!rawText.trim()) return window.customDialog("Ralat", "<p>Sila masukkan senarai nama guru terlebih dahulu.</p>");
+            
             let lines = rawText.split(/\r?\n/);
-            let addedCount = 0;
-            let updatedCount = 0;
-
+            let addedCount = 0, updatedCount = 0;
+            
             if(!window.appState.guru) window.appState.guru = [];
             if(!window.appState.guruKod) window.appState.guruKod = {};
             if(!window.appState.guruSesi) window.appState.guruSesi = {};
@@ -827,39 +891,32 @@
             lines.forEach(line => {
                 if(!line.trim()) return;
                 let parts = line.split(/,|\t/).map(s => s.trim());
-                
                 let extracted = window.parseTeacherData(parts);
-                let cleanName = extracted.nama;
-                let ic = extracted.ic;
-                let delima = extracted.delima;
+                let {nama, ic, delima} = extracted;
 
-                if(cleanName) {
-                    if(!window.appState.guru.includes(cleanName)) {
-                        window.appState.guru.push(cleanName);
-                        window.appState.guruKod[cleanName] = cleanName.substring(0, 3).toUpperCase();
-                        window.appState.guruSesi[cleanName] = 'pagi';
-                        window.appState.guruIC[cleanName] = ic;
-                        window.appState.guruDelima[cleanName] = delima;
+                if(nama) {
+                    if(!window.appState.guru.includes(nama)) {
+                        window.appState.guru.push(nama);
+                        window.appState.guruKod[nama] = nama.substring(0, 3).toUpperCase();
+                        window.appState.guruSesi[nama] = 'pagi';
+                        window.appState.guruIC[nama] = ic;
+                        window.appState.guruDelima[nama] = delima;
                         addedCount++;
                     } else {
-                        // Jika nama sudah wujud, kemas kini IC & ID DELIMa sekiranya ada dikesan
-                        if(ic) window.appState.guruIC[cleanName] = ic;
-                        if(delima) window.appState.guruDelima[cleanName] = delima;
+                        if(ic) window.appState.guruIC[nama] = ic;
+                        if(delima) window.appState.guruDelima[nama] = delima;
                         updatedCount++;
                     }
                 }
             });
 
-            simpanData();
-            refreshUIAll();
-            tutupModalPukalGuru();
+            window.simpanData(); window.refreshUIAll(); window.tutupModalPukalGuru();
             window.customDialog("Berjaya", `<p>Seramai <b>${addedCount}</b> guru baharu ditambah, dan maklumat <b>${updatedCount}</b> guru sedia ada dikemas kini.</p>`);
         };
 
         window.prosesFailPukalGuru = function(event) {
             let file = event.target.files[0];
             if (!file) return;
-
             window.customDialog("Memproses Fail...", "<p class='text-center py-3'>Membaca data dari fail, sila tunggu ⏳</p>");
 
             let reader = new FileReader();
@@ -867,12 +924,10 @@
                 let data = new Uint8Array(e.target.result);
                 try {
                     let workbook = XLSX.read(data, {type: 'array'});
-                    let firstSheetName = workbook.SheetNames[0];
-                    let worksheet = workbook.Sheets[firstSheetName];
+                    let worksheet = workbook.Sheets[workbook.SheetNames[0]];
                     let json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
                     
-                    let addedCount = 0;
-                    let updatedCount = 0;
+                    let addedCount = 0, updatedCount = 0;
                     if(!window.appState.guru) window.appState.guru = [];
                     if(!window.appState.guruKod) window.appState.guruKod = {};
                     if(!window.appState.guruSesi) window.appState.guruSesi = {};
@@ -881,36 +936,28 @@
 
                     json.forEach((row) => {
                         if (!row || row.length === 0) return;
-                        
                         let extracted = window.parseTeacherData(row);
-                        let rawName = extracted.nama;
-                        let ic = extracted.ic;
-                        let delima = extracted.delima;
-
-                        if (!rawName) return;
-
-                        if(!window.appState.guru.includes(rawName)) {
-                            window.appState.guru.push(rawName);
-                            window.appState.guruKod[rawName] = rawName.substring(0, 3).toUpperCase();
-                            window.appState.guruSesi[rawName] = 'pagi';
-                            window.appState.guruIC[rawName] = ic;
-                            window.appState.guruDelima[rawName] = delima;
+                        let {nama, ic, delima} = extracted;
+                        
+                        if (!nama) return;
+                        if(!window.appState.guru.includes(nama)) {
+                            window.appState.guru.push(nama);
+                            window.appState.guruKod[nama] = nama.substring(0, 3).toUpperCase();
+                            window.appState.guruSesi[nama] = 'pagi';
+                            window.appState.guruIC[nama] = ic;
+                            window.appState.guruDelima[nama] = delima;
                             addedCount++;
                         } else {
-                            if(ic) window.appState.guruIC[rawName] = ic;
-                            if(delima) window.appState.guruDelima[rawName] = delima;
+                            if(ic) window.appState.guruIC[nama] = ic;
+                            if(delima) window.appState.guruDelima[nama] = delima;
                             updatedCount++;
                         }
                     });
 
-                    simpanData();
-                    refreshUIAll();
-                    tutupModalPukalGuru();
+                    window.simpanData(); window.refreshUIAll(); window.tutupModalPukalGuru();
                     document.getElementById('fileUploadPukal').value = "";
-                    
-                    window.customDialog("Berjaya", `<p>Seramai <b>${addedCount}</b> guru baharu diimport, dan maklumat <b>${updatedCount}</b> guru sedia ada dikemas kini dari fail <b>${file.name}</b>.</p>`);
+                    window.customDialog("Berjaya", `<p>Seramai <b>${addedCount}</b> guru baharu diimport, dan maklumat <b>${updatedCount}</b> guru sedia ada dikemas kini.</p>`);
                 } catch(err) {
-                    console.error("Ralat membaca fail Excel/CSV:", err);
                     document.getElementById('fileUploadPukal').value = "";
                     window.customDialog("Ralat", "<p>Gagal membaca fail. Pastikan format fail sah.</p>");
                 }
@@ -921,7 +968,6 @@
         window.editGuru = function(oldName) {
             let currentIC = window.appState.guruIC?.[oldName] || "";
             let currentDelima = window.appState.guruDelima?.[oldName] || "";
-            
             let inputHTML = `
                 <div class="space-y-3">
                     <div>
@@ -944,37 +990,20 @@
                 let newIC = document.getElementById('editICGuruInput').value.trim();
                 let newDelima = document.getElementById('editDelimaGuruInput').value.trim();
                 
-                if(!newName) {
-                    window.customDialog("Ralat", "<p>Nama guru tidak boleh dibiarkan kosong.</p>");
-                    return;
-                }
-                
-                if(newName !== oldName && window.appState.guru.includes(newName)) {
-                    setTimeout(() => window.customDialog("Ralat", "<p>Nama guru ini sudah wujud.</p>"), 300);
-                    return;
-                }
+                if(!newName) return window.customDialog("Ralat", "<p>Nama guru tidak boleh dibiarkan kosong.</p>");
+                if(newName !== oldName && window.appState.guru.includes(newName)) return setTimeout(() => window.customDialog("Ralat", "<p>Nama ini sudah wujud.</p>"), 300);
 
                 if(newName !== oldName) {
                     let idx = window.appState.guru.indexOf(oldName);
                     if(idx !== -1) window.appState.guru[idx] = newName;
 
-                    window.appState.guruKod[newName] = window.appState.guruKod[oldName];
-                    delete window.appState.guruKod[oldName];
-
-                    window.appState.guruSesi[newName] = window.appState.guruSesi[oldName];
-                    delete window.appState.guruSesi[oldName];
-                    
-                    if(window.appState.agihan) {
-                        window.appState.agihan.forEach(a => { if(a.guru === oldName) a.guru = newName; });
-                    }
-                    
-                    if(window.appState.kekangan) {
-                        window.appState.kekangan.forEach(k => {
-                            if(k.kondisi?.guru === oldName) k.kondisi.guru = newName;
-                            if(k.kondisi?.guru2 === oldName) k.kondisi.guru2 = newName;
-                        });
-                    }
-                    
+                    window.appState.guruKod[newName] = window.appState.guruKod[oldName]; delete window.appState.guruKod[oldName];
+                    window.appState.guruSesi[newName] = window.appState.guruSesi[oldName]; delete window.appState.guruSesi[oldName];
+                    if(window.appState.agihan) window.appState.agihan.forEach(a => { if(a.guru === oldName) a.guru = newName; });
+                    if(window.appState.kekangan) window.appState.kekangan.forEach(k => {
+                        if(k.kondisi?.guru === oldName) k.kondisi.guru = newName;
+                        if(k.kondisi?.guru2 === oldName) k.kondisi.guru2 = newName;
+                    });
                     if(window.appState.jadual) {
                         for(let h in window.appState.jadual) {
                             for(let kls in window.appState.jadual[h]) {
@@ -990,83 +1019,61 @@
 
                 if(!window.appState.guruIC) window.appState.guruIC = {};
                 if(!window.appState.guruDelima) window.appState.guruDelima = {};
-                
-                if(newName !== oldName) {
-                    delete window.appState.guruIC[oldName];
-                    delete window.appState.guruDelima[oldName];
-                }
+                if(newName !== oldName) { delete window.appState.guruIC[oldName]; delete window.appState.guruDelima[oldName]; }
                 window.appState.guruIC[newName] = newIC;
                 window.appState.guruDelima[newName] = newDelima;
 
-                simpanData();
-                refreshUIAll();
-                setTimeout(() => window.paparSenarai('guru'), 300);
+                window.simpanData(); window.refreshUIAll(); setTimeout(() => window.paparSenarai('guru'), 300);
             });
         };
 
         window.paparSenarai = function(jenis, sorted = false) {
-            let tajuk = "";
-            let dataArr = [];
+            let tajuk = "", dataArr = [];
             if(jenis === 'guru') { tajuk = "Senarai Guru Berdaftar"; dataArr = [...window.appState.guru]; }
             else if(jenis === 'kelas') { tajuk = "Senarai Kelas Berdaftar"; dataArr = [...window.appState.kelas]; }
             else if(jenis === 'subjek') { tajuk = "Senarai Mata Pelajaran"; dataArr = [...window.appState.subjek]; }
 
-            if(sorted && jenis === 'guru') {
-                dataArr.sort((a, b) => a.localeCompare(b, 'ms', { sensitivity: 'base' }));
-            }
+            if(sorted && jenis === 'guru') dataArr.sort((a, b) => a.localeCompare(b, 'ms', { sensitivity: 'base' }));
 
-            if(!dataArr || dataArr.length === 0) {
-                window.customDialog(tajuk, "<p>Tiada maklumat direkodkan lagi.</p>");
-                return;
-            }
+            if(!dataArr || dataArr.length === 0) return window.customDialog(tajuk, "<p>Tiada maklumat direkodkan lagi.</p>");
 
-            let extraHeader = "";
-            if(jenis === 'guru') {
-                extraHeader = `<div class="flex justify-between items-center mb-3">
-                    <span class="text-xs text-slate-500">Jumlah: <b>${dataArr.length}</b></span>
-                    <button onclick="window.paparSenarai('guru', ${!sorted})" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded transition border">
-                        ${sorted ? '🔄 Susunan Asal' : '🔤 Susun A-Z'}
-                    </button>
-                </div>`;
-            } else {
-                extraHeader = `<p class="text-xs text-slate-500 mb-3">Jumlah: <b>${dataArr.length}</b></p>`;
-            }
+            let extraHeader = jenis === 'guru' 
+                ? `<div class="flex justify-between items-center mb-3"><span class="text-xs text-slate-500">Jumlah: <b>${dataArr.length}</b></span><button onclick="window.paparSenarai('guru', ${!sorted})" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded transition border">${sorted ? '🔄 Susunan Asal' : '🔤 Susun A-Z'}</button></div>` 
+                : `<p class="text-xs text-slate-500 mb-3">Jumlah: <b>${dataArr.length}</b></p>`;
 
             let senaraiHTML = dataArr.map((item, idx) => {
-                let label = item;
-                let editBtn = "";
+                let label = item, editBtn = "";
                 if(jenis === 'guru') {
-                    let kod = window.appState.guruKod && window.appState.guruKod[item] ? window.appState.guruKod[item] : '-';
-                    let ic = window.appState.guruIC && window.appState.guruIC[item] ? window.appState.guruIC[item] : '';
+                    let kod = window.appState.guruKod?.[item] || '-';
+                    let ic = window.appState.guruIC?.[item] || '';
                     let details = ic ? `<br><span class="text-[10px] text-slate-400 font-normal">IC: ${ic}</span>` : '';
                     label = `<div>${item} <span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[10px] ml-2 font-bold">${kod}</span>${details}</div>`;
                     editBtn = `<button onclick="window.editGuru('${item}')" class="text-blue-500 hover:text-blue-700 font-bold text-xs bg-blue-50 p-1.5 rounded transition mr-1" title="Sunting">✏️</button>`;
                 }
-                return `<div class="flex justify-between items-center bg-slate-50 border border-slate-200 px-3 py-2 rounded-lg text-sm mb-2">
-                    <div class="font-medium text-slate-700 flex items-start gap-2"><span class="mt-0.5">${idx + 1}.</span> ${label}</div>
-                    <div class="flex items-center shrink-0">
-                        ${editBtn}
-                        <button onclick="window.padamItem('${jenis}', '${item}')" class="text-red-500 hover:text-red-700 font-bold text-xs bg-red-50 p-1.5 rounded transition" title="Padam">🗑️</button>
-                    </div>
-                </div>`;
+                return `<div class="flex justify-between items-center bg-slate-50 border border-slate-200 px-3 py-2 rounded-lg text-sm mb-2"><div class="font-medium text-slate-700 flex items-start gap-2"><span class="mt-0.5">${idx + 1}.</span> ${label}</div><div class="flex items-center shrink-0">${editBtn}<button onclick="window.padamItem('${jenis}', '${item}')" class="text-red-500 hover:text-red-700 font-bold text-xs bg-red-50 p-1.5 rounded transition" title="Padam">🗑️</button></div></div>`;
             }).join('');
             
             window.customDialog(tajuk, `${extraHeader}<div class="pr-1 max-h-[60vh] overflow-y-auto">${senaraiHTML}</div>`);
         };
 
-        function bersihkanJadual(jenis, nilai) {
+        window.bersihkanJadual = function(jenis, nilai) {
             if(!window.appState.jadual) return;
             for (let h in window.appState.jadual) {
                 for (let kls in window.appState.jadual[h]) {
                     for (let slot in window.appState.jadual[h][kls]) {
                         let cell = window.appState.jadual[h][kls][slot];
-                        if (cell && ((jenis === 'guru' && cell.guru === nilai) || (jenis === 'subjek' && cell.subjek === nilai))) {
-                            delete window.appState.jadual[h][kls][slot];
+                        if(cell) {
+                            if (jenis === 'guru') {
+                                if (cell.guru === nilai) delete window.appState.jadual[h][kls][slot];
+                                else if (cell.coTeacher === nilai) cell.coTeacher = null;
+                            } else if (jenis === 'subjek' && cell.subjek === nilai) {
+                                delete window.appState.jadual[h][kls][slot];
+                            }
                         }
                     }
                 }
             }
-        }
+        };
 
         window.padamItem = function(jenis, nilai) {
             window.customDialog("Pengesahan", `<p>Adakah anda pasti mahu memadam "${nilai}"?</p>`, true, () => {
@@ -1079,43 +1086,33 @@
                     if(window.appState.guruKod) delete window.appState.guruKod[nilai];
                     if(window.appState.guruIC) delete window.appState.guruIC[nilai];
                     if(window.appState.guruDelima) delete window.appState.guruDelima[nilai];
-                    bersihkanJadual(jenis, nilai);
+                    window.bersihkanJadual(jenis, nilai);
                 } else if (jenis === 'kelas') {
                     if(window.appState.agihan) window.appState.agihan = window.appState.agihan.filter(a => a.kelas !== nilai);
                     if(window.appState.kekangan) window.appState.kekangan = window.appState.kekangan.filter(k => k.kondisi?.kelas !== nilai);
-                    if(window.appState.jadual) {
-                        for(let h in window.appState.jadual) {
-                            delete window.appState.jadual[h][nilai];
-                        }
-                    }
+                    if(window.appState.jadual) for(let h in window.appState.jadual) delete window.appState.jadual[h][nilai];
                 } else if (jenis === 'subjek') {
                     if(window.appState.agihan) window.appState.agihan = window.appState.agihan.filter(a => a.subjek !== nilai);
                     if(window.appState.kekangan) window.appState.kekangan = window.appState.kekangan.filter(k => k.kondisi?.subjek !== nilai);
-                    bersihkanJadual(jenis, nilai);
+                    window.bersihkanJadual(jenis, nilai);
                 }
 
-                simpanData();
-                refreshUIAll();
-                window.paparSenarai(jenis);
+                window.simpanData(); window.refreshUIAll(); window.paparSenarai(jenis);
             });
         };
 
-        function renderGuruSesi() {
+        window.renderGuruSesi = function() {
             let container = document.getElementById('guruSesiContainer');
             if(!container) return;
             if(!window.appState.guru || window.appState.guru.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic col-span-full">Tiada guru didaftarkan lagi.</p>`;
-                return;
+                container.innerHTML = `<p class="text-xs text-slate-400 italic col-span-full">Tiada guru didaftarkan lagi.</p>`; return;
             }
             let html = "";
             window.appState.guru.forEach(g => {
                 let sesi = window.appState.guruSesi[g] || 'pagi';
-                let kod = window.appState.guruKod && window.appState.guruKod[g] ? window.appState.guruKod[g] : '-';
+                let kod = window.appState.guruKod?.[g] || '-';
                 html += `<div class="bg-slate-50 border p-3 rounded-lg flex justify-between items-center text-xs">
-                    <div>
-                        <span class="font-bold text-slate-700 block">${g}</span>
-                        <span class="text-[10px] text-indigo-600 font-bold">Kod: ${kod}</span>
-                    </div>
+                    <div><span class="font-bold text-slate-700 block">${g}</span><span class="text-[10px] text-indigo-600 font-bold">Kod: ${kod}</span></div>
                     <select onchange="window.tukarSesiGuru('${g}', this.value)" class="border rounded px-2 py-1 font-semibold text-indigo-700 bg-white">
                         <option value="pagi" ${sesi==='pagi'?'selected':''}>Sesi Pagi</option>
                         <option value="petang" ${sesi==='petang'?'selected':''}>Sesi Petang</option>
@@ -1124,169 +1121,100 @@
                 </div>`;
             });
             container.innerHTML = html;
-        }
+        };
 
         window.tukarSesiGuru = function(guru, val) {
             if(!window.appState.guruSesi) window.appState.guruSesi = {};
-            window.appState.guruSesi[guru] = val;
-            simpanData();
+            window.appState.guruSesi[guru] = val; window.simpanData();
         };
 
         window.tukarJenisSesiSekolah = function() {
             let newSession = document.getElementById('jenisSesiSekolah').value;
             if (!window.appState.configMasaData) {
-                window.appState.configMasaData = {
-                    pagi: JSON.parse(JSON.stringify(window.appState.configMasa)),
-                    petang: JSON.parse(JSON.stringify(window.appState.configMasa)),
-                    bergabung: JSON.parse(JSON.stringify(window.appState.configMasa))
-                };
+                window.appState.configMasaData = { pagi: JSON.parse(JSON.stringify(window.appState.configMasa)), petang: JSON.parse(JSON.stringify(window.appState.configMasa)), bergabung: JSON.parse(JSON.stringify(window.appState.configMasa)) };
             }
             window.appState.jenisSesiSekolah = newSession;
-            if (window.appState.configMasaData[newSession]) {
-                window.appState.configMasa = JSON.parse(JSON.stringify(window.appState.configMasaData[newSession]));
-            }
-            simpanData();
-            renderConfigMasa();
+            if (window.appState.configMasaData[newSession]) window.appState.configMasa = JSON.parse(JSON.stringify(window.appState.configMasaData[newSession]));
+            window.simpanData(); window.renderConfigMasa();
         };
 
-        function renderConfigMasa() {
+        window.renderConfigMasa = function() {
             let container = document.getElementById('configMasaContainer');
             if(!container) return;
+            if(!window.appState.masaSekolah) window.appState.masaSekolah = { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20 };
             
-            if(!window.appState.masaSekolah) {
-                window.appState.masaSekolah = { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20 };
-            }
             let masa = window.appState.masaSekolah;
-            
-            let elPagi = document.getElementById('masa_mula_pagi');
-            let elPetang = document.getElementById('masa_mula_petang');
-            let elSlot = document.getElementById('masa_tempoh_slot');
-            let elRehat = document.getElementById('masa_tempoh_rehat');
+            let elPagi = document.getElementById('masa_mula_pagi'), elPetang = document.getElementById('masa_mula_petang'), elSlot = document.getElementById('masa_tempoh_slot'), elRehat = document.getElementById('masa_tempoh_rehat');
             
             if(elPagi) elPagi.value = masa.mulaPagi;
             if(elPetang) elPetang.value = masa.mulaPetang;
             if(elSlot) elSlot.value = masa.tempohSlot;
             if(elRehat) elRehat.value = masa.tempohRehat;
 
-            function kiraTamat(mulaTime, jumlahSlot) {
-                if(!mulaTime) return "--:--";
-                let parts = mulaTime.split(':');
-                let h = parseInt(parts[0]);
-                let m = parseInt(parts[1]);
-                let tMins = (h * 60) + m + (parseInt(jumlahSlot) * parseInt(masa.tempohSlot)) + parseInt(masa.tempohRehat);
-                let endH = Math.floor(tMins / 60) % 24;
-                let endM = tMins % 60;
-                let ampm = endH >= 12 ? 'PM' : 'AM';
-                let printH = endH > 12 ? endH - 12 : (endH === 0 ? 12 : endH);
-                return `${printH}:${endM.toString().padStart(2, '0')} ${ampm}`;
-            }
-
             let jenis = window.appState.jenisSesiSekolah || "pagi";
             let defaultMula = (jenis === 'petang') ? masa.mulaPetang : masa.mulaPagi;
-
-            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
             let html = "";
-            hariList.forEach(h => {
+            ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'].forEach(h => {
                 let cfg = window.appState.configMasa[h] || { jumlah: 8, rehat: 4 };
-                let waktuTamat = kiraTamat(defaultMula, cfg.jumlah);
+                let parts = defaultMula.split(':');
+                let tMins = (parseInt(parts[0]) * 60) + parseInt(parts[1]) + (cfg.jumlah * masa.tempohSlot) + masa.tempohRehat;
+                let endH = Math.floor(tMins / 60) % 24;
+                let endM = tMins % 60;
+                let waktuTamat = `${endH > 12 ? endH - 12 : (endH === 0 ? 12 : endH)}:${endM.toString().padStart(2, '0')} ${endH >= 12 ? 'PM' : 'AM'}`;
+                
                 html += `<div class="bg-slate-50 p-3 rounded-xl border relative shadow-sm">
                     <h4 class="font-bold text-xs text-indigo-700 mb-2">${h}</h4>
                     <div class="absolute top-3 right-3 text-[9px] px-1.5 py-0.5 bg-indigo-100 text-indigo-800 rounded font-bold border border-indigo-200">Tamat: ${waktuTamat}</div>
                     <div class="space-y-2 mt-3">
-                        <div>
-                            <label class="text-[10px] text-slate-500 block font-semibold mb-0.5">Jumlah Slot Waktu:</label>
-                            <input type="number" id="cfg_jumlah_${h}" value="${cfg.jumlah}" min="4" max="15" class="w-full text-xs border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-slate-500 block font-semibold mb-0.5">Rehat selepas Slot:</label>
-                            <input type="number" id="cfg_rehat_${h}" value="${cfg.rehat}" min="2" max="10" class="w-full text-xs border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500">
-                        </div>
+                        <div><label class="text-[10px] text-slate-500 block font-semibold mb-0.5">Jumlah Slot Waktu:</label><input type="number" id="cfg_jumlah_${h}" value="${cfg.jumlah}" min="4" max="15" class="w-full text-xs border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500"></div>
+                        <div><label class="text-[10px] text-slate-500 block font-semibold mb-0.5">Rehat selepas Slot:</label><input type="number" id="cfg_rehat_${h}" value="${cfg.rehat}" min="2" max="10" class="w-full text-xs border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500"></div>
                     </div>
                 </div>`;
             });
             container.innerHTML = html;
-        }
+        };
 
         window.simpanConfigMasa = function() {
-            window.appState.masaSekolah = {
-                mulaPagi: document.getElementById('masa_mula_pagi').value || "07:30",
-                mulaPetang: document.getElementById('masa_mula_petang').value || "13:00",
-                tempohSlot: parseInt(document.getElementById('masa_tempoh_slot').value) || 30,
-                tempohRehat: parseInt(document.getElementById('masa_tempoh_rehat').value) || 20
-            };
+            window.appState.masaSekolah = { mulaPagi: document.getElementById('masa_mula_pagi').value || "07:30", mulaPetang: document.getElementById('masa_mula_petang').value || "13:00", tempohSlot: parseInt(document.getElementById('masa_tempoh_slot').value) || 30, tempohRehat: parseInt(document.getElementById('masa_tempoh_rehat').value) || 20 };
             
-            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
-            hariList.forEach(h => {
-                let jml = parseInt(document.getElementById(`cfg_jumlah_${h}`).value) || 8;
-                let rht = parseInt(document.getElementById(`cfg_rehat_${h}`).value) || 4;
-                window.appState.configMasa[h] = { jumlah: jml, rehat: rht };
+            ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'].forEach(h => {
+                window.appState.configMasa[h] = { jumlah: parseInt(document.getElementById(`cfg_jumlah_${h}`).value) || 8, rehat: parseInt(document.getElementById(`cfg_rehat_${h}`).value) || 4 };
             });
             
             let sesiAktif = window.appState.jenisSesiSekolah || 'pagi';
-            if (!window.appState.configMasaData) {
-                window.appState.configMasaData = {
-                    pagi: JSON.parse(JSON.stringify(window.appState.configMasa)),
-                    petang: JSON.parse(JSON.stringify(window.appState.configMasa)),
-                    bergabung: JSON.parse(JSON.stringify(window.appState.configMasa))
-                };
-            }
+            if (!window.appState.configMasaData) window.appState.configMasaData = { pagi: JSON.parse(JSON.stringify(window.appState.configMasa)), petang: JSON.parse(JSON.stringify(window.appState.configMasa)), bergabung: JSON.parse(JSON.stringify(window.appState.configMasa)) };
             window.appState.configMasaData[sesiAktif] = JSON.parse(JSON.stringify(window.appState.configMasa));
 
-            simpanData();
-            renderConfigMasa();
-            window.customDialog("Berjaya", "<p>Konfigurasi parameter masa dan slot berjaya disimpan.</p>");
+            window.simpanData(); window.renderConfigMasa(); window.customDialog("Berjaya", "<p>Konfigurasi masa berjaya disimpan.</p>");
         };
 
-        function renderAgihanDropdowns() {
-            let gOpt = `<option value="">-- Pilih Guru --</option>` + window.appState.guru.map(g => {
-                let kod = window.appState.guruKod && window.appState.guruKod[g] ? window.appState.guruKod[g] : '';
-                return `<option value="${g}">${g} ${kod ? `(${kod})` : ''}</option>`;
-            }).join('');
-            let sOpt = `<option value="">-- Pilih Subjek --</option>` + window.appState.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
-            let kOpt = `<option value="">-- Pilih Kelas --</option>` + window.appState.kelas.map(k => `<option value="${k}">${k}</option>`).join('');
+        window.renderAgihanDropdowns = function() {
+            let gOpt = `<option value="">-- Pilih Guru --</option>` + window.appState.guru.map(g => `<option value="${g}">${g} ${window.appState.guruKod?.[g] ? `(${window.appState.guruKod[g]})` : ''}</option>`).join('');
             document.getElementById('agihanGuru').innerHTML = gOpt;
-            document.getElementById('agihanSubjek').innerHTML = sOpt;
-            document.getElementById('agihanKelas').innerHTML = kOpt;
-        }
+            document.getElementById('agihanSubjek').innerHTML = `<option value="">-- Pilih Subjek --</option>` + window.appState.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
+            document.getElementById('agihanKelas').innerHTML = `<option value="">-- Pilih Kelas --</option>` + window.appState.kelas.map(k => `<option value="${k}">${k}</option>`).join('');
+        };
 
         window.tambahAgihan = function() {
-            let guru = document.getElementById('agihanGuru').value;
-            let subjek = document.getElementById('agihanSubjek').value;
-            let kelas = document.getElementById('agihanKelas').value;
-            let waktu = parseInt(document.getElementById('agihanWaktu').value) || 0;
-            if(!guru || !subjek || !kelas || waktu <= 0) {
-                window.customDialog("Ralat", "<p>Sila lengkapkan maklumat agihan dengan betul.</p>");
-                return;
-            }
+            let guru = document.getElementById('agihanGuru').value, subjek = document.getElementById('agihanSubjek').value, kelas = document.getElementById('agihanKelas').value, waktu = parseInt(document.getElementById('agihanWaktu').value) || 0;
+            if(!guru || !subjek || !kelas || waktu <= 0) return window.customDialog("Ralat", "<p>Sila lengkapkan maklumat agihan dengan betul.</p>");
             if(!window.appState.agihan) window.appState.agihan = [];
             window.appState.agihan.push({ guru, subjek, kelas, waktu });
-            document.getElementById('agihanWaktu').value = "";
-            simpanData();
-            renderSenaraiAgihan();
+            document.getElementById('agihanWaktu').value = ""; window.simpanData(); window.renderSenaraiAgihan();
         };
 
-        function renderSenaraiAgihan() {
+        window.renderSenaraiAgihan = function() {
             let container = document.getElementById('senaraiAgihan');
             if(!container) return;
-            if(!window.appState.agihan || window.appState.agihan.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic text-center p-4">Tiada agihan beban direkodkan lagi.</p>`;
-                return;
-            }
+            if(!window.appState.agihan || window.appState.agihan.length === 0) return container.innerHTML = `<p class="text-xs text-slate-400 italic text-center p-4">Tiada agihan beban direkodkan lagi.</p>`;
             let html = "";
             window.appState.agihan.forEach((a, idx) => {
-                html += `<div class="flex justify-between items-center bg-slate-50 border px-4 py-2.5 rounded-xl text-xs">
-                    <div><b>${a.guru}</b> mengajar <b>${a.subjek}</b> di kelas <b>${a.kelas}</b> (<span class="text-indigo-600 font-bold">${a.waktu} waktu/minggu</span>)</div>
-                    <button onclick="window.padamAgihan(${idx})" class="text-red-500 hover:text-red-700 font-bold bg-red-50 px-2 py-1 rounded transition">Padam</button>
-                </div>`;
+                html += `<div class="flex justify-between items-center bg-slate-50 border px-4 py-2.5 rounded-xl text-xs"><div><b>${a.guru}</b> mengajar <b>${a.subjek}</b> di kelas <b>${a.kelas}</b> (<span class="text-indigo-600 font-bold">${a.waktu} waktu/minggu</span>)</div><button onclick="window.padamAgihan(${idx})" class="text-red-500 hover:text-red-700 font-bold bg-red-50 px-2 py-1 rounded transition">Padam</button></div>`;
             });
             container.innerHTML = html;
-        }
-
-        window.padamAgihan = function(idx) {
-            window.appState.agihan.splice(idx, 1);
-            simpanData();
-            renderSenaraiAgihan();
         };
+
+        window.padamAgihan = function(idx) { window.appState.agihan.splice(idx, 1); window.simpanData(); window.renderSenaraiAgihan(); };
 
         window.bukaModalKekangan = function() {
             window.editIndexKekangan = null;
@@ -1386,9 +1314,9 @@
             } else {
                 window.appState.kekangan.push(obj);
             }
-            simpanData();
-            tutupModalKekangan();
-            renderKekanganList();
+            window.simpanData();
+            window.tutupModalKekangan();
+            window.renderKekanganList();
         };
 
         window.editKekangan = function(idx) {
@@ -1418,17 +1346,28 @@
 
         window.padamKekangan = function(idx) {
             window.appState.kekangan.splice(idx, 1);
-            simpanData();
-            renderKekanganList();
+            window.simpanData();
+            window.renderKekanganList();
         };
 
         window.toggleAktifKekangan = function(idx) {
             window.appState.kekangan[idx].aktif = !window.appState.kekangan[idx].aktif;
-            simpanData();
-            renderKekanganList();
+            window.simpanData();
+            window.renderKekanganList();
         };
 
-        function renderKekanganList() {
+        window.paparInfoKekangan = function(jenisId) {
+            let def = null;
+            for(let cat in KEKANGAN_DEFINITIONS) {
+                let f = KEKANGAN_DEFINITIONS[cat].find(d => d.id === jenisId);
+                if(f) { def = f; break; }
+            }
+            if(def) {
+                window.customDialog(`ℹ️ Info Kekangan: ${def.label}`, `<p class="text-sm text-slate-700 leading-relaxed font-medium mt-1 mb-2">${def.desc}</p>`);
+            }
+        };
+
+        window.renderKekanganList = function() {
             let container = document.getElementById('senaraiKekanganAktif');
             if(!container) return;
             if(!window.appState.kekangan || window.appState.kekangan.length === 0) {
@@ -1458,7 +1397,10 @@
                             <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${k.tahap === 'HARD' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-amber-100 text-amber-700 border border-amber-200'}">
                                 ${k.tahap === 'HARD' ? 'MANDATORI' : 'TOLERANSI'} ${k.tahap === 'SOFT' ? `(+${k.priority} Penalti)` : ''}
                             </span>
-                            <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">${def ? def.label : k.jenis}</span>
+                            <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 flex items-center gap-1.5">
+                                ${def ? def.label : k.jenis}
+                                <button onclick="window.paparInfoKekangan('${k.jenis}')" class="inline-flex items-center justify-center w-4 h-4 bg-blue-200 hover:bg-blue-300 text-blue-800 rounded-full text-[10px] transition font-black cursor-pointer shadow-sm" title="Papar Fungsi Kekangan">i</button>
+                            </span>
                         </div>
                         <p class="text-[12px] text-slate-600">${desc}</p>
                     </div>
@@ -1470,11 +1412,21 @@
                 </div>`;
             });
             container.innerHTML = html;
-        }
+        };
 
-        function runDiagnostics() {
-            let totalDemand = {};
-            let totalGuruDemand = {};
+        window.getriezmannTeacherActivity = function(curJadual, h, s_id, guruTarget) {
+            if(!curJadual[h]) return null;
+            for(let kls in curJadual[h]) {
+                let cell = curJadual[h][kls][s_id];
+                if(cell && (cell.guru === guruTarget || cell.coTeacher === guruTarget)) {
+                    return { class: kls, subject: cell.subjek };
+                }
+            }
+            return null;
+        };
+
+        window.runDiagnostics = function() {
+            let totalDemand = {}, totalGuruDemand = {};
             if(window.appState.agihan) {
                 window.appState.agihan.forEach(a => {
                     totalDemand[a.kelas] = (totalDemand[a.kelas] || 0) + a.waktu;
@@ -1483,64 +1435,29 @@
             }
             let issues = [];
             let totalSlotTersediaGlobal = 0;
-            
-            for(let h in window.appState.configMasa) {
-                totalSlotTersediaGlobal += window.appState.configMasa[h].jumlah;
-            }
+            for(let h in window.appState.configMasa) totalSlotTersediaGlobal += window.appState.configMasa[h].jumlah;
 
             for(let kls in totalDemand) {
-                if(totalDemand[kls] > totalSlotTersediaGlobal) {
-                    issues.push(`Kelas <b>${kls}</b> memerlukan ${totalDemand[kls]} waktu, tetapi slot tersedia untuk seminggu hanya ${totalSlotTersediaGlobal}.`);
-                }
+                if(totalDemand[kls] > totalSlotTersediaGlobal) issues.push(`Kelas <b>${kls}</b> memerlukan ${totalDemand[kls]} waktu, tetapi slot tersedia hanya ${totalSlotTersediaGlobal}.`);
             }
-
             for(let g in totalGuruDemand) {
-                if(totalGuruDemand[g] > totalSlotTersediaGlobal) {
-                    issues.push(`Guru <b>${g}</b> diberikan beban mengajar ${totalGuruDemand[g]} waktu, melebihi had slot maksimum seminggu (${totalSlotTersediaGlobal} slot).`);
-                }
+                if(totalGuruDemand[g] > totalSlotTersediaGlobal) issues.push(`Guru <b>${g}</b> diberikan beban mengajar ${totalGuruDemand[g]} waktu, melebihi had slot maksimum seminggu (${totalSlotTersediaGlobal} slot).`);
             }
-            
-            if (window.appState.kekangan && window.appState.agihan) {
-                let soloConstraints = window.appState.kekangan.filter(k => k.aktif && k.jenis === 's_solo_sahaja');
-                soloConstraints.forEach(kek => {
-                    let subjekSolo = kek.kondisi.subjek;
-                    window.appState.agihan.forEach(a => {
-                        if (a.subjek === subjekSolo && a.waktu > 5) {
-                            issues.push(`Kekangan "Slot Solo Sahaja" aktif untuk <b>${subjekSolo}</b>, tetapi kelas <b>${a.kelas}</b> diberi agihan ${a.waktu} waktu seminggu. Maksimum 5 slot sahaja.`);
-                        }
-                    });
-                });
-            }
-
             return issues;
-        }
+        };
 
-        function getTeacherActivity(curJadual, h, s_id, guruTarget) {
-            if(!curJadual[h]) return null;
-            for(let kls in curJadual[h]) {
-                if(curJadual[h][kls][s_id]?.guru === guruTarget) {
-                    return { class: kls, subject: curJadual[h][kls][s_id].subjek };
-                }
-            }
-            return null;
-        }
-
-        function validateConstraint(h, s_idx, kls, guru, subjek, curJadual, conf) {
+        window.validateConstraint = function(h, s_idx, kls, guru, subjek, curJadual, conf) {
             if(!window.appState.kekangan) return { isHardViolated: false, penalti: 0, reward: 0, coTeacher: null };
             let p = 0, r = 0, hardViolation = false, coTeacher = null;
 
-            let countSubjekHariIni = 0;
-            let countGuruHariIni = 0;
-            let countGuruBeforeRehat = 0;
-            let countGuruAfterRehat = 0;
+            let countSubjekHariIni = 0, countGuruHariIni = 0, countGuruBeforeRehat = 0, countGuruAfterRehat = 0;
 
             if(curJadual[h]) {
                 for(let klsIter in curJadual[h]) {
                     for(let slotKey in curJadual[h][klsIter]) {
-                        if(klsIter === kls && curJadual[h][klsIter][slotKey]?.subjek === subjek) {
-                            countSubjekHariIni++;
-                        }
-                        if(curJadual[h][klsIter][slotKey]?.guru === guru) {
+                        if(klsIter === kls && curJadual[h][klsIter][slotKey]?.subjek === subjek) countSubjekHariIni++;
+                        let cell = curJadual[h][klsIter][slotKey];
+                        if(cell && (cell.guru === guru || cell.coTeacher === guru)) {
                             countGuruHariIni++;
                             let slotNum = parseInt(slotKey.split('_s')[1]);
                             if(slotNum <= conf.rehat) countGuruBeforeRehat++;
@@ -1549,181 +1466,88 @@
                     }
                 }
             }
-            countSubjekHariIni += 1;
-            countGuruHariIni += 1;
-            if(s_idx <= conf.rehat) countGuruBeforeRehat++;
-            else countGuruAfterRehat++;
+            countSubjekHariIni += 1; countGuruHariIni += 1;
+            if(s_idx <= conf.rehat) countGuruBeforeRehat++; else countGuruAfterRehat++;
 
             for(let kek of window.appState.kekangan) {
                 if(!kek.aktif) continue;
 
                 if(kek.jenis === 'g_tidak_tersedia' && kek.kondisi.guru === guru) {
-                    if(kek.kondisi.hari === h && kek.kondisi.slot_masa === s_idx) {
-                        if(kek.tahap === 'HARD') hardViolation = true;
-                        p += kek.penalti || 10;
-                    }
+                    if(kek.kondisi.hari === h && kek.kondisi.slot_masa === s_idx) { if(kek.tahap === 'HARD') hardViolation = true; p += kek.penalti || 10; }
                 }
-                if(kek.jenis === 'g_elak_2_awal' && kek.kondisi.guru === guru && s_idx <= 2) {
-                    if(kek.tahap === 'HARD') hardViolation = true;
-                    p += kek.penalti || 10;
-                }
-                if(kek.jenis === 'g_elak_2_akhir' && kek.kondisi.guru === guru && s_idx >= conf.jumlah - 1) {
-                    if(kek.tahap === 'HARD') hardViolation = true;
-                    p += kek.penalti || 10;
-                }
+                if(kek.jenis === 'g_elak_2_awal' && kek.kondisi.guru === guru && s_idx <= 2) { if(kek.tahap === 'HARD') hardViolation = true; p += kek.penalti || 10; }
+                if(kek.jenis === 'g_elak_2_akhir' && kek.kondisi.guru === guru && s_idx >= conf.jumlah - 1) { if(kek.tahap === 'HARD') hardViolation = true; p += kek.penalti || 10; }
                 
                 if(kek.jenis === 'g_seimbang_hari' && kek.kondisi.guru === guru) {
                     let totalWaktuGuru = 0;
-                    if(window.appState.agihan) {
-                        window.appState.agihan.forEach(a => {
-                            if(a.guru === guru) totalWaktuGuru += a.waktu;
-                        });
-                    }
-                    let purataSehari = Math.ceil(totalWaktuGuru / 5);
-                    if(purataSehari === 0) purataSehari = 1;
-
-                    if(countGuruHariIni > purataSehari) {
-                        p += (countGuruHariIni - purataSehari) * (kek.penalti || 30);
-                        if(kek.tahap === 'HARD') hardViolation = true;
-                    }
+                    if(window.appState.agihan) window.appState.agihan.forEach(a => { if(a.guru === guru) totalWaktuGuru += a.waktu; });
+                    let purataSehari = Math.max(1, Math.ceil(totalWaktuGuru / 5));
+                    if(countGuruHariIni > purataSehari) { p += (countGuruHariIni - purataSehari) * (kek.penalti || 30); if(kek.tahap === 'HARD') hardViolation = true; }
                 }
 
                 if(kek.jenis === 'g_seimbang_rehat' && kek.kondisi.guru === guru) {
-                    if(Math.abs(countGuruBeforeRehat - countGuruAfterRehat) > 1) {
-                        p += (kek.penalti || 20);
-                        if(kek.tahap === 'HARD') hardViolation = true;
-                    }
+                    if(Math.abs(countGuruBeforeRehat - countGuruAfterRehat) > 1) { p += (kek.penalti || 20); if(kek.tahap === 'HARD') hardViolation = true; }
                 }
 
                 if(kek.jenis === 'g_jarak_double_period' && kek.kondisi.guru === guru) {
-                    let s_prev1 = s_idx - 1;
-                    let s_prev2 = s_idx - 2;
+                    let s_prev1 = s_idx - 1, s_prev2 = s_idx - 2;
                     if(s_prev1 >= 1 && s_prev2 >= 1) {
-                        let act1 = getTeacherActivity(curJadual, h, `${h}_s${s_prev1}`, guru);
-                        let act2 = getTeacherActivity(curJadual, h, `${h}_s${s_prev2}`, guru);
-                        
-                        if(act1 && act2 && act1.class === act2.class && act1.subject === act2.subject) {
-                            p += (kek.penalti || 50);
-                            if(kek.tahap === 'HARD') hardViolation = true;
-                        }
+                        let act1 = window.getriezmannTeacherActivity(curJadual, h, `${h}_s${s_prev1}`, guru);
+                        let act2 = window.getriezmannTeacherActivity(curJadual, h, `${h}_s${s_prev2}`, guru);
+                        if(act1 && act2 && act1.class === act2.class && act1.subject === act2.subject) { p += (kek.penalti || 50); if(kek.tahap === 'HARD') hardViolation = true; }
                     }
                 }
 
-                if(kek.jenis === 's_sebelum_rehat' && kek.kondisi.subjek === subjek && s_idx > conf.rehat) {
-                    if(kek.tahap === 'HARD') hardViolation = true;
-                    p += kek.penalti || 10;
-                }
-                if(kek.jenis === 's_selepas_rehat' && kek.kondisi.subjek === subjek && s_idx <= conf.rehat) {
-                    if(kek.tahap === 'HARD') hardViolation = true;
-                    p += kek.penalti || 10;
-                }
-                if(kek.jenis === 's_awal_pagi' && kek.kondisi.subjek === subjek && s_idx > 2) {
-                    if(kek.tahap === 'HARD') hardViolation = true;
-                    p += kek.penalti || 10;
-                }
-                if(kek.jenis === 's_lewat_petang' && kek.kondisi.subjek === subjek && s_idx < conf.jumlah - 1) {
-                    if(kek.tahap === 'HARD') hardViolation = true;
-                    p += kek.penalti || 10;
-                }
-                if(kek.jenis === 'g_co_teacher' && kek.kondisi.guru === guru && kek.kondisi.subjek === subjek && kek.kondisi.kelas === kls) {
-                    coTeacher = kek.kondisi.guru2;
-                }
+                if(kek.jenis === 's_sebelum_rehat' && kek.kondisi.subjek === subjek && s_idx > conf.rehat) { if(kek.tahap === 'HARD') hardViolation = true; p += kek.penalti || 10; }
+                if(kek.jenis === 's_selepas_rehat' && kek.kondisi.subjek === subjek && s_idx <= conf.rehat) { if(kek.tahap === 'HARD') hardViolation = true; p += kek.penalti || 10; }
+                if(kek.jenis === 's_awal_pagi' && kek.kondisi.subjek === subjek && s_idx > 2) { if(kek.tahap === 'HARD') hardViolation = true; p += kek.penalti || 10; }
+                if(kek.jenis === 's_lewat_petang' && kek.kondisi.subjek === subjek && s_idx < conf.jumlah - 1) { if(kek.tahap === 'HARD') hardViolation = true; p += kek.penalti || 10; }
+                if(kek.jenis === 'g_co_teacher' && kek.kondisi.guru === guru && kek.kondisi.subjek === subjek && kek.kondisi.kelas === kls) { coTeacher = kek.kondisi.guru2; }
 
                 if(kek.jenis === 's_double_period' && kek.kondisi.subjek === subjek) {
                     let prevSlotId = `${h}_s${s_idx - 1}`;
-                    if(curJadual[h]?.[kls]?.[prevSlotId]?.subjek === subjek) {
-                        r += 300;
-                    } else {
-                        p += 300;
-                    }
+                    if(curJadual[h]?.[kls]?.[prevSlotId]?.subjek === subjek) r += 300; else p += 300;
                 }
 
-                if(kek.jenis === 's_solo_sahaja' && kek.kondisi.subjek === subjek) {
-                    if (countSubjekHariIni > 1) {
-                        p += kek.penalti || 500;
-                        if(kek.tahap === 'HARD') hardViolation = true;
-                    }
-                }
-
-                if(kek.jenis === 's_elak_pisah_rehat' && kek.kondisi.subjek === subjek) {
-                    if (s_idx === conf.rehat + 1) {
-                        let prevSlotId = `${h}_s${s_idx - 1}`;
-                        if(curJadual[h]?.[kls]?.[prevSlotId]?.subjek === subjek) {
-                            p += kek.penalti || 500;
-                            if(kek.tahap === 'HARD') hardViolation = true;
-                        }
-                    }
+                if(kek.jenis === 's_solo_sahaja' && kek.kondisi.subjek === subjek && countSubjekHariIni > 1) { p += kek.penalti || 500; if(kek.tahap === 'HARD') hardViolation = true; }
+                if(kek.jenis === 's_elak_pisah_rehat' && kek.kondisi.subjek === subjek && s_idx === conf.rehat + 1) {
+                    let prevSlotId = `${h}_s${s_idx - 1}`;
+                    if(curJadual[h]?.[kls]?.[prevSlotId]?.subjek === subjek) { p += kek.penalti || 500; if(kek.tahap === 'HARD') hardViolation = true; }
                 }
 
                 if(kek.jenis === 's_elak_ulang_hari' && kek.kondisi.subjek === subjek) {
                     let prev1 = curJadual[h]?.[kls]?.[`${h}_s${s_idx - 1}`]?.subjek;
                     let prev2 = curJadual[h]?.[kls]?.[`${h}_s${s_idx - 2}`]?.subjek;
-                    
                     let appearedCount = 0;
-                    for(let i = 1; i < s_idx; i++) {
-                        if(curJadual[h]?.[kls]?.[`${h}_s${i}`]?.subjek === subjek) appearedCount++;
-                    }
-
+                    for(let i = 1; i < s_idx; i++) if(curJadual[h]?.[kls]?.[`${h}_s${i}`]?.subjek === subjek) appearedCount++;
                     if(appearedCount > 0) {
-                        if(prev1 !== subjek) {
-                            p += kek.penalti || 500;
-                            if(kek.tahap === 'HARD') hardViolation = true;
-                        } 
-                        else if(prev1 === subjek && prev2 === subjek) {
-                            p += kek.penalti || 500;
-                            if(kek.tahap === 'HARD') hardViolation = true;
-                        }
+                        if(prev1 !== subjek || (prev1 === subjek && prev2 === subjek)) { p += kek.penalti || 500; if(kek.tahap === 'HARD') hardViolation = true; }
                     }
                 }
 
                 if(kek.jenis === 'm_01_kepelbagaian_subjek' && (!kek.kondisi.kelas || kek.kondisi.kelas === kls)) {
-                    if(countSubjekHariIni === 3) p += 5;
-                    else if(countSubjekHariIni === 4) p += 50;
-                    else if(countSubjekHariIni >= 5) {
-                        p += 1000;
-                        if(kek.tahap === 'HARD') hardViolation = true;
-                    }
+                    if(countSubjekHariIni === 3) p += 5; else if(countSubjekHariIni === 4) p += 50; else if(countSubjekHariIni >= 5) { p += 1000; if(kek.tahap === 'HARD') hardViolation = true; }
                 }
 
                 if(kek.jenis === 'm_02_subjek_seimbang' && (!kek.kondisi.kelas || kek.kondisi.kelas === kls)) {
                     let totalWaktuSubjek = 0;
-                    if(window.appState.agihan) {
-                        window.appState.agihan.forEach(a => {
-                            if(a.subjek === subjek && a.kelas === kls) totalWaktuSubjek += a.waktu;
-                        });
-                    }
-                    let purataSehari = Math.ceil(totalWaktuSubjek / 5);
-                    if(purataSehari === 0) purataSehari = 1;
-
-                    if(countSubjekHariIni > purataSehari) {
-                        p += (countSubjekHariIni - purataSehari) * (kek.penalti || 15);
-                        if(kek.tahap === 'HARD') hardViolation = true;
-                    }
+                    if(window.appState.agihan) window.appState.agihan.forEach(a => { if(a.subjek === subjek && a.kelas === kls) totalWaktuSubjek += a.waktu; });
+                    let purataSehari = Math.max(1, Math.ceil(totalWaktuSubjek / 5));
+                    if(countSubjekHariIni > purataSehari) { p += (countSubjekHariIni - purataSehari) * (kek.penalti || 15); if(kek.tahap === 'HARD') hardViolation = true; }
                 }
             }
-
             return { isHardViolated: hardViolation, penalti: p, reward: r, coTeacher };
-        }
+        };
 
         window.janaAI = function() {
-            if(!window.appState.agihan || window.appState.agihan.length === 0) {
-                window.customDialog("Ralat", "<p>Sila masukkan agihan mengajar terlebih dahulu.</p>");
-                return;
-            }
+            if(!window.appState.agihan || window.appState.agihan.length === 0) return window.customDialog("Ralat", "<p>Sila masukkan agihan mengajar terlebih dahulu.</p>");
+            let diagIssues = window.runDiagnostics();
+            if(diagIssues.length > 0) return window.customDialog("🔴 Jadual TIDAK Boleh Dijana", `<p class="mb-2 font-bold text-red-600">Punca Utama Masalah:</p><ul class="list-disc pl-5 space-y-1 mb-3">${diagIssues.map(i=>`<li>${i}</li>`).join('')}</ul><p class="text-xs text-slate-500">Sila kurangkan waktu subjek atau tambah slot masa.</p>`);
 
-            let diagIssues = runDiagnostics();
-            if(diagIssues.length > 0) {
-                window.customDialog("🔴 Jadual TIDAK Boleh Dijana", `<p class="mb-2 font-bold text-red-600">Punca Utama Masalah:</p><ul class="list-disc pl-5 space-y-1 mb-3">${diagIssues.map(i=>`<li>${i}</li>`).join('')}</ul><p class="text-xs text-slate-500">Cadangan: Sila kurangkan jumlah waktu subjek atau tambah slot masa persekolahan.</p>`);
-                return;
-            }
-
-            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
             let poolAgihan = [];
             window.appState.agihan.forEach(a => {
                 let sesiGuru = window.appState.guruSesi?.[a.guru] || 'pagi';
-                for(let i=0; i<a.waktu; i++) {
-                    poolAgihan.push({ guru: a.guru, subjek: a.subjek, kelas: a.kelas, sesi: sesiGuru });
-                }
+                for(let i=0; i<a.waktu; i++) poolAgihan.push({ guru: a.guru, subjek: a.subjek, kelas: a.kelas, sesi: sesiGuru });
             });
 
             for (let i = poolAgihan.length - 1; i > 0; i--) {
@@ -1731,55 +1555,50 @@
                 [poolAgihan[i], poolAgihan[j]] = [poolAgihan[j], poolAgihan[i]];
             }
 
-            let newJadual = {};
-            let gagalCount = 0;
-
-            hariList.forEach(h => {
-                newJadual[h] = {};
-                window.appState.kelas.forEach(kls => { newJadual[h][kls] = {}; });
-            });
+            let newJadual = {}, gagalCount = 0;
+            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
+            hariList.forEach(h => { newJadual[h] = {}; window.appState.kelas.forEach(kls => { newJadual[h][kls] = {}; }); });
 
             hariList.forEach(h => {
                 let conf = window.appState.configMasa[h] || { jumlah: 8, rehat: 4 };
                 for(let s=1; s<=conf.jumlah; s++) {
                     let slotKey = `${h}_s${s}`;
-                    
                     let rawakKelas = [...window.appState.kelas];
-                    for (let i = rawakKelas.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [rawakKelas[i], rawakKelas[j]] = [rawakKelas[j], rawakKelas[i]];
-                    }
+                    for (let i = rawakKelas.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [rawakKelas[i], rawakKelas[j]] = [rawakKelas[j], rawakKelas[i]]; }
 
                     rawakKelas.forEach(kls => {
-                        let bestIdx = -1;
-                        let bestScore = -999999;
-
+                        let bestIdx = -1, bestScore = -999999;
                         for(let idx=0; idx<poolAgihan.length; idx++) {
                             let item = poolAgihan[idx];
                             if(item.kelas !== kls) continue;
 
                             let guruBusy = false;
                             for(let k in newJadual[h]) {
-                                if(newJadual[h][k][slotKey]?.guru === item.guru) guruBusy = true;
+                                let c = newJadual[h][k][slotKey];
+                                if(c && (c.guru === item.guru || c.coTeacher === item.guru)) guruBusy = true;
                             }
                             if(guruBusy) continue;
 
-                            let valResult = validateConstraint(h, s, kls, item.guru, item.subjek, newJadual, conf);
+                            let valResult = window.validateConstraint(h, s, kls, item.guru, item.subjek, newJadual, conf);
                             if(valResult.isHardViolated) continue;
+                            
+                            if(valResult.coTeacher) {
+                                for(let k in newJadual[h]) {
+                                    let c = newJadual[h][k][slotKey];
+                                    if(c && (c.guru === valResult.coTeacher || c.coTeacher === valResult.coTeacher)) guruBusy = true;
+                                }
+                                if(guruBusy) continue;
+                            }
 
                             let score = 100 - valResult.penalti + valResult.reward;
-                            if(score > bestScore) {
-                                bestScore = score;
-                                bestIdx = idx;
-                            }
+                            if(score > bestScore) { bestScore = score; bestIdx = idx; }
                         }
 
                         if(bestIdx !== -1) {
                             let chosen = poolAgihan.splice(bestIdx, 1)[0];
-                            let valResult = validateConstraint(h, s, kls, chosen.guru, chosen.subjek, newJadual, conf);
+                            let valResult = window.validateConstraint(h, s, kls, chosen.guru, chosen.subjek, newJadual, conf);
                             newJadual[h][kls][slotKey] = { subjek: chosen.subjek, guru: chosen.guru, coTeacher: valResult.coTeacher };
                         } else {
-                            // AI BACKTRACKING (DEPTH-1 SWAPPING LOGIC)
                             let swapped = false;
                             for (let idx = 0; idx < poolAgihan.length; idx++) {
                                 let item = poolAgihan[idx];
@@ -1791,54 +1610,46 @@
                                     if (!prevPlaced) continue;
 
                                     delete newJadual[h][kls][prevSlotKey];
-
-                                    let guruBusyPrev = Object.keys(newJadual[h]).some(k => newJadual[h][k][prevSlotKey]?.guru === item.guru);
+                                    let guruBusyPrev = Object.keys(newJadual[h]).some(k => {
+                                        let c = newJadual[h][k][prevSlotKey];
+                                        return c && (c.guru === item.guru || c.coTeacher === item.guru);
+                                    });
+                                    
                                     if (!guruBusyPrev) {
-                                        let val1 = validateConstraint(h, prevS, kls, item.guru, item.subjek, newJadual, conf);
-                                        
+                                        let val1 = window.validateConstraint(h, prevS, kls, item.guru, item.subjek, newJadual, conf);
                                         if (!val1.isHardViolated) {
                                             newJadual[h][kls][prevSlotKey] = { subjek: item.subjek, guru: item.guru, coTeacher: val1.coTeacher };
-                                            let guruBusyCur = Object.keys(newJadual[h]).some(k => newJadual[h][k][slotKey]?.guru === prevPlaced.guru);
+                                            let guruBusyCur = Object.keys(newJadual[h]).some(k => {
+                                                let c = newJadual[h][k][slotKey];
+                                                return c && (c.guru === prevPlaced.guru || c.coTeacher === prevPlaced.guru);
+                                            });
                                             
                                             if (!guruBusyCur) {
-                                                let val2 = validateConstraint(h, s, kls, prevPlaced.guru, prevPlaced.subjek, newJadual, conf);
+                                                let val2 = window.validateConstraint(h, s, kls, prevPlaced.guru, prevPlaced.subjek, newJadual, conf);
                                                 if (!val2.isHardViolated) {
                                                     newJadual[h][kls][slotKey] = { subjek: prevPlaced.subjek, guru: prevPlaced.guru, coTeacher: val2.coTeacher };
                                                     poolAgihan.splice(idx, 1);
-                                                    swapped = true;
-                                                    break;
+                                                    swapped = true; break;
                                                 }
                                             }
                                         }
                                     }
-
                                     if (!swapped) {
                                         newJadual[h][kls][prevSlotKey] = prevPlaced;
                                         delete newJadual[h][kls][slotKey];
-                                    } else {
-                                        break;
-                                    }
+                                    } else break;
                                 }
                                 if (swapped) break;
                             }
-                            
-                            if (!swapped) {
-                                gagalCount++;
-                            }
+                            if (!swapped) gagalCount++;
                         }
                     });
                 }
             });
 
-            window.appState.jadual = newJadual;
-            simpanData();
-            renderJadualDropdowns();
-
-            if(gagalCount > 0) {
-                window.customDialog("Jadual Selesai", `<p class="mb-2 text-amber-700 font-bold">⚠️ Selesai dengan beberapa slot kosong (${gagalCount} slot).</p>`);
-            } else {
-                window.customDialog("✨ Berjaya!", "<p>Jadual waktu berjaya dijana sepenuhnya tanpa sebarang pelanggaran Hard Constraint!</p>");
-            }
+            window.appState.jadual = newJadual; window.simpanData(); window.renderJadualDropdowns();
+            if(gagalCount > 0) window.customDialog("Jadual Selesai", `<p class="mb-2 text-amber-700 font-bold">⚠️ Selesai dengan beberapa slot kosong (${gagalCount} slot).</p>`);
+            else window.customDialog("✨ Berjaya!", "<p>Jadual waktu berjaya dijana sepenuhnya!</p>");
         };
 
         window.formatMins = function(mins) {
@@ -1853,22 +1664,17 @@
             let masa = window.appState.masaSekolah;
             let jenis = window.appState.jenisSesiSekolah || "pagi";
             let mulaStr = (jenis === 'petang') ? masa.mulaPetang : masa.mulaPagi;
-            
             let parts = mulaStr.split(':');
             let startMins = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-            
             let dayConf = window.appState.configMasa[dayStr] || window.appState.configMasa['Isnin'] || {rehat: 4};
             let rehatSlot = dayConf.rehat;
-            
             let tSlot = parseInt(masa.tempohSlot) || 30;
             let tRehat = parseInt(masa.tempohRehat) || 20;
 
             let totalSlotBefore = slotNumber - 1;
             let totalRehatBefore = (slotNumber > rehatSlot) ? 1 : 0;
-            
             let sMins = startMins + (totalSlotBefore * tSlot) + (totalRehatBefore * tRehat);
             let eMins = sMins + tSlot;
-            
             return `${window.formatMins(sMins)} - ${window.formatMins(eMins)}`;
         };
 
@@ -1878,7 +1684,6 @@
             let mulaStr = (jenis === 'petang') ? masa.mulaPetang : masa.mulaPagi;
             let parts = mulaStr.split(':');
             let startMins = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-            
             let dayConf = window.appState.configMasa[dayStr] || window.appState.configMasa['Isnin'] || {rehat: 4};
             let rehatSlot = dayConf.rehat;
             let tSlot = parseInt(masa.tempohSlot) || 30;
@@ -1886,7 +1691,6 @@
 
             let sMins = startMins + (rehatSlot * tSlot);
             let eMins = sMins + tRehat;
-            
             return `${window.formatMins(sMins)} - ${window.formatMins(eMins)}`;
         };
 
@@ -1896,34 +1700,22 @@
             e.dataTransfer.effectAllowed = 'move';
             setTimeout(() => window.isDragging = true, 50);
         };
-
-        window.handleDragOver = function(e) {
-            if(!window.modSuntinganAktif) return;
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        };
+        window.handleDragOver = function(e) { if(!window.modSuntinganAktif) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
 
         window.handleDrop = function(e, targetH, targetKls, targetSlotId) {
             if(!window.modSuntinganAktif) return;
-            e.preventDefault();
-            setTimeout(() => window.isDragging = false, 100);
-            
+            e.preventDefault(); setTimeout(() => window.isDragging = false, 100);
             if(!window.draggedSlot) return;
             let src = window.draggedSlot;
             
             if(src.h === targetH && src.kls === targetKls && src.slotId === targetSlotId) return;
-
-            if(src.kls !== targetKls) {
-                window.customDialog("Makluman", "<p>Sila buat pertukaran (drag & drop) di dalam jadual kelas yang sama.</p>");
-                return;
-            }
+            if(src.kls !== targetKls) return window.customDialog("Makluman", "<p>Pertukaran hanya dibenarkan di dalam kelas yang sama sahaja.</p>");
 
             let tempSrc = window.appState.jadual[src.h]?.[src.kls]?.[src.slotId];
             let tempTarget = window.appState.jadual[targetH]?.[targetKls]?.[targetSlotId];
 
             if(!window.appState.jadual[src.h]) window.appState.jadual[src.h] = {};
             if(!window.appState.jadual[src.h][src.kls]) window.appState.jadual[src.h][src.kls] = {};
-            
             if(!window.appState.jadual[targetH]) window.appState.jadual[targetH] = {};
             if(!window.appState.jadual[targetH][targetKls]) window.appState.jadual[targetH][targetKls] = {};
 
@@ -1933,88 +1725,54 @@
             if(tempSrc) window.appState.jadual[targetH][targetKls][targetSlotId] = tempSrc;
             else delete window.appState.jadual[targetH][targetKls][targetSlotId];
 
-            simpanData();
-            renderJadualKelas();
-            window.draggedSlot = null;
+            window.simpanData(); window.renderJadualKelas(); window.draggedSlot = null;
         };
 
-        function renderJadualDropdowns() {
+        window.renderJadualDropdowns = function() {
             let selKls = document.getElementById('paparKelasSelect');
             if(selKls) {
                 let curKls = selKls.value;
                 selKls.innerHTML = `<option value="">-- Pilih Kelas --</option>` + (window.appState.kelas || []).map(k => `<option value="${k}" ${k===curKls?'selected':''}>${k}</option>`).join('');
                 if(window.appState.kelas?.length > 0 && !curKls) selKls.value = window.appState.kelas[0];
             }
-
             let selGuru = document.getElementById('paparGuruSelect');
             if(selGuru) {
                 let curGuru = selGuru.value;
                 selGuru.innerHTML = `<option value="">-- Pilih Guru --</option>` + (window.appState.guru || []).map(g => `<option value="${g}" ${g===curGuru?'selected':''}>${g}</option>`).join('');
                 if(window.appState.guru?.length > 0 && !curGuru) selGuru.value = window.appState.guru[0];
             }
-            toggleModePapar();
-        }
+            window.toggleModePapar();
+        };
 
         window.toggleModePapar = function() {
             let mode = document.getElementById('paparJenisMode').value;
-            let wrapKls = document.getElementById('wrapperPaparKelas');
-            let wrapGuru = document.getElementById('wrapperPaparGuru');
-            if(mode === 'guru') {
-                wrapKls.classList.add('hidden');
-                wrapGuru.classList.remove('hidden');
-                renderJadualGuru();
-            } else {
-                wrapGuru.classList.add('hidden');
-                wrapKls.classList.remove('hidden');
-                renderJadualKelas();
-            }
+            if(mode === 'guru') { document.getElementById('wrapperPaparKelas').classList.add('hidden'); document.getElementById('wrapperPaparGuru').classList.remove('hidden'); window.renderJadualGuru(); } 
+            else { document.getElementById('wrapperPaparGuru').classList.add('hidden'); document.getElementById('wrapperPaparKelas').classList.remove('hidden'); window.renderJadualKelas(); }
         };
 
         window.toggleModSuntingan = function() {
             window.modSuntinganAktif = !window.modSuntinganAktif;
             let btn = document.getElementById('btnToggleSunting');
-            if(window.modSuntinganAktif) {
-                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5";
-                btn.innerHTML = "<span>✅ Tamat Suntingan</span>";
-            } else {
-                btn.className = "bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5";
-                btn.innerHTML = "<span>✏️ Sunting Manual</span>";
-            }
-            toggleModePapar();
+            if(window.modSuntinganAktif) { btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5"; btn.innerHTML = "<span>✅ Tamat Suntingan</span>"; } 
+            else { btn.className = "bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5"; btn.innerHTML = "<span>✏️ Sunting Manual</span>"; }
+            window.toggleModePapar();
         };
 
         window.renderJadualKelas = function() {
             let kls = document.getElementById('paparKelasSelect').value;
             let container = document.getElementById('paparanJadualContainer');
             if(!container) return;
-            if(!kls) { container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Sila pilih kelas.</p>`; return; }
-            if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Belum ada jadual dijana.</p>`;
-                return;
-            }
+            if(!kls) return container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Sila pilih kelas.</p>`;
+            if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) return container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Belum ada jadual dijana.</p>`;
 
-            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
-            let maxSlot = 8;
-            for(let h of hariList) {
-                let conf = window.appState.configMasa[h] || { jumlah: 8 };
-                if(conf.jumlah > maxSlot) maxSlot = conf.jumlah;
-            }
+            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'], maxSlot = 8;
+            for(let h of hariList) { let conf = window.appState.configMasa[h] || { jumlah: 8 }; if(conf.jumlah > maxSlot) maxSlot = conf.jumlah; }
             let stdRehat = (window.appState.configMasa['Isnin'] || {rehat: 4}).rehat;
-            let namaSekolah = window.appState.schoolName || "Sekolah";
             let tarikh = new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
             
-            let html = `
-            <div class="hidden print:block text-center mb-6 print-color-adjust">
-                <h2 class="text-2xl font-bold uppercase text-slate-900 mb-1">${namaSekolah}</h2>
-                <h3 class="text-xl font-bold text-slate-800 uppercase">Jadual Waktu Kelas: <span class="border-b-2 border-slate-800">${kls}</span></h3>
-            </div>
-            <table class="w-full border-collapse border border-slate-200 text-xs print-color-adjust">
-                <thead><tr class="bg-indigo-50 text-indigo-900"><th class="border border-slate-200 p-2.5 w-24">Hari / Slot</th>`;
-            
+            let html = `<div class="hidden print:block text-center mb-6 print-color-adjust"><h2 class="text-2xl font-bold uppercase text-slate-900 mb-1">${window.appState.schoolName || "Sekolah"}</h2><h3 class="text-xl font-bold text-slate-800 uppercase">Jadual Waktu Kelas: <span class="border-b-2 border-slate-800">${kls}</span></h3></div><table class="w-full border-collapse border border-slate-200 text-xs print-color-adjust"><thead><tr class="bg-indigo-50 text-indigo-900"><th class="border border-slate-200 p-2.5 w-24">Hari / Slot</th>`;
             for(let s=1; s<=maxSlot; s++) {
-                if(s === stdRehat + 1) {
-                    html += `<th class="border border-slate-200 p-2.5 bg-amber-100/60 text-amber-800 leading-tight">REHAT<br><span class="text-[9px] font-normal text-amber-700/80 whitespace-nowrap">${window.getRehatTimeText('Isnin')}</span></th>`;
-                }
+                if(s === stdRehat + 1) html += `<th class="border border-slate-200 p-2.5 bg-amber-100/60 text-amber-800 leading-tight">REHAT<br><span class="text-[9px] font-normal text-amber-700/80 whitespace-nowrap">${window.getRehatTimeText('Isnin')}</span></th>`;
                 html += `<th class="border border-slate-200 p-2.5 leading-tight">Slot ${s}<br><span class="text-[9px] font-normal text-indigo-700/80 whitespace-nowrap">${window.getSlotTimeText(s, 'Isnin')}</span></th>`;
             }
             html += `</tr></thead><tbody>`;
@@ -2023,47 +1781,30 @@
                 let conf = window.appState.configMasa[h] || { jumlah: 8, rehat: 4 };
                 html += `<tr><td class="border border-slate-200 p-2.5 font-bold bg-slate-50 text-center">${h}</td>`;
                 for(let s=1; s<=maxSlot; s++) {
-                    if(s === stdRehat + 1) {
-                        html += `<td class="border border-slate-200 p-2 bg-amber-50 text-center font-bold text-amber-700 text-[10px]">REHAT</td>`;
-                    }
-
+                    if(s === stdRehat + 1) html += `<td class="border border-slate-200 p-2 bg-amber-50 text-center font-bold text-amber-700 text-[10px]">REHAT</td>`;
                     if(s > conf.jumlah) { html += `<td class="border border-slate-200 p-2.5 bg-slate-100 text-center text-slate-300">-</td>`; continue; }
+                    
                     let slotId = `${h}_s${s}`;
                     let cellData = window.appState.jadual[h]?.[kls]?.[slotId];
-                    let subjek = cellData?.subjek || "";
-                    let guru = cellData?.guru || "";
-                    let coTeacher = cellData?.coTeacher || "";
+                    let subjek = cellData?.subjek || "", guru = cellData?.guru || "", coTeacher = cellData?.coTeacher || "";
+                    let paparanGuru = coTeacher ? `${window.appState.guruKod?.[guru]||guru} & ${window.appState.guruKod?.[coTeacher]||coTeacher}` : (window.appState.guruKod?.[guru]||guru);
                     
-                    let kodGuru = guru ? (window.appState.guruKod?.[guru] || guru) : "";
-                    let kodCoTeacher = coTeacher ? (window.appState.guruKod?.[coTeacher] || coTeacher) : "";
-                    let paparanGuru = coTeacher ? `${kodGuru} & ${kodCoTeacher}` : kodGuru;
-
                     let bgColor = subjek ? window.getColorForSubjek(subjek) : '#ffffff';
-                    let dragEvents = "";
-                    let cursorStyle = "";
-                    
+                    let dragEvents = "", cursorStyle = "";
                     if (window.modSuntinganAktif) {
                         cursorStyle = subjek ? "cursor-grab hover:ring-2 hover:ring-indigo-400 opacity-90 hover:opacity-100" : "cursor-pointer hover:bg-slate-100 border-dashed border-2 border-slate-300";
-                        dragEvents = `ondragover="handleDragOver(event)" ondrop="handleDrop(event, '${h}', '${kls}', '${slotId}')"`;
-                        if(subjek) {
-                            dragEvents += ` draggable="true" ondragstart="handleDragStart(event, '${h}', '${kls}', '${slotId}')"`;
-                        }
+                        dragEvents = `ondragover="window.handleDragOver(event)" ondrop="window.handleDrop(event, '${h}', '${kls}', '${slotId}')"`;
+                        if(subjek) dragEvents += ` draggable="true" ondragstart="window.handleDragStart(event, '${h}', '${kls}', '${slotId}')"`;
                     }
+                    let clickAction = window.modSuntinganAktif ? `onclick="if(!window.isDragging) window.bukaModalSuntingManual('${h}', '${kls}', '${slotId}')"` : "";
 
-                    let cellStyle = `border border-slate-200 p-2 text-center transition-all shadow-sm ${cursorStyle}`;
-                    let clickAction = window.modSuntinganAktif ? `onclick="if(!window.isDragging) bukaModalSuntingManual('${h}', '${kls}', '${slotId}')"` : "";
-
-                    html += `<td class="${cellStyle}" style="background-color: ${bgColor};" ${dragEvents} ${clickAction}>
+                    html += `<td class="border border-slate-200 p-2 text-center transition-all shadow-sm ${cursorStyle}" style="background-color: ${bgColor};" ${dragEvents} ${clickAction}>
                         ${subjek ? `<div class="font-bold text-slate-800">${subjek}</div><div class="text-[10px] text-slate-600 font-semibold" title="Utama: ${guru}">${paparanGuru}</div>` : `<span class="text-slate-300 italic">Kosong</span>`}
                     </td>`;
                 }
                 html += `</tr>`;
             });
-            html += `</tbody></table>
-            <div class="hidden print:flex mt-8 justify-between items-end text-xs font-bold text-slate-800 print-color-adjust">
-                <div>Pengesahan Pengetua/Guru Besar:<br><br><br>....................................................................</div>
-                <div class="text-right">Tarikh Dijana: ${tarikh}<br>Sistem Penjadualan Pintar AI</div>
-            </div>`;
+            html += `</tbody></table><div class="hidden print:flex mt-8 justify-between items-end text-xs font-bold text-slate-800 print-color-adjust"><div>Pengesahan Pengetua/Guru Besar:<br><br><br>....................................................................</div><div class="text-right">Tarikh Dijana: ${tarikh}<br>Sistem Penjadualan Pintar AI</div></div>`;
             container.innerHTML = html;
         };
 
@@ -2071,33 +1812,16 @@
             let guruTarget = document.getElementById('paparGuruSelect').value;
             let container = document.getElementById('paparanJadualContainer');
             if(!container) return;
-            if(!guruTarget) { container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Sila pilih guru.</p>`; return; }
-            if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Belum ada jadual dijana.</p>`;
-                return;
-            }
+            if(!guruTarget) return container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Sila pilih guru.</p>`;
+            if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) return container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Belum ada jadual dijana.</p>`;
 
-            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
-            let maxSlot = 8;
-            for(let h of hariList) {
-                let conf = window.appState.configMasa[h] || { jumlah: 8 };
-                if(conf.jumlah > maxSlot) maxSlot = conf.jumlah;
-            }
+            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'], maxSlot = 8;
+            for(let h of hariList) { let conf = window.appState.configMasa[h] || { jumlah: 8 }; if(conf.jumlah > maxSlot) maxSlot = conf.jumlah; }
             let stdRehat = (window.appState.configMasa['Isnin'] || {rehat: 4}).rehat;
-            let namaSekolah = window.appState.schoolName || "Sekolah";
-            let tarikh = new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
             
-            let html = `
-            <div class="hidden print:block text-center mb-6 print-color-adjust">
-                <h2 class="text-2xl font-bold uppercase text-slate-900 mb-1">${namaSekolah}</h2>
-                <h3 class="text-xl font-bold text-slate-800 uppercase">Jadual Waktu Guru: <span class="border-b-2 border-slate-800">${guruTarget}</span></h3>
-            </div>
-            <table class="w-full border-collapse border border-slate-200 text-xs print-color-adjust">
-                <thead><tr class="bg-emerald-50 text-emerald-900"><th class="border border-slate-200 p-2.5 w-24">Hari / Slot</th>`;
+            let html = `<div class="hidden print:block text-center mb-6 print-color-adjust"><h2 class="text-2xl font-bold uppercase text-slate-900 mb-1">${window.appState.schoolName || "Sekolah"}</h2><h3 class="text-xl font-bold text-slate-800 uppercase">Jadual Waktu Guru: <span class="border-b-2 border-slate-800">${guruTarget}</span></h3></div><table class="w-full border-collapse border border-slate-200 text-xs print-color-adjust"><thead><tr class="bg-emerald-50 text-emerald-900"><th class="border border-slate-200 p-2.5 w-24">Hari / Slot</th>`;
             for(let s=1; s<=maxSlot; s++) {
-                if(s === stdRehat + 1) {
-                    html += `<th class="border border-slate-200 p-2.5 bg-amber-100/60 text-amber-800 leading-tight">REHAT<br><span class="text-[9px] font-normal text-amber-700/80 whitespace-nowrap">${window.getRehatTimeText('Isnin')}</span></th>`;
-                }
+                if(s === stdRehat + 1) html += `<th class="border border-slate-200 p-2.5 bg-amber-100/60 text-amber-800 leading-tight">REHAT<br><span class="text-[9px] font-normal text-amber-700/80 whitespace-nowrap">${window.getRehatTimeText('Isnin')}</span></th>`;
                 html += `<th class="border border-slate-200 p-2.5 leading-tight">Slot ${s}<br><span class="text-[9px] font-normal text-emerald-700/80 whitespace-nowrap">${window.getSlotTimeText(s, 'Isnin')}</span></th>`;
             }
             html += `</tr></thead><tbody>`;
@@ -2106,51 +1830,40 @@
                 let conf = window.appState.configMasa[h] || { jumlah: 8, rehat: 4 };
                 html += `<tr><td class="border border-slate-200 p-2.5 font-bold bg-slate-50 text-center">${h}</td>`;
                 for(let s=1; s<=maxSlot; s++) {
-                    if(s === stdRehat + 1) {
-                        html += `<td class="border border-slate-200 p-2 bg-amber-50 text-center font-bold text-amber-700 text-[10px]">REHAT</td>`;
-                    }
-                    
+                    if(s === stdRehat + 1) html += `<td class="border border-slate-200 p-2 bg-amber-50 text-center font-bold text-amber-700 text-[10px]">REHAT</td>`;
                     if(s > conf.jumlah) { html += `<td class="border border-slate-200 p-2.5 bg-slate-100 text-center text-slate-300">-</td>`; continue; }
-                    let slotId = `${h}_s${s}`;
-                    let matchedClass = "";
-                    let matchedSubjek = "";
-
+                    
+                    let slotId = `${h}_s${s}`, matchedClass = "", matchedSubjek = "";
                     for(let kls of (window.appState.kelas || [])) {
                         let cell = window.appState.jadual[h]?.[kls]?.[slotId];
-                        if(cell && cell.guru === guruTarget) {
-                            matchedClass = kls;
-                            matchedSubjek = cell.subjek;
-                            break;
+                        if(cell && (cell.guru === guruTarget || cell.coTeacher === guruTarget)) {
+                            matchedClass = kls; matchedSubjek = cell.subjek; break;
                         }
                     }
 
                     let bgColor = matchedSubjek ? window.getColorForSubjek(matchedSubjek) : '#ffffff';
-
-                    html += `<td class="border border-slate-200 p-2 text-center shadow-sm" style="background-color: ${bgColor};">
-                        ${matchedSubjek ? `<div class="font-bold text-slate-800">${matchedSubjek}</div><div class="text-[10px] text-slate-600 font-semibold">${matchedClass}</div>` : `<span class="text-slate-300 italic">Bebas</span>`}
-                    </td>`;
+                    html += `<td class="border border-slate-200 p-2 text-center shadow-sm" style="background-color: ${bgColor};">${matchedSubjek ? `<div class="font-bold text-slate-800">${matchedSubjek}</div><div class="text-[10px] text-slate-600 font-semibold">${matchedClass}</div>` : `<span class="text-slate-300 italic">Bebas</span>`}</td>`;
                 }
                 html += `</tr>`;
             });
-            html += `</tbody></table>
-            <div class="hidden print:flex mt-8 justify-between items-end text-xs font-bold text-slate-800 print-color-adjust">
-                <div>Pengesahan Pengetua/Guru Besar:<br><br><br>....................................................................</div>
-                <div class="text-right">Tarikh Dijana: ${tarikh}<br>Sistem Penjadualan Pintar AI</div>
-            </div>`;
+            html += `</tbody></table><div class="hidden print:flex mt-8 justify-between items-end text-xs font-bold text-slate-800 print-color-adjust"><div>Pengesahan Pengetua/Guru Besar:<br><br><br>....................................................................</div><div class="text-right">Tarikh Dijana: ${new Date().toLocaleDateString('ms-MY')}<br>Sistem Penjadualan Pintar AI</div></div>`;
             container.innerHTML = html;
         };
 
         window.bukaModalSuntingManual = function(h, kls, slotId) {
             activeSlotEdit = { hari: h, kelas: kls, slotId };
-            let sOpt = `<option value="">-- Kosongkan Slot --</option>` + (window.appState.subjek || []).map(s => `<option value="${s}">${s}</option>`).join('');
+            document.getElementById('editManualSubjek').innerHTML = `<option value="">-- Kosongkan Slot --</option>` + (window.appState.subjek || []).map(s => `<option value="${s}">${s}</option>`).join('');
             let gOpt = `<option value="">-- Tiada Guru --</option>` + (window.appState.guru || []).map(g => `<option value="${g}">${g}</option>`).join('');
-            document.getElementById('editManualSubjek').innerHTML = sOpt;
             document.getElementById('editManualGuru').innerHTML = gOpt;
+            document.getElementById('editManualCoTeacher').innerHTML = gOpt;
 
             let current = window.appState.jadual[h]?.[kls]?.[slotId];
             if(current) {
                 document.getElementById('editManualSubjek').value = current.subjek || "";
                 document.getElementById('editManualGuru').value = current.guru || "";
+                document.getElementById('editManualCoTeacher').value = current.coTeacher || "";
+            } else {
+                document.getElementById('editManualCoTeacher').value = "";
             }
 
             document.getElementById('modalSuntingManual').classList.remove('hidden');
@@ -2168,162 +1881,98 @@
             let { hari, kelas, slotId } = activeSlotEdit;
             let subjek = document.getElementById('editManualSubjek').value;
             let guru = document.getElementById('editManualGuru').value;
+            let coTeacher = document.getElementById('editManualCoTeacher').value;
 
-            if (guru) {
-                let clashClass = null;
-                let clashSubjek = null;
+            if (guru || coTeacher) {
+                let clashClass = null, clashSubjek = null, guruClash = null;
                 if (window.appState.jadual[hari]) {
                     for (let kls of Object.keys(window.appState.jadual[hari])) {
                         if (kls !== kelas) {
                             let cell = window.appState.jadual[hari][kls][slotId];
-                            if (cell && cell.guru === guru) {
-                                clashClass = kls;
-                                clashSubjek = cell.subjek;
-                                break;
+                            if (cell) {
+                                if(guru && (cell.guru === guru || cell.coTeacher === guru)) { clashClass = kls; clashSubjek = cell.subjek; guruClash = guru; break; }
+                                if(coTeacher && (cell.guru === coTeacher || cell.coTeacher === coTeacher)) { clashClass = kls; clashSubjek = cell.subjek; guruClash = coTeacher; break; }
                             }
                         }
                     }
                 }
-
                 if (clashClass) {
-                    let paparanSlot = slotId.split('_')[1].replace('s', 'Slot ');
-                    window.customDialog("Pertindihan Jadual Dikesan 🔴", 
-                        `<p class="text-sm font-semibold text-slate-700">Tindakan tidak dapat diteruskan.</p>
-                        <div class="bg-red-50 border border-red-200 p-3 rounded-lg mt-3 text-xs text-red-800">
-                            Cikgu <b>${guru}</b> mengajar <b>${clashSubjek}</b> di kelas <b>${clashClass}</b> pada masa ini (${hari}, ${paparanSlot}).
-                        </div>`
-                    );
-                    return;
+                    return window.customDialog("Pertindihan Jadual Dikesan 🔴", `<p class="text-sm font-semibold text-slate-700">Tindakan tidak dapat diteruskan.</p><div class="bg-red-50 border border-red-200 p-3 rounded-lg mt-3 text-xs text-red-800">Cikgu <b>${guruClash}</b> sedang mengajar <b>${clashSubjek}</b> di kelas <b>${clashClass}</b> pada masa ini.</div>`);
                 }
             }
 
             if(!window.appState.jadual[hari]) window.appState.jadual[hari] = {};
             if(!window.appState.jadual[hari][kelas]) window.appState.jadual[hari][kelas] = {};
 
-            if(!subjek) {
-                delete window.appState.jadual[hari][kelas][slotId];
-            } else {
-                window.appState.jadual[hari][kelas][slotId] = { subjek, guru };
-            }
-            simpanData();
-            tutupModalSuntingManual();
-            toggleModePapar();
+            if(!subjek) { delete window.appState.jadual[hari][kelas][slotId]; } 
+            else { window.appState.jadual[hari][kelas][slotId] = { subjek, guru, coTeacher: (coTeacher || null) }; }
+            window.simpanData(); window.tutupModalSuntingManual(); window.toggleModePapar();
         };
 
         window.kosongkanSlotManual = function() {
             if(!activeSlotEdit) return;
             let { hari, kelas, slotId } = activeSlotEdit;
-            if(window.appState.jadual[hari]?.[kelas]?.[slotId]) {
-                delete window.appState.jadual[hari][kelas][slotId];
-            }
-            simpanData();
-            tutupModalSuntingManual();
-            toggleModePapar();
+            if(window.appState.jadual[hari]?.[kelas]?.[slotId]) delete window.appState.jadual[hari][kelas][slotId];
+            window.simpanData(); window.tutupModalSuntingManual(); window.toggleModePapar();
         };
 
         window.kongsiJadual = async function() {
             let container = document.getElementById('paparanJadualContainer');
-            if(!container || container.innerText.includes('Belum ada jadual dijana') || container.innerText.includes('Sila pilih')) {
-                window.customDialog("Ralat", "<p>Sila papar jadual kelas atau guru terlebih dahulu sebelum berkongsi.</p>");
-                return;
-            }
+            if(!container || container.innerText.includes('Belum ada jadual dijana')) return window.customDialog("Ralat", "<p>Sila papar jadual kelas atau guru terlebih dahulu sebelum berkongsi.</p>");
 
             let modal = document.getElementById('customModal');
             document.getElementById('modalTitle').innerText = "Memproses PDF...";
             document.getElementById('modalMessage').innerHTML = "<p class='text-center py-4 font-bold text-indigo-700'>Sedang menjana jadual ke format PDF, sila tunggu... ⏳</p>";
-            document.getElementById('modalBtnOk').classList.add('hidden');
-            document.getElementById('modalBtnCancel').classList.add('hidden');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            document.getElementById('modalBtnOk').classList.add('hidden'); document.getElementById('modalBtnCancel').classList.add('hidden');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
 
             let clone = container.cloneNode(true);
             let hiddenHeader = clone.querySelector('.hidden.print\\:block');
-            if(hiddenHeader) {
-                hiddenHeader.classList.remove('hidden', 'print:block');
-                hiddenHeader.classList.add('block', 'mb-6', 'text-center');
-            }
+            if(hiddenHeader) { hiddenHeader.classList.remove('hidden', 'print:block'); hiddenHeader.classList.add('block', 'mb-6', 'text-center'); }
             let hiddenFooter = clone.querySelector('.hidden.print\\:flex');
-            if(hiddenFooter) {
-                hiddenFooter.classList.remove('hidden', 'print:flex');
-                hiddenFooter.classList.add('flex', 'mt-8', 'justify-between', 'items-end');
-            }
+            if(hiddenFooter) { hiddenFooter.classList.remove('hidden', 'print:flex'); hiddenFooter.classList.add('flex', 'mt-8', 'justify-between', 'items-end'); }
 
             let printWrapper = document.createElement('div');
-            printWrapper.style.padding = '30px';
-            printWrapper.style.backgroundColor = 'white';
-            printWrapper.appendChild(clone);
-
+            printWrapper.style.padding = '30px'; printWrapper.style.backgroundColor = 'white'; printWrapper.appendChild(clone);
             let sasaran = document.getElementById('paparJenisMode').value === 'guru' ? document.getElementById('paparGuruSelect').value : document.getElementById('paparKelasSelect').value;
             let fileName = `Jadual_${sasaran.replace(/[^a-z0-9]/gi, '_')}.pdf`;
-
-            let opt = {
-                margin:       0.3,
-                filename:     fileName,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
-            };
+            let opt = { margin: 0.3, filename: fileName, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } };
 
             try {
                 let pdfBlob = await html2pdf().set(opt).from(printWrapper).output('blob');
                 let file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.getElementById('modalBtnOk').classList.remove('hidden');
+                modal.classList.add('hidden'); modal.classList.remove('flex'); document.getElementById('modalBtnOk').classList.remove('hidden');
 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            title: `Jadual Waktu ${sasaran}`,
-                            text: `Sila rujuk lampiran PDF untuk Jadual Waktu terkini (${sasaran}).`,
-                            files: [file]
-                        });
-                    } catch(e) {}
+                    try { await navigator.share({ title: `Jadual Waktu ${sasaran}`, text: `Sila rujuk lampiran PDF untuk Jadual Waktu terkini (${sasaran}).`, files: [file] }); } catch(e) {}
                 } else {
                     html2pdf().set(opt).from(printWrapper).save();
                     window.customDialog("Makluman", `<p>Fail <b>${fileName}</b> berjaya dimuat turun.</p>`);
                 }
             } catch (err) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.getElementById('modalBtnOk').classList.remove('hidden');
+                modal.classList.add('hidden'); modal.classList.remove('flex'); document.getElementById('modalBtnOk').classList.remove('hidden');
                 window.customDialog("Ralat", "<p>Gagal menjana PDF.</p>");
             }
         };
 
         window.bukaJadualIndukModal = function() {
-            if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) {
-                window.customDialog("Ralat", "<p>Sila jana jadual waktu terlebih dahulu.</p>");
-                return;
-            }
-            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
-            let html = `<div class="space-y-6">`;
+            if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) return window.customDialog("Ralat", "<p>Sila jana jadual waktu terlebih dahulu.</p>");
+            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'], html = `<div class="space-y-6">`;
             hariList.forEach(h => {
                 let conf = window.appState.configMasa[h] || { jumlah: 8, rehat: 4 };
-                html += `<div class="bg-white border rounded-xl p-4 shadow-sm">
-                    <h4 class="font-bold text-sm text-indigo-700 mb-3 border-b pb-2">📅 Hari: ${h}</h4>
-                    <div class="overflow-x-auto"><table class="w-full border-collapse border border-slate-200 text-xs">
-                    <thead><tr class="bg-slate-100 text-slate-700"><th class="border p-2 w-28">Kelas</th>`;
-                
+                html += `<div class="bg-white border rounded-xl p-4 shadow-sm"><h4 class="font-bold text-sm text-indigo-700 mb-3 border-b pb-2">📅 Hari: ${h}</h4><div class="overflow-x-auto"><table class="w-full border-collapse border border-slate-200 text-xs"><thead><tr class="bg-slate-100 text-slate-700"><th class="border p-2 w-28">Kelas</th>`;
                 for(let s=1; s<=conf.jumlah; s++) {
-                    if(s === conf.rehat + 1) {
-                        html += `<th class="border p-2 bg-amber-100/60 text-amber-800 leading-tight">REHAT<br><span class="text-[9px] font-normal text-amber-700/80 whitespace-nowrap">${window.getRehatTimeText(h)}</span></th>`;
-                    }
+                    if(s === conf.rehat + 1) html += `<th class="border p-2 bg-amber-100/60 text-amber-800 leading-tight">REHAT<br><span class="text-[9px] font-normal text-amber-700/80 whitespace-nowrap">${window.getRehatTimeText(h)}</span></th>`;
                     html += `<th class="border p-2 leading-tight">Slot ${s}<br><span class="text-[9px] font-normal text-slate-500 whitespace-nowrap">${window.getSlotTimeText(s, h)}</span></th>`;
                 }
-                
                 html += `</tr></thead><tbody>`;
                 (window.appState.kelas || []).forEach(kls => {
                     html += `<tr><td class="border p-2 font-bold bg-slate-50">${kls}</td>`;
                     for(let s=1; s<=conf.jumlah; s++) {
-                        if(s === conf.rehat + 1) {
-                            html += `<td class="border p-2 bg-amber-50 text-center font-bold text-amber-700 text-[10px]">REHAT</td>`;
-                        }
-                        let slotId = `${h}_s${s}`;
-                        let cell = window.appState.jadual[h]?.[kls]?.[slotId];
+                        if(s === conf.rehat + 1) html += `<td class="border p-2 bg-amber-50 text-center font-bold text-amber-700 text-[10px]">REHAT</td>`;
+                        let slotId = `${h}_s${s}`, cell = window.appState.jadual[h]?.[kls]?.[slotId];
                         let kod = cell?.guru ? (window.appState.guruKod?.[cell.guru] || cell.guru) : "";
                         let bgColor = cell?.subjek ? window.getColorForSubjek(cell.subjek) : 'transparent';
-                        
                         html += `<td class="border p-2 text-center" style="background-color: ${bgColor};">${cell ? `<div class="font-bold text-slate-800">${cell.subjek}</div><div class="text-[9px] text-slate-600 font-semibold">${kod}</div>` : `<span class="text-slate-300">-</span>`}</td>`;
                     }
                     html += `</tr>`;
@@ -2332,57 +1981,33 @@
             });
             html += `</div>`;
             document.getElementById('modalJadualIndukContent').innerHTML = html;
-            document.getElementById('modalJadualInduk').classList.remove('hidden');
-            document.getElementById('modalJadualInduk').classList.add('flex');
+            document.getElementById('modalJadualInduk').classList.remove('hidden'); document.getElementById('modalJadualInduk').classList.add('flex');
         };
 
-        window.simpanNamaSekolah = function() {
-            window.appState.schoolName = document.getElementById('inputNamaSekolah').value;
-            simpanData();
-            window.customDialog("Berjaya", "<p>Nama sekolah berjaya dikemas kini.</p>");
-        };
+        window.simpanNamaSekolah = function() { window.appState.schoolName = document.getElementById('inputNamaSekolah').value; window.simpanData(); window.customDialog("Berjaya", "<p>Nama sekolah berjaya dikemas kini.</p>"); };
 
         window.exportDataJSON = function() {
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.appState, null, 2));
-            let dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `SistemJadualData_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(dlAnchor);
-            dlAnchor.click();
-            dlAnchor.remove();
+            let dlAnchor = document.createElement('a'); dlAnchor.setAttribute("href", dataStr); dlAnchor.setAttribute("download", `SistemJadualData_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(dlAnchor); dlAnchor.click(); dlAnchor.remove();
         };
 
         window.importDataJSON = function(event) {
-            let file = event.target.files[0];
-            if(!file) return;
+            let file = event.target.files[0]; if(!file) return;
             let reader = new FileReader();
             reader.onload = function(e) {
-                try {
-                    window.appState = JSON.parse(e.target.result);
-                    simpanData();
-                    refreshUIAll();
-                    window.customDialog("Berjaya", "<p>Data berjaya diimport ke akaun anda!</p>");
-                } catch(err) {
-                    window.customDialog("Ralat", "<p>Fail JSON tidak sah.</p>");
-                }
+                try { window.appState = JSON.parse(e.target.result); window.simpanData(); window.refreshUIAll(); window.customDialog("Berjaya", "<p>Data berjaya diimport ke akaun anda!</p>"); } 
+                catch(err) { window.customDialog("Ralat", "<p>Fail JSON tidak sah.</p>"); }
             };
             reader.readAsText(file);
         };
 
         window.simpanVersiBaharu = async function() {
             let namaVersi = document.getElementById('inputNamaVersi').value.trim();
-            if(!namaVersi) { window.customDialog("Makluman", "<p>Sila masukkan nama versi jadual.</p>"); return; }
-            if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) {
-                window.customDialog("Ralat", "<p>Tiada jadual untuk disimpan. Sila jana jadual terlebih dahulu.</p>"); return;
-            }
+            if(!namaVersi) return window.customDialog("Makluman", "<p>Sila masukkan nama versi jadual.</p>");
+            if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) return window.customDialog("Ralat", "<p>Tiada jadual untuk disimpan.</p>");
 
-            let versiObj = {
-                id: 'v_' + Date.now().toString(),
-                nama: namaVersi,
-                tarikh: new Date().toLocaleString('ms-MY'),
-                jadual: JSON.parse(JSON.stringify(window.appState.jadual))
-            };
-
+            let versiObj = { id: 'v_' + Date.now().toString(), nama: namaVersi, tarikh: new Date().toLocaleString('ms-MY'), jadual: JSON.parse(JSON.stringify(window.appState.jadual)) };
             document.getElementById('inputNamaVersi').value = "";
             let activeUid = currentUser ? currentUser.uid : "lokal_offline";
             
@@ -2391,16 +2016,13 @@
                     window.customDialog("Menyimpan...", "<p>Sedang menyimpan jadual ke awan...</p>");
                     await setDoc(doc(db, "artifacts", "sistem-jadual", "users", activeUid, "versions", versiObj.id), versiObj);
                     window.customDialog("Berjaya", `<p>Versi <b>${namaVersi}</b> telah berjaya disimpan ke awan.</p>`);
-                } catch (e) {
-                    window.customDialog("Ralat", "<p>Gagal menyimpan versi.</p>");
-                }
+                } catch (e) { window.customDialog("Ralat", "<p>Gagal menyimpan versi.</p>"); }
             } else {
                 let localV = JSON.parse(localStorage.getItem(`jadualVersi_${activeUid}`)) || [];
-                localV.push(versiObj);
-                localStorage.setItem(`jadualVersi_${activeUid}`, JSON.stringify(localV));
+                localV.push(versiObj); localStorage.setItem(`jadualVersi_${activeUid}`, JSON.stringify(localV));
                 window.customDialog("Berjaya", `<p>Versi <b>${namaVersi}</b> disimpan dalam peranti.</p>`);
             }
-            muatSenaraiVersi();
+            window.muatSenaraiVersi();
         };
 
         window.muatSenaraiVersi = async function() {
@@ -2412,60 +2034,48 @@
             if (db && activeUid !== "lokal_offline") {
                 try {
                     const qSnap = await getDocs(collection(db, "artifacts", "sistem-jadual", "users", activeUid, "versions"));
-                    qSnap.forEach(docSnap => { listHTML += binaHtmlSenaraiVersi(docSnap.data()); });
+                    qSnap.forEach(docSnap => { listHTML += window.binaHtmlSenaraiVersi(docSnap.data()); });
                 } catch(e) {}
             } else {
                 let localV = JSON.parse(localStorage.getItem(`jadualVersi_${activeUid}`)) || [];
-                localV.forEach(data => { listHTML += binaHtmlSenaraiVersi(data); });
+                localV.forEach(data => { listHTML += window.binaHtmlSenaraiVersi(data); });
             }
             container.innerHTML = listHTML === "" ? `<p class="text-center text-xs text-slate-400 py-4">Tiada versi direkodkan.</p>` : listHTML;
         };
 
-        function binaHtmlSenaraiVersi(data) {
+        window.binaHtmlSenaraiVersi = function(data) {
             return `<div class="bg-white border rounded-lg p-3 flex justify-between items-center shadow-sm">
-                <div>
-                    <div class="font-bold text-xs text-indigo-700">${data.nama}</div>
-                    <div class="text-[10px] text-slate-500">${data.tarikh}</div>
-                </div>
+                <div><div class="font-bold text-xs text-indigo-700">${data.nama}</div><div class="text-[10px] text-slate-500">${data.tarikh}</div></div>
                 <div class="flex gap-2">
-                    <button onclick="muatVersiKeSistem('${data.id}')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded border border-emerald-200 transition">🔄 Muat Jadual Ini</button>
-                    <button onclick="padamVersiSistem('${data.id}')" class="px-2 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[10px] rounded border border-red-200 transition">🗑️</button>
+                    <button onclick="window.muatVersiKeSistem('${data.id}')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded border border-emerald-200 transition">🔄 Muat</button>
+                    <button onclick="window.padamVersiSistem('${data.id}')" class="px-2 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[10px] rounded border border-red-200 transition">🗑️</button>
                 </div>
             </div>`;
-        }
+        };
 
         window.muatVersiKeSistem = async function(vId) {
             window.customDialog("Pengesahan", "<p>Tindakan ini akan <b>MENGGANTIKAN</b> jadual semasa anda. Teruskan?</p>", true, async () => {
-                let activeUid = currentUser ? currentUser.uid : "lokal_offline";
-                let targetJadual = null;
+                let activeUid = currentUser ? currentUser.uid : "lokal_offline", targetJadual = null;
                 if (db && activeUid !== "lokal_offline") {
                     let docSnap = await getDoc(doc(db, "artifacts", "sistem-jadual", "users", activeUid, "versions", vId));
                     if(docSnap.exists()) targetJadual = docSnap.data().jadual;
                 } else {
                     let localV = JSON.parse(localStorage.getItem(`jadualVersi_${activeUid}`)) || [];
-                    let found = localV.find(v => v.id === vId);
-                    if(found) targetJadual = found.jadual;
+                    let found = localV.find(v => v.id === vId); if(found) targetJadual = found.jadual;
                 }
-                if(targetJadual) {
-                    window.appState.jadual = targetJadual;
-                    simpanData();
-                    renderJadualDropdowns();
-                    window.customDialog("Selesai", "<p>Jadual versi berjaya dimuatkan ke ruang kerja.</p>");
-                }
+                if(targetJadual) { window.appState.jadual = targetJadual; window.simpanData(); window.renderJadualDropdowns(); window.customDialog("Selesai", "<p>Jadual versi berjaya dimuatkan ke ruang kerja.</p>"); }
             });
         };
 
         window.padamVersiSistem = async function(vId) {
             window.customDialog("Amaran", "<p>Adakah anda pasti mahu memadam versi jadual ini?</p>", true, async () => {
                 let activeUid = currentUser ? currentUser.uid : "lokal_offline";
-                if (db && activeUid !== "lokal_offline") {
-                    await deleteDoc(doc(db, "artifacts", "sistem-jadual", "users", activeUid, "versions", vId));
-                } else {
+                if (db && activeUid !== "lokal_offline") { await deleteDoc(doc(db, "artifacts", "sistem-jadual", "users", activeUid, "versions", vId)); } 
+                else {
                     let localV = JSON.parse(localStorage.getItem(`jadualVersi_${activeUid}`)) || [];
-                    localV = localV.filter(v => v.id !== vId);
-                    localStorage.setItem(`jadualVersi_${activeUid}`, JSON.stringify(localV));
+                    localV = localV.filter(v => v.id !== vId); localStorage.setItem(`jadualVersi_${activeUid}`, JSON.stringify(localV));
                 }
-                muatSenaraiVersi();
+                window.muatSenaraiVersi();
             });
         };
 
@@ -2476,9 +2086,7 @@
                 let payload = { userId: currentUser ? currentUser.uid : "lokal_offline", appState: window.appState };
                 await fetch(GAS_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
                 window.customDialog("Berjaya!", "<p>Data berjaya direkodkan ke Google Sheets!</p>");
-            } catch(e) {
-                window.customDialog("Selesai", "<p>Permintaan sandaran telah dihantar.</p>");
-            }
+            } catch(e) { window.customDialog("Selesai", "<p>Permintaan sandaran telah dihantar.</p>"); }
         };
 
         window.resetDataSemasa = function() {
@@ -2489,9 +2097,7 @@
                     configMasa: { Isnin: {jumlah:8, rehat:4}, Selasa: {jumlah:8, rehat:4}, Rabu: {jumlah:8, rehat:4}, Khamis: {jumlah:8, rehat:4}, Jumaat: {jumlah:6, rehat:3} }, 
                     jenisSesiSekolah: "pagi", agihan: [], kekangan: [], jadual: {} 
                 };
-                simpanData();
-                refreshUIAll();
-                window.customDialog("Selesai", "<p>Semua pangkalan data ruang kerja ini telah dikosongkan.</p>");
+                window.simpanData(); window.refreshUIAll(); window.customDialog("Selesai", "<p>Semua pangkalan data ruang kerja ini telah dikosongkan.</p>");
             });
         };
     </script>
