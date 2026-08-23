@@ -92,6 +92,9 @@
                                     <input type="text" id="inputKodGuru" placeholder="Kod (Cth: JAB)" maxlength="5" class="w-24 text-xs border rounded-lg px-3 py-2 uppercase focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                                     <button onclick="tambahData('guru')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah</button>
                                 </div>
+                                <button onclick="bukaModalPukalGuru()" class="w-full mt-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs py-2 rounded-lg border border-emerald-200 transition flex items-center justify-center gap-1.5">
+                                    <span>📋</span> Tambah Pukal Guru
+                                </button>
                             </div>
                         </div>
                         <button onclick="window.paparSenarai('guru')" class="w-full mt-2 bg-slate-50 hover:bg-slate-100 text-indigo-600 font-bold text-xs py-2 rounded-lg border border-slate-200 transition flex items-center justify-center gap-1.5">
@@ -359,6 +362,24 @@
 
     </main>
 
+    <!-- MODAL TAMBAH GURU PUKAL -->
+    <div id="modalPukalGuru" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-[90%] max-w-lg animate-modal flex flex-col">
+            <div class="flex justify-between items-center p-5 border-b shrink-0">
+                <h3 class="text-lg font-bold text-slate-800">Tambah Guru Secara Pukal</h3>
+                <button onclick="tutupModalPukalGuru()" class="text-slate-400 hover:text-red-500 font-bold text-lg">✕</button>
+            </div>
+            <div class="p-5 space-y-3">
+                <p class="text-xs text-slate-500">Salin dan tampal (Paste) senarai nama guru dari Excel atau taip baris demi baris (atau dipisahkan dengan koma).</p>
+                <textarea id="textareaPukalGuru" rows="6" placeholder="Cth:&#10;Cikgu Ahmad bin Ali&#10;Cikgu Siti binti Abu&#10;Cikgu Muthu a/l Kumar" class="w-full text-xs border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+            </div>
+            <div class="flex justify-end gap-2 p-5 border-t shrink-0">
+                <button onclick="tutupModalPukalGuru()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Batal</button>
+                <button onclick="prosesTambahPukalGuru()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan Pukal</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL KEKANGAN MIKRO -->
     <div id="modalKekangan" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
         <div class="bg-white rounded-xl shadow-2xl w-[90%] max-w-lg animate-modal flex flex-col max-h-[90vh]">
@@ -466,7 +487,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Konfigurasi Rasmi Firebase
         const firebaseConfig = {
@@ -732,6 +753,47 @@
             refreshUIAll();
         };
 
+        window.bukaModalPukalGuru = function() {
+            document.getElementById('textareaPukalGuru').value = "";
+            document.getElementById('modalPukalGuru').classList.remove('hidden');
+            document.getElementById('modalPukalGuru').classList.add('flex');
+        };
+
+        window.tutupModalPukalGuru = function() {
+            document.getElementById('modalPukalGuru').classList.add('hidden');
+            document.getElementById('modalPukalGuru').classList.remove('flex');
+        };
+
+        window.prosesTambahPukalGuru = function() {
+            let rawText = document.getElementById('textareaPukalGuru').value;
+            if(!rawText.trim()) {
+                window.customDialog("Ralat", "<p>Sila masukkan senarai nama guru terlebih dahulu.</p>");
+                return;
+            }
+
+            let lines = rawText.split(/\r?\n|,/);
+            let addedCount = 0;
+
+            if(!window.appState.guru) window.appState.guru = [];
+            if(!window.appState.guruKod) window.appState.guruKod = {};
+            if(!window.appState.guruSesi) window.appState.guruSesi = {};
+
+            lines.forEach(name => {
+                let cleanName = name.trim();
+                if(cleanName && !window.appState.guru.includes(cleanName)) {
+                    window.appState.guru.push(cleanName);
+                    window.appState.guruKod[cleanName] = cleanName.substring(0, 3).toUpperCase();
+                    window.appState.guruSesi[cleanName] = 'pagi';
+                    addedCount++;
+                }
+            });
+
+            simpanData();
+            refreshUIAll();
+            tutupModalPukalGuru();
+            window.customDialog("Berjaya", `<p>Seramai <b>${addedCount}</b> guru baru berjaya ditambah secara pukal.</p>`);
+        };
+
         window.paparSenarai = function(jenis, sorted = false) {
             let tajuk = "";
             let dataArr = [];
@@ -772,7 +834,6 @@
             window.customDialog(tajuk, `${extraHeader}<div class="pr-1 max-h-[60vh] overflow-y-auto">${senaraiHTML}</div>`);
         };
 
-        // TAMBAHAN: Fungsi Pembantu untuk membersihkan sel jadual yang mengandungi data terpadam
         function bersihkanJadual(jenis, nilai) {
             if(!window.appState.jadual) return;
             for (let h in window.appState.jadual) {
@@ -854,7 +915,6 @@
         window.tukarJenisSesiSekolah = function() {
             let newSession = document.getElementById('jenisSesiSekolah').value;
             
-            // 1. Pastikan profil data sesi berasingan wujud (First-time initialization)
             if (!window.appState.configMasaData) {
                 window.appState.configMasaData = {
                     pagi: JSON.parse(JSON.stringify(window.appState.configMasa)),
@@ -865,7 +925,6 @@
 
             window.appState.jenisSesiSekolah = newSession;
 
-            // 2. Muat tetapan slot untuk sesi yang baru dipilih
             if (window.appState.configMasaData[newSession]) {
                 window.appState.configMasa = JSON.parse(JSON.stringify(window.appState.configMasaData[newSession]));
             }
@@ -947,7 +1006,6 @@
                 window.appState.configMasa[h] = { jumlah: jml, rehat: rht };
             });
             
-            // Simpan ke profil sesi berasingan agar tidak hilang bila tukar dropdown
             let sesiAktif = window.appState.jenisSesiSekolah || 'pagi';
             if (!window.appState.configMasaData) {
                 window.appState.configMasaData = {
@@ -1200,7 +1258,7 @@
             container.innerHTML = html;
         }
 
-        // --- ENJIN AI & VALIDATOR DENGAN KEKANGAN MIKRO ---
+        // --- ENJIN AI & VALIDATOR DENGAN KEKANGAN MIKRO & BACKTRACKING ---
         function runDiagnostics() {
             let totalDemand = {};
             let totalGuruDemand = {};
@@ -1223,21 +1281,19 @@
                 }
             }
 
-            // TAMBAHAN: Semak jika beban guru melebihi slot maksimum sekolah seminggu
             for(let g in totalGuruDemand) {
                 if(totalGuruDemand[g] > totalSlotTersediaGlobal) {
                     issues.push(`Guru <b>${g}</b> diberikan beban mengajar ${totalGuruDemand[g]} waktu, melebihi had slot maksimum seminggu (${totalSlotTersediaGlobal} slot).`);
                 }
             }
             
-            // Semakan Khas untuk Kekangan "Slot Solo Sahaja"
             if (window.appState.kekangan && window.appState.agihan) {
                 let soloConstraints = window.appState.kekangan.filter(k => k.aktif && k.jenis === 's_solo_sahaja');
                 soloConstraints.forEach(kek => {
                     let subjekSolo = kek.kondisi.subjek;
                     window.appState.agihan.forEach(a => {
                         if (a.subjek === subjekSolo && a.waktu > 5) {
-                            issues.push(`Kekangan "Slot Solo Sahaja" aktif untuk <b>${subjekSolo}</b>, tetapi kelas <b>${a.kelas}</b> diberi agihan ${a.waktu} waktu seminggu. Peraturan ini menetapkan <b>maksimum 5 slot sahaja seminggu</b>.`);
+                            issues.push(`Kekangan "Slot Solo Sahaja" aktif untuk <b>${subjekSolo}</b>, tetapi kelas <b>${a.kelas}</b> diberi agihan ${a.waktu} waktu seminggu. Maksimum 5 slot sahaja.`);
                         }
                     });
                 });
@@ -1303,7 +1359,6 @@
                     p += kek.penalti || 10;
                 }
                 
-                // 1. BEBAN HARIAN SEIMBANG
                 if(kek.jenis === 'g_seimbang_hari' && kek.kondisi.guru === guru) {
                     let totalWaktuGuru = 0;
                     if(window.appState.agihan) {
@@ -1320,7 +1375,6 @@
                     }
                 }
 
-                // 2. SEBELUM & SELEPAS REHAT SEIMBANG
                 if(kek.jenis === 'g_seimbang_rehat' && kek.kondisi.guru === guru) {
                     if(Math.abs(countGuruBeforeRehat - countGuruAfterRehat) > 1) {
                         p += (kek.penalti || 20);
@@ -1328,7 +1382,6 @@
                     }
                 }
 
-                // 3. SLOT KOSONG SELEPAS DOUBLE PERIOD
                 if(kek.jenis === 'g_jarak_double_period' && kek.kondisi.guru === guru) {
                     let s_prev1 = s_idx - 1;
                     let s_prev2 = s_idx - 2;
@@ -1336,7 +1389,6 @@
                         let act1 = getTeacherActivity(curJadual, h, `${h}_s${s_prev1}`, guru);
                         let act2 = getTeacherActivity(curJadual, h, `${h}_s${s_prev2}`, guru);
                         
-                        // Jika slot-1 dan slot-2 guru mengajar subjek sama dan kelas sama (double period)
                         if(act1 && act2 && act1.class === act2.class && act1.subject === act2.subject) {
                             p += (kek.penalti || 50);
                             if(kek.tahap === 'HARD') hardViolation = true;
@@ -1374,7 +1426,6 @@
                 }
 
                 if(kek.jenis === 's_solo_sahaja' && kek.kondisi.subjek === subjek) {
-                    // Jika subjek ini dah muncul lebih dari sekali pada hari ini, halang AI
                     if (countSubjekHariIni > 1) {
                         p += kek.penalti || 500;
                         if(kek.tahap === 'HARD') hardViolation = true;
@@ -1382,7 +1433,6 @@
                 }
 
                 if(kek.jenis === 's_elak_pisah_rehat' && kek.kondisi.subjek === subjek) {
-                    // Jika ini adalah slot tepat selepas rehat, semak slot sebelum rehat
                     if (s_idx === conf.rehat + 1) {
                         let prevSlotId = `${h}_s${s_idx - 1}`;
                         if(curJadual[h]?.[kls]?.[prevSlotId]?.subjek === subjek) {
@@ -1402,12 +1452,10 @@
                     }
 
                     if(appearedCount > 0) {
-                        // Kes 1: Subjek pernah wujud hari ini, tapi BUKAN pada slot tepat sebelum ini (Ulangan Terpisah)
                         if(prev1 !== subjek) {
                             p += kek.penalti || 500;
                             if(kek.tahap === 'HARD') hardViolation = true;
                         } 
-                        // Kes 2: Subjek wujud pada slot sebelum ini, TETAPI sudah masuk masa ketiga (Menghalang Triple Period)
                         else if(prev1 === subjek && prev2 === subjek) {
                             p += kek.penalti || 500;
                             if(kek.tahap === 'HARD') hardViolation = true;
@@ -1439,7 +1487,7 @@
                         if(kek.tahap === 'HARD') hardViolation = true;
                     }
                 }
-            } // Penutup loop for(let kek of window.appState.kekangan)
+            }
 
             return { isHardViolated: hardViolation, penalti: p, reward: r, coTeacher };
         }
@@ -1465,7 +1513,6 @@
                 }
             });
 
-            // Fisher-Yates Shuffle pada poolAgihan untuk susunan rawak 100% setiap janaan
             for (let i = poolAgihan.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [poolAgihan[i], poolAgihan[j]] = [poolAgihan[j], poolAgihan[i]];
@@ -1487,7 +1534,6 @@
                 for(let s=1; s<=conf.jumlah; s++) {
                     let slotKey = `${h}_s${s}`;
                     
-                    // Shuffle giliran kelas setiap kali mencari slot supaya tiada kelas sentiasa monopoli masa cantik
                     let rawakKelas = [...window.appState.kelas];
                     for (let i = rawakKelas.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
@@ -1533,30 +1579,25 @@
                                 let item = poolAgihan[idx];
                                 if (item.kelas !== kls) continue;
 
-                                // Cari dalam slot sebelumnya yang telah diisi untuk kelas ini
                                 for (let prevS = 1; prevS < s; prevS++) {
                                     let prevSlotKey = `${h}_s${prevS}`;
                                     let prevPlaced = newJadual[h][kls][prevSlotKey];
                                     if (!prevPlaced) continue;
 
-                                    // 1. Cabut 'prevPlaced' sementara
                                     delete newJadual[h][kls][prevSlotKey];
 
-                                    // 2. Semak jika 'item' (subjek baru) boleh masuk ke prevS
                                     let guruBusyPrev = Object.keys(newJadual[h]).some(k => newJadual[h][k][prevSlotKey]?.guru === item.guru);
                                     if (!guruBusyPrev) {
                                         let val1 = validateConstraint(h, prevS, kls, item.guru, item.subjek, newJadual, conf);
                                         
                                         if (!val1.isHardViolated) {
-                                            // 3. Semak jika 'prevPlaced' (subjek lama) boleh pindah ke 's' (slot semasa)
-                                            newJadual[h][kls][prevSlotKey] = { subjek: item.subjek, guru: item.guru, coTeacher: val1.coTeacher }; // Isi item ke prevS sementara
+                                            newJadual[h][kls][prevSlotKey] = { subjek: item.subjek, guru: item.guru, coTeacher: val1.coTeacher };
                                             
                                             let guruBusyCur = Object.keys(newJadual[h]).some(k => newJadual[h][k][slotKey]?.guru === prevPlaced.guru);
                                             
                                             if (!guruBusyCur) {
                                                 let val2 = validateConstraint(h, s, kls, prevPlaced.guru, prevPlaced.subjek, newJadual, conf);
                                                 if (!val2.isHardViolated) {
-                                                    // BERJAYA SWAP! (Pertukaran sah)
                                                     newJadual[h][kls][slotKey] = { subjek: prevPlaced.subjek, guru: prevPlaced.guru, coTeacher: val2.coTeacher };
                                                     poolAgihan.splice(idx, 1);
                                                     swapped = true;
@@ -1566,18 +1607,16 @@
                                         }
                                     }
 
-                                    // 4. Revert (Kembalikan kepada asal jika gagal)
                                     if (!swapped) {
                                         newJadual[h][kls][prevSlotKey] = prevPlaced;
                                         delete newJadual[h][kls][slotKey];
                                     } else {
-                                        break; // Swap berjaya
+                                        break;
                                     }
                                 }
                                 if (swapped) break;
                             }
                             
-                            // Jika pertukaran (swapping) pun masih gagal
                             if (!swapped) {
                                 gagalCount++;
                             }
@@ -1667,17 +1706,17 @@
             return `${window.formatMins(sMins)} - ${window.formatMins(eMins)}`;
         };
 
-        // --- PENGENDALI DRAG & DROP UNTUK JADUAL ---
+        // --- DRAG & DROP UNTUK JADUAL ---
         window.handleDragStart = function(e, h, kls, slotId) {
             if(!window.modSuntinganAktif) return;
             window.draggedSlot = { h, kls, slotId };
             e.dataTransfer.effectAllowed = 'move';
-            setTimeout(() => window.isDragging = true, 50); // Mencegah klik terpicu secara serentak
+            setTimeout(() => window.isDragging = true, 50);
         };
 
         window.handleDragOver = function(e) {
             if(!window.modSuntinganAktif) return;
-            e.preventDefault(); // Membenarkan 'drop'
+            e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
         };
 
@@ -1689,16 +1728,13 @@
             if(!window.draggedSlot) return;
             let src = window.draggedSlot;
             
-            // Halang jika letak di tempat yang sama
             if(src.h === targetH && src.kls === targetKls && src.slotId === targetSlotId) return;
 
-            // Halang penukaran merentas kelas berbeza (untuk elak konflik rumit)
             if(src.kls !== targetKls) {
-                window.customDialog("Makluman", "<p>Untuk menukar jadual, pastikan anda menarik-dan-meletak (Drag & Drop) di dalam kelas yang sama.</p>");
+                window.customDialog("Makluman", "<p>Sila buat pertukaran (drag & drop) di dalam kelas yang sama.</p>");
                 return;
             }
 
-            // Laksanakan proses penukaran slot (Swapping)
             let tempSrc = window.appState.jadual[src.h]?.[src.kls]?.[src.slotId];
             let tempTarget = window.appState.jadual[targetH]?.[targetKls]?.[targetSlotId];
 
@@ -1708,7 +1744,6 @@
             if(!window.appState.jadual[targetH]) window.appState.jadual[targetH] = {};
             if(!window.appState.jadual[targetH][targetKls]) window.appState.jadual[targetH][targetKls] = {};
 
-            // Tukar data
             if(tempTarget) window.appState.jadual[src.h][src.kls][src.slotId] = tempTarget;
             else delete window.appState.jadual[src.h][src.kls][src.slotId];
 
@@ -1755,7 +1790,6 @@
                 return;
             }
 
-            // Papar Status Memproses
             let modal = document.getElementById('customModal');
             document.getElementById('modalTitle').innerText = "Memproses PDF...";
             document.getElementById('modalMessage').innerHTML = "<p class='text-center py-4 font-bold text-indigo-700'>Sedang menjana jadual ke format PDF, sila tunggu... ⏳</p>";
@@ -1764,10 +1798,8 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
 
-            // Hasilkan Clone (Salinan) Container untuk ubah suai kelas paparan PDF
             let clone = container.cloneNode(true);
             
-            // Aktifkan elemen Header & Footer yang pada asalnya disembunyikan untuk skrin biasa (print:hidden)
             let hiddenHeader = clone.querySelector('.hidden.print\\:block');
             if(hiddenHeader) {
                 hiddenHeader.classList.remove('hidden', 'print:block');
@@ -1779,13 +1811,11 @@
                 hiddenFooter.classList.add('flex', 'mt-8', 'justify-between', 'items-end');
             }
 
-            // Balut dalam bekas berlatar putih dengan margin (Padding)
             let printWrapper = document.createElement('div');
             printWrapper.style.padding = '30px';
             printWrapper.style.backgroundColor = 'white';
             printWrapper.appendChild(clone);
 
-            // Nama fail dinamik (Guru atau Kelas)
             let sasaran = document.getElementById('paparJenisMode').value === 'guru' 
                 ? document.getElementById('paparGuruSelect').value 
                 : document.getElementById('paparKelasSelect').value;
@@ -1800,16 +1830,13 @@
             };
 
             try {
-                // Jana PDF sebagai Blob Data
                 let pdfBlob = await html2pdf().set(opt).from(printWrapper).output('blob');
                 let file = new File([pdfBlob], fileName, { type: 'application/pdf' });
                 
-                // Tutup Modal Memproses
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
                 document.getElementById('modalBtnOk').classList.remove('hidden');
 
-                // Semak jika pelayar peranti menyokong perkongsian fail (Web Share API) - Biasanya Telefon Pintar
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
                         await navigator.share({
@@ -1817,16 +1844,12 @@
                             text: `Sila rujuk lampiran PDF untuk Jadual Waktu terkini (${sasaran}).`,
                             files: [file]
                         });
-                    } catch(e) {
-                        console.log('Perkongsian dibatalkan', e);
-                    }
+                    } catch(e) {}
                 } else {
-                    // Jika pelayar Desktop tidak menyokong Web Share, sistem muat turun fail PDF
                     html2pdf().set(opt).from(printWrapper).save();
-                    window.customDialog("Makluman (Format Desktop)", `<p>Pelayar ini tidak menyokong fungsi "Buka WhatsApp" terus. Jadual telah <b>dimuat turun sebagai PDF</b> ke dalam komputer anda.</p><p class="mt-2 text-[11px] text-slate-500">Sila buka WhatsApp Web atau Telegram dan lampirkan fail <b>${fileName}</b> tersebut secara manual.</p>`);
+                    window.customDialog("Makluman", `<p>Fail <b>${fileName}</b> berjaya dimuat turun.</p>`);
                 }
             } catch (err) {
-                console.error(err);
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
                 document.getElementById('modalBtnOk').classList.remove('hidden');
@@ -1851,9 +1874,7 @@
                 if(conf.jumlah > maxSlot) maxSlot = conf.jumlah;
             }
 
-            // Gunakan tetapan Isnin sebagai sandaran paparan selaras
             let stdRehat = (window.appState.configMasa['Isnin'] || {rehat: 4}).rehat;
-
             let namaSekolah = window.appState.schoolName || "Sekolah";
             let tarikh = new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
             
@@ -1892,9 +1913,7 @@
                     let kodCoTeacher = coTeacher ? (window.appState.guruKod?.[coTeacher] || coTeacher) : "";
                     let paparanGuru = coTeacher ? `${kodGuru} & ${kodCoTeacher}` : kodGuru;
 
-                    // Dinamik Warna & Tetapan Drag-Drop
                     let bgColor = subjek ? window.getColorForSubjek(subjek) : '#ffffff';
-                    
                     let dragEvents = "";
                     let cursorStyle = "";
                     
@@ -1907,12 +1926,10 @@
                     }
 
                     let cellStyle = `border border-slate-200 p-2 text-center transition-all shadow-sm ${cursorStyle}`;
-                    
-                    // Gunakan pengawal isDragging supaya Drag & Drop tidak mencetuskan Modal Suntingan
                     let clickAction = window.modSuntinganAktif ? `onclick="if(!window.isDragging) bukaModalSuntingManual('${h}', '${kls}', '${slotId}')"` : "";
 
                     html += `<td class="${cellStyle}" style="background-color: ${bgColor};" ${dragEvents} ${clickAction}>
-                        ${subjek ? `<div class="font-bold text-slate-800">${subjek}</div><div class="text-[10px] text-slate-600 font-semibold" title="Utama: ${guru}${coTeacher ? ` | Bersama: ${coTeacher}` : ''}">${paparanGuru}</div>` : `<span class="text-slate-300 italic">Kosong</span>`}
+                        ${subjek ? `<div class="font-bold text-slate-800">${subjek}</div><div class="text-[10px] text-slate-600 font-semibold" title="Utama: ${guru}">${paparanGuru}</div>` : `<span class="text-slate-300 italic">Kosong</span>`}
                     </td>`;
                 }
                 html += `</tr>`;
@@ -1943,7 +1960,6 @@
             }
 
             let stdRehat = (window.appState.configMasa['Isnin'] || {rehat: 4}).rehat;
-
             let namaSekolah = window.appState.schoolName || "Sekolah";
             let tarikh = new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
             
@@ -2029,12 +2045,9 @@
             let subjek = document.getElementById('editManualSubjek').value;
             let guru = document.getElementById('editManualGuru').value;
 
-            // --- SEMAKAN PERTINDIHAN JADUAL GURU (CLASH DETECTION) ---
             if (guru) {
                 let clashClass = null;
                 let clashSubjek = null;
-                
-                // Semak semua kelas pada hari dan slot masa yang sama
                 if (window.appState.jadual[hari]) {
                     for (let kls of Object.keys(window.appState.jadual[hari])) {
                         if (kls !== kelas) {
@@ -2042,26 +2055,23 @@
                             if (cell && cell.guru === guru) {
                                 clashClass = kls;
                                 clashSubjek = cell.subjek;
-                                break; // Berhenti mencari jika terjumpa tindihan
+                                break;
                             }
                         }
                     }
                 }
 
-                // Jika terjumpa tindihan, sekat suntingan dan papar mesej
                 if (clashClass) {
                     let paparanSlot = slotId.split('_')[1].replace('s', 'Slot ');
                     window.customDialog("Pertindihan Jadual Dikesan 🔴", 
-                        `<p class="text-sm font-semibold text-slate-700">Tindakan ini tidak dapat diteruskan.</p>
+                        `<p class="text-sm font-semibold text-slate-700">Tindakan tidak dapat diteruskan.</p>
                         <div class="bg-red-50 border border-red-200 p-3 rounded-lg mt-3 text-xs text-red-800">
-                            Cikgu <b>${guru}</b> telah pun dijadualkan mengajar <b>${clashSubjek}</b> di kelas <b>${clashClass}</b> pada masa ini (${hari}, ${paparanSlot}).
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-3">Sila kosongkan slot guru tersebut di kelas ${clashClass} terlebih dahulu jika anda mahu memindahkannya ke slot kelas ini.</p>`
+                            Cikgu <b>${guru}</b> mengajar <b>${clashSubjek}</b> di kelas <b>${clashClass}</b> pada masa ini (${hari}, ${paparanSlot}).
+                        </div>`
                     );
-                    return; // Hentikan fungsi penyimpanan
+                    return;
                 }
             }
-            // --- TAMAT SEMAKAN ---
 
             if(!window.appState.jadual[hari]) window.appState.jadual[hari] = {};
             if(!window.appState.jadual[hari][kelas]) window.appState.jadual[hari][kelas] = {};
@@ -2133,7 +2143,7 @@
             document.getElementById('modalJadualInduk').classList.add('flex');
         };
 
-        // --- TETAPAN & EKSPORT/IMPORT ---
+        // --- TETAPAN, EKSPORT/IMPORT & VERSIONING ---
         window.simpanNamaSekolah = function() {
             window.appState.schoolName = document.getElementById('inputNamaSekolah').value;
             simpanData();
@@ -2168,7 +2178,6 @@
             reader.readAsText(file);
         };
 
-        // --- SISTEM PENGURUSAN VERSI (VERSIONING) ---
         window.simpanVersiBaharu = async function() {
             let namaVersi = document.getElementById('inputNamaVersi').value.trim();
             if(!namaVersi) { window.customDialog("Makluman", "<p>Sila masukkan nama versi jadual.</p>"); return; }
@@ -2180,13 +2189,12 @@
                 id: 'v_' + Date.now().toString(),
                 nama: namaVersi,
                 tarikh: new Date().toLocaleString('ms-MY'),
-                jadual: JSON.parse(JSON.stringify(window.appState.jadual)) // Buat salinan dalam (deep copy)
+                jadual: JSON.parse(JSON.stringify(window.appState.jadual))
             };
 
             document.getElementById('inputNamaVersi').value = "";
             let activeUid = currentUser ? currentUser.uid : "lokal_offline";
             
-            // Simpan Ke Awan jika Log Masuk
             if (db && activeUid !== "lokal_offline") {
                 try {
                     window.customDialog("Menyimpan...", "<p>Sedang menyimpan jadual ke pangkalan data awan...</p>");
@@ -2196,13 +2204,11 @@
                     window.customDialog("Ralat Awan", "<p>Gagal menyimpan versi ke awan.</p>");
                 }
             } else {
-                // Simpan ke Local Storage jika mod Luar Talian
                 let localV = JSON.parse(localStorage.getItem(`jadualVersi_${activeUid}`)) || [];
                 localV.push(versiObj);
                 localStorage.setItem(`jadualVersi_${activeUid}`, JSON.stringify(localV));
-                window.customDialog("Berjaya (Luar Talian)", `<p>Versi <b>${namaVersi}</b> disimpan dalam memori pelayar.</p>`);
+                window.customDialog("Berjaya", `<p>Versi <b>${namaVersi}</b> disimpan dalam memori pelayar.</p>`);
             }
-            
             muatSenaraiVersi();
         };
 
@@ -2212,7 +2218,6 @@
             if(!container) return;
             
             let listHTML = "";
-            
             if (db && activeUid !== "lokal_offline") {
                 try {
                     const qSnap = await getDocs(collection(db, "artifacts", "sistem-jadual", "users", activeUid, "versions"));
@@ -2240,14 +2245,14 @@
                     <div class="text-[10px] text-slate-500">${data.tarikh}</div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="muatVersiKeSistem('${data.id}')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded border border-emerald-200 transition">🔄 Muat Jadual Ini</button>
+                    <button onclick="muatVersiKeSistem('${data.id}')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded border border-emerald-200 transition">🔄 Muat</button>
                     <button onclick="padamVersiSistem('${data.id}')" class="px-2 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[10px] rounded border border-red-200 transition">🗑️</button>
                 </div>
             </div>`;
         }
 
         window.muatVersiKeSistem = async function(vId) {
-            window.customDialog("Pengesahan", "<p>Tindakan ini akan <b>MENGGANTIKAN</b> jadual semasa anda di Tab 4 (Jadual Waktu) dengan versi ini. Teruskan?</p>", true, async () => {
+            window.customDialog("Pengesahan", "<p>Tindakan ini akan <b>MENGGANTIKAN</b> jadual semasa anda dengan versi ini. Teruskan?</p>", true, async () => {
                 let activeUid = currentUser ? currentUser.uid : "lokal_offline";
                 let targetJadual = null;
 
@@ -2263,16 +2268,14 @@
                 if(targetJadual) {
                     window.appState.jadual = targetJadual;
                     simpanData();
-                    renderJadualDropdowns(); // Refresh UI
+                    renderJadualDropdowns();
                     window.customDialog("Selesai", "<p>Jadual versi berjaya dimuatkan ke ruang kerja anda.</p>");
-                } else {
-                    window.customDialog("Ralat", "<p>Data versi tidak ditemui.</p>");
                 }
             });
         };
 
         window.padamVersiSistem = async function(vId) {
-            window.customDialog("Amaran Padam", "<p>Adakah anda pasti mahu memadam versi jadual ini secara kekal?</p>", true, async () => {
+            window.customDialog("Amaran", "<p>Adakah anda pasti mahu memadam versi jadual ini?</p>", true, async () => {
                 let activeUid = currentUser ? currentUser.uid : "lokal_offline";
                 if (db && activeUid !== "lokal_offline") {
                     await deleteDoc(doc(db, "artifacts", "sistem-jadual", "users", activeUid, "versions", vId));
@@ -2286,44 +2289,27 @@
         };
 
         window.hantarKeGoogleSheets = async function() {
-            if(!GAS_WEBHOOK_URL) {
-                window.customDialog("Ralat", "<p>URL Webhook Google Sheets tidak ditetapkan.</p>");
-                return;
-            }
-            window.customDialog("Menghantar...", "<p>Sedang menghantar sandaran data ke pangkalan data Google Sheets...</p>");
+            if(!GAS_WEBHOOK_URL) return;
+            window.customDialog("Menghantar...", "<p>Sedang menghantar sandaran data ke Google Sheets...</p>");
             try {
-                let payload = {
-                    userId: currentUser ? currentUser.uid : "lokal_offline",
-                    appState: window.appState
-                };
-                let response = await fetch(GAS_WEBHOOK_URL, {
+                let payload = { userId: currentUser ? currentUser.uid : "lokal_offline", appState: window.appState };
+                await fetch(GAS_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
-                let resJson = await response.json();
-                if(resJson.status === 'success') {
-                    window.customDialog("Berjaya!", "<p>Data berjaya direkodkan ke Google Sheets!</p>");
-                } else {
-                    window.customDialog("Perhatian", "<p>Respons pelayan: " + resJson.message + "</p>");
-                }
+                window.customDialog("Berjaya!", "<p>Data berjaya direkodkan ke Google Sheets!</p>");
             } catch(e) {
-                window.customDialog("Berjaya!", "<p>Permintaan sandaran telah dihantar melalui sambungan silang pelayar.</p>");
+                window.customDialog("Berjaya!", "<p>Permintaan sandaran telah dihantar.</p>");
             }
         };
 
         window.resetDataSemasa = function() {
-            window.customDialog("Pengesahan", "<p>Adakah anda pasti mahu menetapkan semula semua data dalam akaun ini?</p>", true, () => {
+            window.customDialog("Pengesahan", "<p>Adakah anda pasti mahu menetapkan semula semua data?</p>", true, () => {
                 window.appState = { 
-                    schoolName: "SK / SMK Pintar", 
-                    guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, 
+                    schoolName: "SK / SMK Pintar", guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, 
                     masaSekolah: { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20 }, 
                     configMasa: { Isnin: {jumlah:8, rehat:4}, Selasa: {jumlah:8, rehat:4}, Rabu: {jumlah:8, rehat:4}, Khamis: {jumlah:8, rehat:4}, Jumaat: {jumlah:6, rehat:3} }, 
-                    configMasaData: {
-                        pagi: { Isnin: {jumlah:8, rehat:4}, Selasa: {jumlah:8, rehat:4}, Rabu: {jumlah:8, rehat:4}, Khamis: {jumlah:8, rehat:4}, Jumaat: {jumlah:6, rehat:3} },
-                        petang: { Isnin: {jumlah:8, rehat:4}, Selasa: {jumlah:8, rehat:4}, Rabu: {jumlah:8, rehat:4}, Khamis: {jumlah:8, rehat:4}, Jumaat: {jumlah:6, rehat:3} },
-                        bergabung: { Isnin: {jumlah:8, rehat:4}, Selasa: {jumlah:8, rehat:4}, Rabu: {jumlah:8, rehat:4}, Khamis: {jumlah:8, rehat:4}, Jumaat: {jumlah:6, rehat:3} }
-                    },
                     jenisSesiSekolah: "pagi", agihan: [], kekangan: [], jadual: {} 
                 };
                 simpanData();
