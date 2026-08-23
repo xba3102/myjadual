@@ -53,7 +53,6 @@
     <!-- MAIN CONTAINER -->
     <main class="max-w-7xl mx-auto px-4 py-6">
 
-        <!-- APP CONTENT (Sentiasa papar) -->
         <div id="appContent" class="block">
             
             <!-- TABS NAVIGATION -->
@@ -93,12 +92,12 @@
                                     <button onclick="tambahData('guru')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah</button>
                                 </div>
                                 <button onclick="bukaModalPukalGuru()" class="w-full mt-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs py-2 rounded-lg border border-emerald-200 transition flex items-center justify-center gap-1.5">
-                                    <span>📋</span> Tambah Pukal Guru
+                                    <span>📋</span> Tambah Pukal Guru (Excel / CSV)
                                 </button>
                             </div>
                         </div>
                         <button onclick="window.paparSenarai('guru')" class="w-full mt-2 bg-slate-50 hover:bg-slate-100 text-indigo-600 font-bold text-xs py-2 rounded-lg border border-slate-200 transition flex items-center justify-center gap-1.5">
-                            <span>👁️</span> Papar Senarai Guru
+                            <span>👁️</span> Papar Senarai Guru (Edit & Padam)
                         </button>
                     </div>
 
@@ -156,7 +155,6 @@
                     <h3 class="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2"><span>⏰</span> Konfigurasi Sesi & Slot Masa Mingguan</h3>
                     <p class="text-xs text-slate-500 mb-4">Tetapkan parameter waktu (mula, tamat, tempoh) dan susunan slot untuk setiap hari persekolahan.</p>
                     
-                    <!-- PILIHAN JENIS SESI SEKOLAH & MASA -->
                     <div class="mb-5 bg-slate-50 p-4 rounded-lg border grid grid-cols-2 md:grid-cols-5 gap-4 items-end">
                         <div class="col-span-2 md:col-span-1">
                             <label class="text-[10px] font-bold text-slate-700 block mb-1">Operasi Sesi:</label>
@@ -274,7 +272,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button id="btnToggleSunting" onclick="toggleModSuntingan()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5">
+                            <button id="btnToggleSunting" onclick="toggleModSuntingan()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5" title="Buka fungsi tukar slot secara klik atau Drag & Drop">
                                 <span>✏️</span> Sunting Manual
                             </button>
                             <button onclick="window.kongsiJadual()" class="bg-green-600 hover:bg-green-700 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5">
@@ -370,8 +368,12 @@
                 <button onclick="tutupModalPukalGuru()" class="text-slate-400 hover:text-red-500 font-bold text-lg">✕</button>
             </div>
             <div class="p-5 space-y-3">
-                <p class="text-xs text-slate-500">Salin dan tampal (Paste) senarai nama guru dari Excel atau taip baris demi baris (atau dipisahkan dengan koma).</p>
-                <textarea id="textareaPukalGuru" rows="6" placeholder="Cth:&#10;Cikgu Ahmad bin Ali&#10;Cikgu Siti binti Abu&#10;Cikgu Muthu a/l Kumar" class="w-full text-xs border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                <div class="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-800">
+                    <p class="font-bold mb-1">Format (Pisahkan dengan koma atau tab):</p>
+                    <p class="font-mono">Nama Guru, No. Kad Pengenalan, ID DELIMa</p>
+                </div>
+                <p class="text-[11px] text-slate-500">Salin terus jadual (3 lajur) dari Excel dan tampal di bawah, atau taip secara manual.</p>
+                <textarea id="textareaPukalGuru" rows="6" placeholder="Cth:&#10;Ahmad bin Ali, 801010-01-1234, g-123456@moe-dl.edu.my&#10;Siti binti Abu, 850202-14-5678, g-654321@moe-dl.edu.my" class="w-full text-xs border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
             </div>
             <div class="flex justify-end gap-2 p-5 border-t shrink-0">
                 <button onclick="tutupModalPukalGuru()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Batal</button>
@@ -489,7 +491,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Konfigurasi Rasmi Firebase
+        // Konfigurasi Rasmi Firebase (Preview Environment / Production)
         const firebaseConfig = {
             apiKey: "AIzaSyBbH3sUXVouonVnFK4kJ0dZjPb32eZNPvo",
             authDomain: "makrove6-ef560.firebaseapp.com",
@@ -512,7 +514,7 @@
             console.warn("Firebase initialization warning:", e);
         }
 
-        // Global State
+        // Global State (Objek Induk Sistem)
         window.appState = {
             schoolName: "SK / SMK Pintar",
             guru: [],
@@ -520,6 +522,8 @@
             subjek: [],
             guruSesi: {}, // { "Cikgu Ali": "pagi" }
             guruKod: {},  // { "Cikgu Ali": "JAB" }
+            guruIC: {},   // { "Cikgu Ali": "800101-10-1234" }
+            guruDelima: {}, // { "Cikgu Ali": "g-123@moe-dl.edu.my" }
             masaSekolah: { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20 },
             configMasa: {
                 Isnin: { jumlah: 8, rehat: 4 },
@@ -528,15 +532,15 @@
                 Khamis: { jumlah: 8, rehat: 4 },
                 Jumaat: { jumlah: 6, rehat: 3 }
             },
-            configMasaData: null, // Akan menyimpan profil berasingan { pagi: {}, petang: {}, bergabung: {} }
-            jenisSesiSekolah: "pagi", // pagi | petang | bergabung
+            configMasaData: null, 
+            jenisSesiSekolah: "pagi", 
             agihan: [],
             kekangan: [],
             jadual: {}
         };
 
         window.editIndexKekangan = null;
-        let activeSlotEdit = null; // { hari, kls, slotId }
+        let activeSlotEdit = null;
         window.modSuntinganAktif = false;
         
         // Pembolehubah Global Untuk Drag & Drop
@@ -568,13 +572,12 @@
                 { id: 's_awal_pagi', label: 'Waktu Awal Pagi Sahaja', desc: 'Subjek ini hanya sesuai pada Slot 1 atau Slot 2 pagi.', inputs: ['subjek'] },
                 { id: 's_lewat_petang', label: 'Waktu Lewat Petang Sahaja', desc: 'Subjek ini hanya sesuai pada 2 slot terakhir sesi.', inputs: ['subjek'] },
                 { id: 's_double_period', label: 'Galakkan Double Period', desc: 'Mengutamakan subjek disusun 2 waktu berturut-turut untuk kelas yang sama.', inputs: ['subjek'] },
-                { id: 's_elak_ulang_hari', label: 'Elak Ulangan (Max 1 Sesi/Hari)', desc: 'Subjek ini hanya boleh diajar 1 sesi sehari untuk kelas yang sama (sama ada 1 waktu atau max 2 waktu berturut-turut). Ia tidak boleh dipisah dan diulang semula pada waktu lain di hari yang sama.', inputs: ['subjek'] },
-                { id: 's_solo_sahaja', label: 'Slot Solo Sahaja (Single Period Only)', desc: 'Subjek ini hanya boleh diagihkan 1 waktu sehari. Maksimum 5 waktu seminggu. AI akan menolak jika agihan melebihi 5 waktu.', inputs: ['subjek'] },
+                { id: 's_elak_ulang_hari', label: 'Elak Ulangan (Max 1 Sesi/Hari)', desc: 'Subjek ini hanya boleh diajar 1 sesi sehari untuk kelas yang sama. Ia tidak boleh dipisah dan diulang.', inputs: ['subjek'] },
+                { id: 's_solo_sahaja', label: 'Slot Solo Sahaja (Single Period Only)', desc: 'Subjek ini hanya boleh diagihkan 1 waktu sehari. Maksimum 5 waktu seminggu.', inputs: ['subjek'] },
                 { id: 's_elak_pisah_rehat', label: 'Elak Terpisah Oleh Rehat', desc: 'Jika Double Period, elakkan subjek diajar separuh sebelum dan separuh selepas waktu rehat.', inputs: ['subjek'] }
             ]
         };
 
-        // --- AUTH & STORAGE ---
         window.handleAuthClick = async function() {
             if (!auth) return;
             if (currentUser && currentUser.uid !== "lokal_offline") {
@@ -589,7 +592,7 @@
                     await signInWithPopup(auth, provider);
                 } catch(e) {
                     console.error("Ralat log masuk", e);
-                    window.customDialog("Ralat Log Masuk", "<p>Log masuk dibatalkan atau gagal. Sila cuba lagi.</p>");
+                    window.customDialog("Ralat Log Masuk", "<p>Log masuk dibatalkan atau disekat oleh pelayar. Pastikan pelayar anda membenarkan 'Pop-ups' atau teruskan penggunaan dalam Mod Luar Talian secara percuma.</p>");
                 }
             }
         };
@@ -617,15 +620,12 @@
 
             if(currentUser && currentUser.uid !== "lokal_offline") {
                 window.isAdminUtama = false;
-                
-                // Semak jika pengguna adalah Admin Utama
                 if(currentUser.email === "sekolah-7608@moe-dl.edu.my") {
                     window.isAdminUtama = true;
                     userNameEl.innerHTML = `${currentUser.displayName || "Pentadbir"} <span class="bg-amber-400 text-amber-900 px-1.5 py-0.5 rounded text-[9px] ml-1 font-extrabold shadow-sm">👑 ADMIN UTAMA</span>`;
                 } else {
                     userNameEl.innerText = currentUser.displayName || "Pengguna Awan";
                 }
-                
                 userEmailEl.innerText = currentUser.email || (currentUser.uid.substring(0,8) + "...");
                 authBtnText.innerText = "Log Keluar";
             } else {
@@ -707,9 +707,9 @@
         };
 
         function refreshUIAll() {
-            document.getElementById('countGuru').innerText = window.appState.guru.length;
-            document.getElementById('countKelas').innerText = window.appState.kelas.length;
-            document.getElementById('countSubjek').innerText = window.appState.subjek.length;
+            document.getElementById('countGuru').innerText = (window.appState.guru || []).length;
+            document.getElementById('countKelas').innerText = (window.appState.kelas || []).length;
+            document.getElementById('countSubjek').innerText = (window.appState.subjek || []).length;
             document.getElementById('inputNamaSekolah').value = window.appState.schoolName || "";
             document.getElementById('jenisSesiSekolah').value = window.appState.jenisSesiSekolah || "pagi";
             renderConfigMasa();
@@ -720,20 +720,19 @@
             renderGuruSesi();
         }
 
-        // --- UTILITI WARNA SUBJEK ---
         window.getColorForSubjek = function(subjek) {
             if(!subjek) return '#ffffff';
-            let colors = ['#fecaca', '#fef08a', '#bbf7d0', '#bfdbfe', '#e9d5ff', '#fed7aa', '#99f6e4', '#fbcfe8', '#e2e8f0', '#c7d2fe', '#fecdd3', '#d9f99d'];
+            let colors = ['#fecaca', '#fef08a', '#bbf7d0', '#bfdbfe', '#e9d5ff', '#fed7aa', '#99f6e4', '#fbcfe8', '#e2e8f0', '#c7d2fe', '#fecdd3', '#d9f99d', '#bbf7d0', '#a7f3d0', '#fde047', '#cbd5e1'];
             let hash = 0;
             for (let i = 0; i < subjek.length; i++) { hash = subjek.charCodeAt(i) + ((hash << 5) - hash); }
             return colors[Math.abs(hash) % colors.length];
         };
 
-        // --- DATA INDUK ---
         window.tambahData = function(jenis) {
             let inputEl = document.getElementById(`input${jenis.charAt(0).toUpperCase() + jenis.slice(1)}`);
             let val = inputEl.value.trim();
             if(!val) return;
+            if(!window.appState[jenis]) window.appState[jenis] = [];
             if(window.appState[jenis].includes(val)) {
                 window.customDialog("Ralat", `<p>Maklumat "${val}" sudah wujud.</p>`);
                 return;
@@ -771,19 +770,30 @@
                 return;
             }
 
-            let lines = rawText.split(/\r?\n|,/);
+            let lines = rawText.split(/\r?\n/);
             let addedCount = 0;
 
             if(!window.appState.guru) window.appState.guru = [];
             if(!window.appState.guruKod) window.appState.guruKod = {};
             if(!window.appState.guruSesi) window.appState.guruSesi = {};
+            if(!window.appState.guruIC) window.appState.guruIC = {};
+            if(!window.appState.guruDelima) window.appState.guruDelima = {};
 
-            lines.forEach(name => {
-                let cleanName = name.trim();
+            lines.forEach(line => {
+                if(!line.trim()) return;
+                let parts = line.split(/,|\t/).map(s => s.trim());
+                let cleanName = parts[0];
+                let ic = parts[1] || "";
+                let delima = parts[2] || "";
+
+                if (cleanName.toLowerCase() === 'nama' || cleanName.toLowerCase() === 'bil' || cleanName.toLowerCase() === 'name') return;
+
                 if(cleanName && !window.appState.guru.includes(cleanName)) {
                     window.appState.guru.push(cleanName);
                     window.appState.guruKod[cleanName] = cleanName.substring(0, 3).toUpperCase();
                     window.appState.guruSesi[cleanName] = 'pagi';
+                    window.appState.guruIC[cleanName] = ic;
+                    window.appState.guruDelima[cleanName] = delima;
                     addedCount++;
                 }
             });
@@ -792,6 +802,92 @@
             refreshUIAll();
             tutupModalPukalGuru();
             window.customDialog("Berjaya", `<p>Seramai <b>${addedCount}</b> guru baru berjaya ditambah secara pukal.</p>`);
+        };
+
+        window.editGuru = function(oldName) {
+            let currentIC = window.appState.guruIC?.[oldName] || "";
+            let currentDelima = window.appState.guruDelima?.[oldName] || "";
+            
+            let inputHTML = `
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Baharu:</label>
+                        <input type="text" id="editNamaGuruInput" value="${oldName}" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">No. Kad Pengenalan:</label>
+                        <input type="text" id="editICGuruInput" value="${currentIC}" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">ID DELIMa:</label>
+                        <input type="text" id="editDelimaGuruInput" value="${currentDelima}" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+            `;
+            
+            window.customDialog("Sunting Maklumat Guru", inputHTML, true, () => {
+                let newName = document.getElementById('editNamaGuruInput').value.trim();
+                let newIC = document.getElementById('editICGuruInput').value.trim();
+                let newDelima = document.getElementById('editDelimaGuruInput').value.trim();
+                
+                if(!newName) {
+                    window.customDialog("Ralat", "<p>Nama guru tidak boleh dibiarkan kosong.</p>");
+                    return;
+                }
+                
+                if(newName !== oldName && window.appState.guru.includes(newName)) {
+                    setTimeout(() => window.customDialog("Ralat", "<p>Nama guru ini sudah wujud.</p>"), 300);
+                    return;
+                }
+
+                if(newName !== oldName) {
+                    let idx = window.appState.guru.indexOf(oldName);
+                    if(idx !== -1) window.appState.guru[idx] = newName;
+
+                    window.appState.guruKod[newName] = window.appState.guruKod[oldName];
+                    delete window.appState.guruKod[oldName];
+
+                    window.appState.guruSesi[newName] = window.appState.guruSesi[oldName];
+                    delete window.appState.guruSesi[oldName];
+                    
+                    if(window.appState.agihan) {
+                        window.appState.agihan.forEach(a => { if(a.guru === oldName) a.guru = newName; });
+                    }
+                    
+                    if(window.appState.kekangan) {
+                        window.appState.kekangan.forEach(k => {
+                            if(k.kondisi?.guru === oldName) k.kondisi.guru = newName;
+                            if(k.kondisi?.guru2 === oldName) k.kondisi.guru2 = newName;
+                        });
+                    }
+                    
+                    if(window.appState.jadual) {
+                        for(let h in window.appState.jadual) {
+                            for(let kls in window.appState.jadual[h]) {
+                                for(let slot in window.appState.jadual[h][kls]) {
+                                    let cell = window.appState.jadual[h][kls][slot];
+                                    if(cell && cell.guru === oldName) cell.guru = newName;
+                                    if(cell && cell.coTeacher === oldName) cell.coTeacher = newName;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if(!window.appState.guruIC) window.appState.guruIC = {};
+                if(!window.appState.guruDelima) window.appState.guruDelima = {};
+                
+                if(newName !== oldName) {
+                    delete window.appState.guruIC[oldName];
+                    delete window.appState.guruDelima[oldName];
+                }
+                window.appState.guruIC[newName] = newIC;
+                window.appState.guruDelima[newName] = newDelima;
+
+                simpanData();
+                refreshUIAll();
+                setTimeout(() => window.paparSenarai('guru'), 300); // Reload List
+            });
         };
 
         window.paparSenarai = function(jenis, sorted = false) {
@@ -824,11 +920,22 @@
 
             let senaraiHTML = dataArr.map((item, idx) => {
                 let label = item;
+                let editBtn = "";
                 if(jenis === 'guru') {
                     let kod = window.appState.guruKod && window.appState.guruKod[item] ? window.appState.guruKod[item] : '-';
-                    label = `${item} <span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[10px] ml-2 font-bold">${kod}</span>`;
+                    let ic = window.appState.guruIC && window.appState.guruIC[item] ? window.appState.guruIC[item] : '';
+                    let details = ic ? `<br><span class="text-[10px] text-slate-400 font-normal">IC: ${ic}</span>` : '';
+                    label = `<div>${item} <span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[10px] ml-2 font-bold">${kod}</span>${details}</div>`;
+                    
+                    editBtn = `<button onclick="window.editGuru('${item}')" class="text-blue-500 hover:text-blue-700 font-bold text-xs bg-blue-50 p-1.5 rounded transition mr-1" title="Sunting Maklumat">✏️</button>`;
                 }
-                return `<div class="flex justify-between items-center bg-slate-50 border border-slate-200 px-3 py-2 rounded-lg text-sm mb-2"><span class="font-medium text-slate-700">${idx + 1}. ${label}</span><button onclick="window.padamItem('${jenis}', '${item}')" class="text-red-500 hover:text-red-700 font-bold text-xs bg-red-50 p-1.5 rounded transition" title="Padam">🗑️</button></div>`;
+                return `<div class="flex justify-between items-center bg-slate-50 border border-slate-200 px-3 py-2 rounded-lg text-sm mb-2">
+                    <div class="font-medium text-slate-700 flex items-start gap-2"><span class="mt-0.5">${idx + 1}.</span> ${label}</div>
+                    <div class="flex items-center shrink-0">
+                        ${editBtn}
+                        <button onclick="window.padamItem('${jenis}', '${item}')" class="text-red-500 hover:text-red-700 font-bold text-xs bg-red-50 p-1.5 rounded transition" title="Padam Data">🗑️</button>
+                    </div>
+                </div>`;
             }).join('');
             
             window.customDialog(tajuk, `${extraHeader}<div class="pr-1 max-h-[60vh] overflow-y-auto">${senaraiHTML}</div>`);
@@ -852,12 +959,13 @@
             window.customDialog("Pengesahan", `<p>Adakah anda pasti mahu memadam "${nilai}"?</p>`, true, () => {
                 window.appState[jenis] = window.appState[jenis].filter(item => item !== nilai);
                 
-                // Pembersihan "Ghost Data" Berkait (Agihan & Kekangan)
                 if (jenis === 'guru') {
                     if(window.appState.agihan) window.appState.agihan = window.appState.agihan.filter(a => a.guru !== nilai);
                     if(window.appState.kekangan) window.appState.kekangan = window.appState.kekangan.filter(k => k.kondisi?.guru !== nilai && k.kondisi?.guru2 !== nilai);
                     if(window.appState.guruSesi) delete window.appState.guruSesi[nilai];
                     if(window.appState.guruKod) delete window.appState.guruKod[nilai];
+                    if(window.appState.guruIC) delete window.appState.guruIC[nilai];
+                    if(window.appState.guruDelima) delete window.appState.guruDelima[nilai];
                     bersihkanJadual(jenis, nilai);
                 } else if (jenis === 'kelas') {
                     if(window.appState.agihan) window.appState.agihan = window.appState.agihan.filter(a => a.kelas !== nilai);
@@ -879,7 +987,6 @@
             });
         };
 
-        // --- SESI & MASA ---
         function renderGuruSesi() {
             let container = document.getElementById('guruSesiContainer');
             if(!container) return;
@@ -914,7 +1021,6 @@
 
         window.tukarJenisSesiSekolah = function() {
             let newSession = document.getElementById('jenisSesiSekolah').value;
-            
             if (!window.appState.configMasaData) {
                 window.appState.configMasaData = {
                     pagi: JSON.parse(JSON.stringify(window.appState.configMasa)),
@@ -922,13 +1028,10 @@
                     bergabung: JSON.parse(JSON.stringify(window.appState.configMasa))
                 };
             }
-
             window.appState.jenisSesiSekolah = newSession;
-
             if (window.appState.configMasaData[newSession]) {
                 window.appState.configMasa = JSON.parse(JSON.stringify(window.appState.configMasaData[newSession]));
             }
-
             simpanData();
             renderConfigMasa();
         };
@@ -1021,7 +1124,6 @@
             window.customDialog("Berjaya", "<p>Konfigurasi parameter masa dan slot berjaya disimpan.</p>");
         };
 
-        // --- AGIHAN ---
         function renderAgihanDropdowns() {
             let gOpt = `<option value="">-- Pilih Guru --</option>` + window.appState.guru.map(g => {
                 let kod = window.appState.guruKod && window.appState.guruKod[g] ? window.appState.guruKod[g] : '';
@@ -1073,7 +1175,6 @@
             renderSenaraiAgihan();
         };
 
-        // --- KEKANGAN MIKRO ---
         window.bukaModalKekangan = function() {
             window.editIndexKekangan = null;
             document.getElementById('modalKekanganTitle').innerText = "Tambah Kekangan Mikro Baharu";
@@ -1258,7 +1359,6 @@
             container.innerHTML = html;
         }
 
-        // --- ENJIN AI & VALIDATOR DENGAN KEKANGAN MIKRO & BACKTRACKING ---
         function runDiagnostics() {
             let totalDemand = {};
             let totalGuruDemand = {};
@@ -1523,10 +1623,7 @@
 
             hariList.forEach(h => {
                 newJadual[h] = {};
-                let conf = window.appState.configMasa[h] || { jumlah: 8, rehat: 4 };
-                window.appState.kelas.forEach(kls => {
-                    newJadual[h][kls] = {};
-                });
+                window.appState.kelas.forEach(kls => { newJadual[h][kls] = {}; });
             });
 
             hariList.forEach(h => {
@@ -1567,11 +1664,7 @@
                         if(bestIdx !== -1) {
                             let chosen = poolAgihan.splice(bestIdx, 1)[0];
                             let valResult = validateConstraint(h, s, kls, chosen.guru, chosen.subjek, newJadual, conf);
-                            newJadual[h][kls][slotKey] = {
-                                subjek: chosen.subjek,
-                                guru: chosen.guru,
-                                coTeacher: valResult.coTeacher
-                            };
+                            newJadual[h][kls][slotKey] = { subjek: chosen.subjek, guru: chosen.guru, coTeacher: valResult.coTeacher };
                         } else {
                             // --- AI BACKTRACKING (DEPTH-1 SWAPPING LOGIC) ---
                             let swapped = false;
@@ -1584,7 +1677,7 @@
                                     let prevPlaced = newJadual[h][kls][prevSlotKey];
                                     if (!prevPlaced) continue;
 
-                                    delete newJadual[h][kls][prevSlotKey];
+                                    delete newJadual[h][kls][prevSlotKey]; // Temporary remove
 
                                     let guruBusyPrev = Object.keys(newJadual[h]).some(k => newJadual[h][k][prevSlotKey]?.guru === item.guru);
                                     if (!guruBusyPrev) {
@@ -1592,7 +1685,6 @@
                                         
                                         if (!val1.isHardViolated) {
                                             newJadual[h][kls][prevSlotKey] = { subjek: item.subjek, guru: item.guru, coTeacher: val1.coTeacher };
-                                            
                                             let guruBusyCur = Object.keys(newJadual[h]).some(k => newJadual[h][k][slotKey]?.guru === prevPlaced.guru);
                                             
                                             if (!guruBusyCur) {
@@ -1608,7 +1700,7 @@
                                     }
 
                                     if (!swapped) {
-                                        newJadual[h][kls][prevSlotKey] = prevPlaced;
+                                        newJadual[h][kls][prevSlotKey] = prevPlaced; // revert back
                                         delete newJadual[h][kls][slotKey];
                                     } else {
                                         break;
@@ -1630,30 +1722,11 @@
             renderJadualDropdowns();
 
             if(gagalCount > 0) {
-                window.customDialog("Jadual Selesai", `<p class="mb-2 text-amber-700 font-bold">⚠️ Selesai dengan beberapa slot kosong.</p><p class="text-xs">Sila semak paparan jadual.</p>`);
+                window.customDialog("Jadual Selesai", `<p class="mb-2 text-amber-700 font-bold">⚠️ Selesai dengan beberapa slot kosong.</p><p class="text-xs">Jadual dijana tetapi terdapat ${gagalCount} agihan gagal dimuatkan kerana kekangan ketat.</p>`);
             } else {
                 window.customDialog("✨ Berjaya!", "<p>Jadual waktu berjaya dijana sepenuhnya tanpa sebarang pelanggaran Hard Constraint!</p>");
             }
         };
-
-        // --- PAPARAN JADUAL KELAS & GURU ---
-        function renderJadualDropdowns() {
-            let selKls = document.getElementById('paparKelasSelect');
-            if(selKls) {
-                let curKls = selKls.value;
-                selKls.innerHTML = `<option value="">-- Pilih Kelas --</option>` + (window.appState.kelas || []).map(k => `<option value="${k}" ${k===curKls?'selected':''}>${k}</option>`).join('');
-                if(window.appState.kelas?.length > 0 && !curKls) selKls.value = window.appState.kelas[0];
-            }
-
-            let selGuru = document.getElementById('paparGuruSelect');
-            if(selGuru) {
-                let curGuru = selGuru.value;
-                selGuru.innerHTML = `<option value="">-- Pilih Guru --</option>` + (window.appState.guru || []).map(g => `<option value="${g}" ${g===curGuru?'selected':''}>${g}</option>`).join('');
-                if(window.appState.guru?.length > 0 && !curGuru) selGuru.value = window.appState.guru[0];
-            }
-
-            toggleModePapar();
-        }
 
         window.formatMins = function(mins) {
             let h = Math.floor(mins / 60) % 24;
@@ -1690,13 +1763,11 @@
             let masa = window.appState.masaSekolah;
             let jenis = window.appState.jenisSesiSekolah || "pagi";
             let mulaStr = (jenis === 'petang') ? masa.mulaPetang : masa.mulaPagi;
-            
             let parts = mulaStr.split(':');
             let startMins = parseInt(parts[0]) * 60 + parseInt(parts[1]);
             
             let dayConf = window.appState.configMasa[dayStr] || window.appState.configMasa['Isnin'] || {rehat: 4};
             let rehatSlot = dayConf.rehat;
-            
             let tSlot = parseInt(masa.tempohSlot) || 30;
             let tRehat = parseInt(masa.tempohRehat) || 20;
 
@@ -1706,7 +1777,6 @@
             return `${window.formatMins(sMins)} - ${window.formatMins(eMins)}`;
         };
 
-        // --- DRAG & DROP UNTUK JADUAL ---
         window.handleDragStart = function(e, h, kls, slotId) {
             if(!window.modSuntinganAktif) return;
             window.draggedSlot = { h, kls, slotId };
@@ -1731,7 +1801,7 @@
             if(src.h === targetH && src.kls === targetKls && src.slotId === targetSlotId) return;
 
             if(src.kls !== targetKls) {
-                window.customDialog("Makluman", "<p>Sila buat pertukaran (drag & drop) di dalam kelas yang sama.</p>");
+                window.customDialog("Makluman", "<p>Sila buat pertukaran (drag & drop) di dalam jadual kelas yang sama.</p>");
                 return;
             }
 
@@ -1754,6 +1824,23 @@
             renderJadualKelas();
             window.draggedSlot = null;
         };
+
+        function renderJadualDropdowns() {
+            let selKls = document.getElementById('paparKelasSelect');
+            if(selKls) {
+                let curKls = selKls.value;
+                selKls.innerHTML = `<option value="">-- Pilih Kelas --</option>` + (window.appState.kelas || []).map(k => `<option value="${k}" ${k===curKls?'selected':''}>${k}</option>`).join('');
+                if(window.appState.kelas?.length > 0 && !curKls) selKls.value = window.appState.kelas[0];
+            }
+
+            let selGuru = document.getElementById('paparGuruSelect');
+            if(selGuru) {
+                let curGuru = selGuru.value;
+                selGuru.innerHTML = `<option value="">-- Pilih Guru --</option>` + (window.appState.guru || []).map(g => `<option value="${g}" ${g===curGuru?'selected':''}>${g}</option>`).join('');
+                if(window.appState.guru?.length > 0 && !curGuru) selGuru.value = window.appState.guru[0];
+            }
+            toggleModePapar();
+        }
 
         window.toggleModePapar = function() {
             let mode = document.getElementById('paparJenisMode').value;
@@ -1783,80 +1870,6 @@
             toggleModePapar();
         };
 
-        window.kongsiJadual = async function() {
-            let container = document.getElementById('paparanJadualContainer');
-            if(!container || container.innerText.includes('Belum ada jadual dijana') || container.innerText.includes('Sila pilih')) {
-                window.customDialog("Ralat", "<p>Sila papar jadual kelas atau guru terlebih dahulu sebelum berkongsi.</p>");
-                return;
-            }
-
-            let modal = document.getElementById('customModal');
-            document.getElementById('modalTitle').innerText = "Memproses PDF...";
-            document.getElementById('modalMessage').innerHTML = "<p class='text-center py-4 font-bold text-indigo-700'>Sedang menjana jadual ke format PDF, sila tunggu... ⏳</p>";
-            document.getElementById('modalBtnOk').classList.add('hidden');
-            document.getElementById('modalBtnCancel').classList.add('hidden');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-
-            let clone = container.cloneNode(true);
-            
-            let hiddenHeader = clone.querySelector('.hidden.print\\:block');
-            if(hiddenHeader) {
-                hiddenHeader.classList.remove('hidden', 'print:block');
-                hiddenHeader.classList.add('block', 'mb-6', 'text-center');
-            }
-            let hiddenFooter = clone.querySelector('.hidden.print\\:flex');
-            if(hiddenFooter) {
-                hiddenFooter.classList.remove('hidden', 'print:flex');
-                hiddenFooter.classList.add('flex', 'mt-8', 'justify-between', 'items-end');
-            }
-
-            let printWrapper = document.createElement('div');
-            printWrapper.style.padding = '30px';
-            printWrapper.style.backgroundColor = 'white';
-            printWrapper.appendChild(clone);
-
-            let sasaran = document.getElementById('paparJenisMode').value === 'guru' 
-                ? document.getElementById('paparGuruSelect').value 
-                : document.getElementById('paparKelasSelect').value;
-            let fileName = `Jadual_${sasaran.replace(/[^a-z0-9]/gi, '_')}.pdf`;
-
-            let opt = {
-                margin:       0.3,
-                filename:     fileName,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
-            };
-
-            try {
-                let pdfBlob = await html2pdf().set(opt).from(printWrapper).output('blob');
-                let file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-                
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.getElementById('modalBtnOk').classList.remove('hidden');
-
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            title: `Jadual Waktu ${sasaran}`,
-                            text: `Sila rujuk lampiran PDF untuk Jadual Waktu terkini (${sasaran}).`,
-                            files: [file]
-                        });
-                    } catch(e) {}
-                } else {
-                    html2pdf().set(opt).from(printWrapper).save();
-                    window.customDialog("Makluman", `<p>Fail <b>${fileName}</b> berjaya dimuat turun.</p>`);
-                }
-            } catch (err) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.getElementById('modalBtnOk').classList.remove('hidden');
-                window.customDialog("Ralat", "<p>Gagal menjana PDF.</p>");
-            }
-        };
-
         window.renderJadualKelas = function() {
             let kls = document.getElementById('paparKelasSelect').value;
             let container = document.getElementById('paparanJadualContainer');
@@ -1873,7 +1886,6 @@
                 let conf = window.appState.configMasa[h] || { jumlah: 8 };
                 if(conf.jumlah > maxSlot) maxSlot = conf.jumlah;
             }
-
             let stdRehat = (window.appState.configMasa['Isnin'] || {rehat: 4}).rehat;
             let namaSekolah = window.appState.schoolName || "Sekolah";
             let tarikh = new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -1918,7 +1930,7 @@
                     let cursorStyle = "";
                     
                     if (window.modSuntinganAktif) {
-                        cursorStyle = subjek ? "cursor-grab hover:ring-2 hover:ring-indigo-400 opacity-90 hover:opacity-100" : "cursor-pointer hover:bg-slate-100 border-dashed";
+                        cursorStyle = subjek ? "cursor-grab hover:ring-2 hover:ring-indigo-400 opacity-90 hover:opacity-100" : "cursor-pointer hover:bg-slate-100 border-dashed border-2 border-slate-300";
                         dragEvents = `ondragover="handleDragOver(event)" ondrop="handleDrop(event, '${h}', '${kls}', '${slotId}')"`;
                         if(subjek) {
                             dragEvents += ` draggable="true" ondragstart="handleDragStart(event, '${h}', '${kls}', '${slotId}')"`;
@@ -1958,7 +1970,6 @@
                 let conf = window.appState.configMasa[h] || { jumlah: 8 };
                 if(conf.jumlah > maxSlot) maxSlot = conf.jumlah;
             }
-
             let stdRehat = (window.appState.configMasa['Isnin'] || {rehat: 4}).rehat;
             let namaSekolah = window.appState.schoolName || "Sekolah";
             let tarikh = new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -2097,7 +2108,76 @@
             toggleModePapar();
         };
 
-        // --- JADUAL INDUK ---
+        window.kongsiJadual = async function() {
+            let container = document.getElementById('paparanJadualContainer');
+            if(!container || container.innerText.includes('Belum ada jadual dijana') || container.innerText.includes('Sila pilih')) {
+                window.customDialog("Ralat", "<p>Sila papar jadual kelas atau guru terlebih dahulu sebelum berkongsi.</p>");
+                return;
+            }
+
+            let modal = document.getElementById('customModal');
+            document.getElementById('modalTitle').innerText = "Memproses PDF...";
+            document.getElementById('modalMessage').innerHTML = "<p class='text-center py-4 font-bold text-indigo-700'>Sedang menjana jadual ke format PDF, sila tunggu... ⏳</p>";
+            document.getElementById('modalBtnOk').classList.add('hidden');
+            document.getElementById('modalBtnCancel').classList.add('hidden');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            let clone = container.cloneNode(true);
+            let hiddenHeader = clone.querySelector('.hidden.print\\:block');
+            if(hiddenHeader) {
+                hiddenHeader.classList.remove('hidden', 'print:block');
+                hiddenHeader.classList.add('block', 'mb-6', 'text-center');
+            }
+            let hiddenFooter = clone.querySelector('.hidden.print\\:flex');
+            if(hiddenFooter) {
+                hiddenFooter.classList.remove('hidden', 'print:flex');
+                hiddenFooter.classList.add('flex', 'mt-8', 'justify-between', 'items-end');
+            }
+
+            let printWrapper = document.createElement('div');
+            printWrapper.style.padding = '30px';
+            printWrapper.style.backgroundColor = 'white';
+            printWrapper.appendChild(clone);
+
+            let sasaran = document.getElementById('paparJenisMode').value === 'guru' ? document.getElementById('paparGuruSelect').value : document.getElementById('paparKelasSelect').value;
+            let fileName = `Jadual_${sasaran.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+
+            let opt = {
+                margin:       0.3,
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            try {
+                let pdfBlob = await html2pdf().set(opt).from(printWrapper).output('blob');
+                let file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.getElementById('modalBtnOk').classList.remove('hidden');
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            title: `Jadual Waktu ${sasaran}`,
+                            text: `Sila rujuk lampiran PDF untuk Jadual Waktu terkini (${sasaran}).`,
+                            files: [file]
+                        });
+                    } catch(e) {}
+                } else {
+                    html2pdf().set(opt).from(printWrapper).save();
+                    window.customDialog("Makluman", `<p>Fail <b>${fileName}</b> berjaya dimuat turun.</p>`);
+                }
+            } catch (err) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.getElementById('modalBtnOk').classList.remove('hidden');
+                window.customDialog("Ralat", "<p>Gagal menjana PDF.</p>");
+            }
+        };
+
         window.bukaJadualIndukModal = function() {
             if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) {
                 window.customDialog("Ralat", "<p>Sila jana jadual waktu terlebih dahulu.</p>");
@@ -2143,7 +2223,6 @@
             document.getElementById('modalJadualInduk').classList.add('flex');
         };
 
-        // --- TETAPAN, EKSPORT/IMPORT & VERSIONING ---
         window.simpanNamaSekolah = function() {
             window.appState.schoolName = document.getElementById('inputNamaSekolah').value;
             simpanData();
@@ -2166,8 +2245,7 @@
             let reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    let parsed = JSON.parse(e.target.result);
-                    window.appState = parsed;
+                    window.appState = JSON.parse(e.target.result);
                     simpanData();
                     refreshUIAll();
                     window.customDialog("Berjaya", "<p>Data berjaya diimport ke akaun anda!</p>");
@@ -2197,17 +2275,17 @@
             
             if (db && activeUid !== "lokal_offline") {
                 try {
-                    window.customDialog("Menyimpan...", "<p>Sedang menyimpan jadual ke pangkalan data awan...</p>");
+                    window.customDialog("Menyimpan...", "<p>Sedang menyimpan jadual ke awan...</p>");
                     await setDoc(doc(db, "artifacts", "sistem-jadual", "users", activeUid, "versions", versiObj.id), versiObj);
                     window.customDialog("Berjaya", `<p>Versi <b>${namaVersi}</b> telah berjaya disimpan ke awan.</p>`);
                 } catch (e) {
-                    window.customDialog("Ralat Awan", "<p>Gagal menyimpan versi ke awan.</p>");
+                    window.customDialog("Ralat", "<p>Gagal menyimpan versi.</p>");
                 }
             } else {
                 let localV = JSON.parse(localStorage.getItem(`jadualVersi_${activeUid}`)) || [];
                 localV.push(versiObj);
                 localStorage.setItem(`jadualVersi_${activeUid}`, JSON.stringify(localV));
-                window.customDialog("Berjaya", `<p>Versi <b>${namaVersi}</b> disimpan dalam memori pelayar.</p>`);
+                window.customDialog("Berjaya", `<p>Versi <b>${namaVersi}</b> disimpan dalam peranti.</p>`);
             }
             muatSenaraiVersi();
         };
@@ -2221,21 +2299,13 @@
             if (db && activeUid !== "lokal_offline") {
                 try {
                     const qSnap = await getDocs(collection(db, "artifacts", "sistem-jadual", "users", activeUid, "versions"));
-                    qSnap.forEach(docSnap => {
-                        let data = docSnap.data();
-                        listHTML += binaHtmlSenaraiVersi(data);
-                    });
+                    qSnap.forEach(docSnap => { listHTML += binaHtmlSenaraiVersi(docSnap.data()); });
                 } catch(e) {}
             } else {
                 let localV = JSON.parse(localStorage.getItem(`jadualVersi_${activeUid}`)) || [];
                 localV.forEach(data => { listHTML += binaHtmlSenaraiVersi(data); });
             }
-            
-            if(listHTML === "") {
-                container.innerHTML = `<p class="text-center text-xs text-slate-400 py-4">Tiada versi jadual direkodkan.</p>`;
-            } else {
-                container.innerHTML = listHTML;
-            }
+            container.innerHTML = listHTML === "" ? `<p class="text-center text-xs text-slate-400 py-4">Tiada versi direkodkan.</p>` : listHTML;
         };
 
         function binaHtmlSenaraiVersi(data) {
@@ -2245,17 +2315,16 @@
                     <div class="text-[10px] text-slate-500">${data.tarikh}</div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="muatVersiKeSistem('${data.id}')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded border border-emerald-200 transition">🔄 Muat</button>
+                    <button onclick="muatVersiKeSistem('${data.id}')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded border border-emerald-200 transition">🔄 Muat Jadual Ini</button>
                     <button onclick="padamVersiSistem('${data.id}')" class="px-2 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[10px] rounded border border-red-200 transition">🗑️</button>
                 </div>
             </div>`;
         }
 
         window.muatVersiKeSistem = async function(vId) {
-            window.customDialog("Pengesahan", "<p>Tindakan ini akan <b>MENGGANTIKAN</b> jadual semasa anda dengan versi ini. Teruskan?</p>", true, async () => {
+            window.customDialog("Pengesahan", "<p>Tindakan ini akan <b>MENGGANTIKAN</b> jadual semasa anda. Teruskan?</p>", true, async () => {
                 let activeUid = currentUser ? currentUser.uid : "lokal_offline";
                 let targetJadual = null;
-
                 if (db && activeUid !== "lokal_offline") {
                     let docSnap = await getDoc(doc(db, "artifacts", "sistem-jadual", "users", activeUid, "versions", vId));
                     if(docSnap.exists()) targetJadual = docSnap.data().jadual;
@@ -2264,12 +2333,11 @@
                     let found = localV.find(v => v.id === vId);
                     if(found) targetJadual = found.jadual;
                 }
-
                 if(targetJadual) {
                     window.appState.jadual = targetJadual;
                     simpanData();
                     renderJadualDropdowns();
-                    window.customDialog("Selesai", "<p>Jadual versi berjaya dimuatkan ke ruang kerja anda.</p>");
+                    window.customDialog("Selesai", "<p>Jadual versi berjaya dimuatkan ke ruang kerja.</p>");
                 }
             });
         };
@@ -2293,28 +2361,24 @@
             window.customDialog("Menghantar...", "<p>Sedang menghantar sandaran data ke Google Sheets...</p>");
             try {
                 let payload = { userId: currentUser ? currentUser.uid : "lokal_offline", appState: window.appState };
-                await fetch(GAS_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
+                await fetch(GAS_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
                 window.customDialog("Berjaya!", "<p>Data berjaya direkodkan ke Google Sheets!</p>");
             } catch(e) {
-                window.customDialog("Berjaya!", "<p>Permintaan sandaran telah dihantar.</p>");
+                window.customDialog("Selesai", "<p>Permintaan sandaran telah dihantar.</p>");
             }
         };
 
         window.resetDataSemasa = function() {
-            window.customDialog("Pengesahan", "<p>Adakah anda pasti mahu menetapkan semula semua data?</p>", true, () => {
+            window.customDialog("Pengesahan PENTING", "<p class='text-red-600 font-bold'>ZON BAHAYA: Adakah anda pasti mahu memadam SEMUA rekod (Guru, Kelas, Subjek, Jadual)?</p>", true, () => {
                 window.appState = { 
-                    schoolName: "SK / SMK Pintar", guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, 
+                    schoolName: "SK / SMK Pintar", guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, guruIC: {}, guruDelima: {},
                     masaSekolah: { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20 }, 
                     configMasa: { Isnin: {jumlah:8, rehat:4}, Selasa: {jumlah:8, rehat:4}, Rabu: {jumlah:8, rehat:4}, Khamis: {jumlah:8, rehat:4}, Jumaat: {jumlah:6, rehat:3} }, 
                     jenisSesiSekolah: "pagi", agihan: [], kekangan: [], jadual: {} 
                 };
                 simpanData();
                 refreshUIAll();
-                window.customDialog("Selesai", "<p>Data telah dikosongkan.</p>");
+                window.customDialog("Selesai", "<p>Semua pangkalan data ruang kerja ini telah dikosongkan.</p>");
             });
         };
     </script>
