@@ -45,7 +45,7 @@
                     <div id="userName" class="font-bold text-white">Mod Luar Talian</div>
                     <div id="userEmail" class="text-indigo-200 text-[10px]">Disimpan di memori pelayar</div>
                 </div>
-                <button id="authBtn" onclick="handleAuthClick()" class="bg-white text-indigo-700 hover:bg-indigo-50 font-bold px-4 py-2 rounded-lg text-xs shadow transition flex items-center gap-2">
+                <button id="authBtn" onclick="window.handleAuthClick()" class="bg-white text-indigo-700 hover:bg-indigo-50 font-bold px-4 py-2 rounded-lg text-xs shadow transition flex items-center gap-2">
                     <span>🔐</span> <span id="authBtnText">Log Masuk Awan</span>
                 </button>
             </div>
@@ -59,19 +59,19 @@
             
             <!-- TABS NAVIGATION -->
             <div class="flex border-b border-slate-200 mb-6 bg-white rounded-xl shadow-sm overflow-x-auto print:hidden">
-                <button onclick="switchTab('data')" id="tab-data" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap flex items-center gap-2">
+                <button onclick="window.switchTab('data')" id="tab-data" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap flex items-center gap-2">
                     <span>📁</span> 1. Data Induk
                 </button>
-                <button onclick="switchTab('agihan')" id="tab-agihan" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">
+                <button onclick="window.switchTab('agihan')" id="tab-agihan" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">
                     <span>📊</span> 2. Agihan & Masa
                 </button>
-                <button onclick="switchTab('kekangan')" id="tab-kekangan" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">
+                <button onclick="window.switchTab('kekangan')" id="tab-kekangan" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">
                     <span>🛡️</span> 3. Kekangan Mikro
                 </button>
-                <button onclick="switchTab('jadual')" id="tab-jadual" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">
+                <button onclick="window.switchTab('jadual')" id="tab-jadual" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">
                     <span>⚡</span> 4. Jadual Waktu & AI
                 </button>
-                <button onclick="switchTab('tetapan')" id="tab-tetapan" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">
+                <button onclick="window.switchTab('tetapan')" id="tab-tetapan" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">
                     <span>⚙️</span> 5. Tetapan
                 </button>
             </div>
@@ -91,9 +91,9 @@
                                 <input type="text" id="inputGuru" placeholder="Nama Penuh (Cth: Jabdi bin Lobah)" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                                 <div class="flex gap-2">
                                     <input type="text" id="inputKodGuru" placeholder="Kod (Cth: JAB)" maxlength="5" class="w-24 text-xs border rounded-lg px-3 py-2 uppercase focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                    <button onclick="tambahData('guru')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah</button>
+                                    <button onclick="window.tambahData('guru')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah</button>
                                 </div>
-                                <button onclick="bukaModalPukalGuru()" class="w-full mt-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs py-2 rounded-lg border border-emerald-200 transition flex items-center justify-center gap-1.5">
+                                <button onclick="window.bukaModalPukalGuru()" class="w-full mt-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs py-2 rounded-lg border border-emerald-200 transition flex items-center justify-center gap-1.5">
                                     <span>📋</span> Tambah Pukal Guru (Excel / CSV)
                                 </button>
                             </div>
@@ -112,7 +112,7 @@
                             </div>
                             <div class="flex flex-col gap-2 mb-3">
                                 <input type="text" id="inputKelas" placeholder="Nama Kelas / Formula (Cth: 1 - 6 atau 3A,3B)" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                <button onclick="tambahData('kelas')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah Kelas / Formula</button>
+                                <button onclick="window.tambahData('kelas')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah Kelas / Formula</button>
                             </div>
                             <p class="text-[10px] text-slate-400 italic mb-2">Formula disokong: <b>1 - 6</b> atau <b>3A, 3B, 4A</b></p>
                         </div>
@@ -131,9 +131,9 @@
                             <div class="flex flex-col gap-2 mb-3">
                                 <div class="flex gap-2">
                                     <input type="text" id="inputSubjek" placeholder="Subjek (Cth: Matematik)" class="flex-1 text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                    <button onclick="tambahData('subjek')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah</button>
+                                    <button onclick="window.tambahData('subjek')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow-sm">Tambah</button>
                                 </div>
-                                <button onclick="janaSubjekSK()" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs py-2 rounded-lg border border-amber-200 transition flex items-center justify-center gap-1.5 mt-1">
+                                <button onclick="window.janaSubjekSK()" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs py-2 rounded-lg border border-amber-200 transition flex items-center justify-center gap-1.5 mt-1">
                                     <span>🪄</span> Jana Automatik Subjek Rendah
                                 </button>
                             </div>
@@ -193,7 +193,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4" id="configMasaContainer">
                         <!-- Dijana JS -->
                     </div>
-                    <button onclick="simpanConfigMasa()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition">Simpan Konfigurasi Masa</button>
+                    <button onclick="window.simpanConfigMasa()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition">Simpan Konfigurasi Masa</button>
                 </div>
 
                 <!-- AGIHAN GURU & KELAS -->
@@ -207,7 +207,7 @@
                         <select id="agihanKelas" class="text-xs border rounded-lg px-3 py-2 bg-white"><option value="">-- Pilih Kelas --</option></select>
                         <div class="flex gap-2">
                             <input type="number" id="agihanWaktu" min="1" max="10" placeholder="Waktu/Minggu" class="w-24 text-xs border rounded-lg px-3 py-2 bg-white">
-                            <button onclick="tambahAgihan()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm">Tambah</button>
+                            <button onclick="window.tambahAgihan()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm">Tambah</button>
                         </div>
                     </div>
 
@@ -226,7 +226,7 @@
                             <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2"><span>🛡️</span> Modul Kekangan Mikro (Micro Constraints)</h3>
                             <p class="text-xs text-slate-500">Tetapkan peraturan khusus peringkat Guru, Kelas, Subjek dan Masa berserta tahap Hard/Soft.</p>
                         </div>
-                        <button onclick="bukaModalKekangan()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                        <button onclick="window.bukaModalKekangan()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5">
                             <span>➕</span> Tambah Kekangan Baharu
                         </button>
                     </div>
@@ -261,26 +261,26 @@
                         <div class="flex flex-wrap items-center gap-3">
                             <div class="flex items-center gap-2">
                                 <label class="text-xs font-bold text-slate-700">Papar Mengikut:</label>
-                                <select id="paparJenisMode" onchange="toggleModePapar()" class="text-xs border rounded-lg px-2.5 py-2 font-bold text-indigo-700 bg-white shadow-sm">
+                                <select id="paparJenisMode" onchange="window.toggleModePapar()" class="text-xs border rounded-lg px-2.5 py-2 font-bold text-indigo-700 bg-white shadow-sm">
                                     <option value="kelas">Kelas</option>
                                     <option value="guru">Guru</option>
                                 </select>
                             </div>
                             <div id="wrapperPaparKelas" class="flex items-center gap-2">
                                 <label class="text-xs font-bold text-slate-700">Pilih Kelas:</label>
-                                <select id="paparKelasSelect" onchange="renderJadualKelas()" class="text-xs border rounded-lg px-3 py-2 font-bold text-indigo-700 bg-white shadow-sm">
+                                <select id="paparKelasSelect" onchange="window.renderJadualKelas()" class="text-xs border rounded-lg px-3 py-2 font-bold text-indigo-700 bg-white shadow-sm">
                                     <option value="">-- Pilih Kelas --</option>
                                 </select>
                             </div>
                             <div id="wrapperPaparGuru" class="hidden flex items-center gap-2">
                                 <label class="text-xs font-bold text-slate-700">Pilih Guru:</label>
-                                <select id="paparGuruSelect" onchange="renderJadualGuru()" class="text-xs border rounded-lg px-3 py-2 font-bold text-indigo-700 bg-white shadow-sm">
+                                <select id="paparGuruSelect" onchange="window.renderJadualGuru()" class="text-xs border rounded-lg px-3 py-2 font-bold text-indigo-700 bg-white shadow-sm">
                                     <option value="">-- Pilih Guru --</option>
                                 </select>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button id="btnToggleSunting" onclick="toggleModSuntingan()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5" title="Buka fungsi tukar slot secara klik atau Drag & Drop">
+                            <button id="btnToggleSunting" onclick="window.toggleModSuntingan()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5" title="Buka fungsi tukar slot secara klik atau Drag & Drop">
                                 <span>✏️</span> Sunting Manual
                             </button>
                             <button onclick="window.kongsiJadual()" class="bg-green-600 hover:bg-green-700 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5">
@@ -307,7 +307,7 @@
                         <p class="text-xs text-slate-500 mb-3">Nama sekolah ini akan dipaparkan pada kepala cetakan jadual waktu.</p>
                         <div class="flex gap-3 max-w-xl">
                             <input type="text" id="inputNamaSekolah" placeholder="Nama Sekolah (Cth: SMK Seri Damai)" class="flex-1 text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <button onclick="simpanNamaSekolah()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm">Simpan</button>
+                            <button onclick="window.simpanNamaSekolah()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm">Simpan</button>
                         </div>
                     </div>
 
@@ -318,14 +318,14 @@
                         <h3 class="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2"><span>📂</span> Eksport & Import Data Akaun</h3>
                         <p class="text-xs text-slate-500 mb-3">Muat turun fail JSON untuk memindahkan data tetapan, guru, agihan dan jadual ke akaun lain.</p>
                         <div class="flex flex-wrap gap-3">
-                            <button onclick="exportDataJSON()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+                            <button onclick="window.exportDataJSON()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
                                 <span>📥</span> Muat Turun (Eksport JSON)
                             </button>
                             <label class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2 cursor-pointer">
                                 <span>📤</span> Muat Naik (Import JSON)
-                                <input type="file" id="importFile" accept=".json" onchange="importDataJSON(event)" class="hidden">
+                                <input type="file" id="importFile" accept=".json" onchange="window.importDataJSON(event)" class="hidden">
                             </label>
-                            <button onclick="hantarKeGoogleSheets()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+                            <button onclick="window.hantarKeGoogleSheets()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
                                 <span>📊</span> Hantar Sandaran ke Google Sheets
                             </button>
                         </div>
@@ -340,7 +340,7 @@
                         
                         <div class="flex flex-wrap gap-3 mb-4">
                             <input type="text" id="inputNamaVersi" placeholder="Cth: Jadual Rasmi Penggal 1" class="flex-1 min-w-[200px] text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <button onclick="simpanVersiBaharu()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
+                            <button onclick="window.simpanVersiBaharu()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
                                 <span>💾</span> Simpan Sebagai Versi Baharu
                             </button>
                         </div>
@@ -359,7 +359,7 @@
                     <div>
                         <h3 class="font-bold text-sm text-red-600 mb-1 flex items-center gap-2"><span>⚠️</span> Zon Bahaya</h3>
                         <p class="text-xs text-slate-500 mb-3">Tindakan ini akan memadam semua data guru, kelas, agihan dan jadual dalam akaun semasa.</p>
-                        <button onclick="resetDataSemasa()" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs px-4 py-2 rounded-lg border border-red-200 transition">Set Semula Semua Data</button>
+                        <button onclick="window.resetDataSemasa()" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs px-4 py-2 rounded-lg border border-red-200 transition">Set Semula Semua Data</button>
                     </div>
                 </div>
             </div>
@@ -373,7 +373,7 @@
         <div class="bg-white rounded-xl shadow-2xl w-[90%] max-w-lg animate-modal flex flex-col">
             <div class="flex justify-between items-center p-5 border-b shrink-0">
                 <h3 class="text-lg font-bold text-slate-800">Tambah Guru Secara Pukal</h3>
-                <button onclick="tutupModalPukalGuru()" class="text-slate-400 hover:text-red-500 font-bold text-lg">✕</button>
+                <button onclick="window.tutupModalPukalGuru()" class="text-slate-400 hover:text-red-500 font-bold text-lg">✕</button>
             </div>
             <div class="p-5 space-y-3">
                 <div class="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-800">
@@ -386,7 +386,7 @@
                     <label class="text-[11px] font-bold text-slate-700 block mb-1">Kaedah 1: Salin & Tampal</label>
                     <p class="text-[10px] text-slate-500 mb-1.5">Salin jadual dari Excel dan tampal di bawah.</p>
                     <textarea id="textareaPukalGuru" rows="4" placeholder="Cth:&#10;Ahmad bin Ali, 801010-01-1234, g-123456@moe-dl.edu.my" class="w-full text-xs border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
-                    <button onclick="prosesTambahPukalGuru()" class="mt-2 w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan Teks Tampalan</button>
+                    <button onclick="window.prosesTambahPukalGuru()" class="mt-2 w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan Teks Tampalan</button>
                 </div>
 
                 <div class="flex items-center gap-4 py-1">
@@ -402,12 +402,12 @@
                         <span class="block text-xl mb-1">📂</span>
                         <span class="block text-xs font-bold text-indigo-600">Pilih Fail Excel / CSV</span>
                         <span class="block text-[10px] text-slate-500 mt-1">.xlsx, .xls, .csv disokong</span>
-                        <input type="file" id="fileUploadPukal" accept=".xlsx, .xls, .csv, .tsv" onchange="prosesFailPukalGuru(event)" class="hidden">
+                        <input type="file" id="fileUploadPukal" accept=".xlsx, .xls, .csv, .tsv" onchange="window.prosesFailPukalGuru(event)" class="hidden">
                     </label>
                 </div>
             </div>
             <div class="flex justify-end gap-2 p-4 border-t shrink-0">
-                <button onclick="tutupModalPukalGuru()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition w-full">Tutup</button>
+                <button onclick="window.tutupModalPukalGuru()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition w-full">Tutup</button>
             </div>
         </div>
     </div>
@@ -417,7 +417,7 @@
         <div class="bg-white rounded-xl shadow-2xl w-[90%] max-w-lg animate-modal flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center p-5 border-b shrink-0">
                 <h3 id="modalKekanganTitle" class="text-lg font-bold text-slate-800">Tambah Kekangan Mikro</h3>
-                <button onclick="tutupModalKekangan()" class="text-slate-400 hover:text-red-500 font-bold text-lg">✕</button>
+                <button onclick="window.tutupModalKekangan()" class="text-slate-400 hover:text-red-500 font-bold text-lg">✕</button>
             </div>
             <div class="p-5 space-y-4 overflow-y-auto">
                 <div>
@@ -453,8 +453,8 @@
                 </div>
             </div>
             <div class="flex justify-end gap-2 p-5 border-t shrink-0">
-                <button onclick="tutupModalKekangan()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Batal</button>
-                <button onclick="simpanKekanganBaru()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan Kekangan</button>
+                <button onclick="window.tutupModalKekangan()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Batal</button>
+                <button onclick="window.simpanKekanganBaru()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan Kekangan</button>
             </div>
         </div>
     </div>
@@ -477,7 +477,7 @@
         <div class="bg-white rounded-xl shadow-2xl p-6 w-[90%] max-w-md animate-modal">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                 <h3 class="text-base font-bold text-slate-800">Sunting Slot Jadual</h3>
-                <button onclick="tutupModalSuntingManual()" class="text-slate-400 hover:text-red-500 font-bold">✕</button>
+                <button onclick="window.tutupModalSuntingManual()" class="text-slate-400 hover:text-red-500 font-bold">✕</button>
             </div>
             <div class="space-y-4">
                 <div>
@@ -500,10 +500,10 @@
                 </div>
             </div>
             <div class="flex justify-between items-center mt-6 border-t pt-3">
-                <button onclick="kosongkanSlotManual()" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-lg transition">Kosongkan Slot</button>
+                <button onclick="window.kosongkanSlotManual()" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-lg transition">Kosongkan Slot</button>
                 <div class="flex gap-2">
-                    <button onclick="tutupModalSuntingManual()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Batal</button>
-                    <button onclick="simpanSuntingManual()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan</button>
+                    <button onclick="window.tutupModalSuntingManual()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Batal</button>
+                    <button onclick="window.simpanSuntingManual()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan</button>
                 </div>
             </div>
         </div>
@@ -574,40 +574,39 @@
         };
 
         window.editIndexKekangan = null;
-        let activeSlotEdit = null;
         window.modSuntinganAktif = false;
-        
+        let activeSlotEdit = null;
         window.draggedSlot = null;
         window.isDragging = false;
 
         const KEKANGAN_DEFINITIONS = {
             guru: [
-                { id: 'g_elak_2_awal', label: 'Elak 2 Masa Pertama', desc: 'Guru tidak boleh mengajar pada 2 waktu terawal.', inputs: ['guru'] },
-                { id: 'g_elak_2_akhir', label: 'Elak 2 Masa Terakhir', desc: 'Guru tidak boleh mengajar pada 2 waktu terakhir.', inputs: ['guru'] },
-                { id: 'g_seimbang_hari', label: 'Beban Harian Seimbang', desc: 'Waktu mengajar diagihkan seimbang secara automatik.', inputs: ['guru'] },
-                { id: 'g_seimbang_rehat', label: 'Sebelum & Selepas Rehat Seimbang', desc: 'Sistem cuba menyeimbangkan beban mengajar sebelum/selepas rehat.', inputs: ['guru'] },
-                { id: 'g_jarak_double_period', label: 'Slot Kosong Selepas Double Period', desc: 'Mesti ada 1 slot rehat/kosong selepas double period.', inputs: ['guru'] },
-                { id: 'g_max_sehari', label: 'Had Maksimum Waktu Sehari', desc: 'Had maksimum waktu mengajar guru sehari.', inputs: ['guru', 'number'] },
-                { id: 'g_max_turut', label: 'Had Waktu Berturut-turut', desc: 'Had maksimum waktu mengajar berturut-turut.', inputs: ['guru', 'number'] },
-                { id: 'g_min_rehat', label: 'Jarak Rehat Minimum', desc: 'Had minimum rehat antara dua sesi mengajar.', inputs: ['guru', 'number'] },
-                { id: 'g_tidak_tersedia', label: 'Guru Tidak Tersedia (Slot)', desc: 'Guru dikunci daripada mengajar pada hari dan waktu tertentu.', inputs: ['guru', 'hari', 'slot_masa'] },
-                { id: 'g_co_teacher', label: 'Guru Bersama (Co-Teacher)', desc: 'Guru ini mesti mengajar bersama Guru Kedua untuk subjek kelas ini.', inputs: ['guru', 'guru2', 'subjek', 'kelas'] },
-                { id: 'g_keutamaan_slot', label: 'Keutamaan Slot (Priority)', desc: 'Guru ini diutamakan untuk mengajar pada hari/slot ini.', inputs: ['guru', 'hari', 'slot_masa'] }
+                { id: 'g_elak_2_awal', label: 'Elak 2 Masa Pertama', desc: 'Sistem tidak akan membenarkan guru mengajar pada 2 waktu terawal bagi hari tersebut.', inputs: ['guru'] },
+                { id: 'g_elak_2_akhir', label: 'Elak 2 Masa Terakhir', desc: 'Sistem tidak akan membenarkan guru mengajar pada 2 waktu terakhir bagi hari tersebut.', inputs: ['guru'] },
+                { id: 'g_seimbang_hari', label: 'Beban Harian Seimbang', desc: 'AI akan menyelerakkan waktu mengajar agar guru tidak terbeban dengan waktu yang terlalu banyak pada satu hari tertentu.', inputs: ['guru'] },
+                { id: 'g_seimbang_rehat', label: 'Sebelum & Selepas Rehat Seimbang', desc: 'Sistem meminimumkan jurang waktu mengajar; jika guru mengajar 3 waktu sebelum rehat, selepas rehat mesti sekurang-kurangnya 2 waktu.', inputs: ['guru'] },
+                { id: 'g_jarak_double_period', label: 'Slot Kosong Selepas Double Period', desc: 'Selepas guru mengajar 2 waktu berturut-turut, AI akan cuba menyisipkan sekurang-kurangnya 1 slot rehat/kosong.', inputs: ['guru'] },
+                { id: 'g_max_sehari', label: 'Had Maksimum Waktu Sehari', desc: 'Menetapkan had maksimum bilangan waktu mengajar yang boleh diberikan kepada seorang guru dalam sehari.', inputs: ['guru', 'number'] },
+                { id: 'g_max_turut', label: 'Had Waktu Berturut-turut', desc: 'Menghadkan guru daripada mengajar tanpa henti; contohnya tidak boleh melebihi 3 waktu berturut-turut.', inputs: ['guru', 'number'] },
+                { id: 'g_min_rehat', label: 'Jarak Rehat Minimum', desc: 'Jika ada 2 sesi mengajar berbeza dalam sehari, mesti ada jarak slot minimum antara sesi tersebut (kecuali bersambung).', inputs: ['guru', 'number'] },
+                { id: 'g_tidak_tersedia', label: 'Guru Tidak Tersedia (Slot)', desc: 'Mengunci (Lock) guru daripada diletakkan jadual pada hari dan waktu / slot tertentu (contoh: guru cuti belajar pada hari Jumaat).', inputs: ['guru', 'hari', 'slot_masa'] },
+                { id: 'g_co_teacher', label: 'Guru Bersama (Co-Teacher)', desc: 'Memastikan Guru Utama (Guru 1) dan Guru Bersama (Guru 2) mesti dijadualkan mengajar subjek dan kelas yang sama, pada masa yang sama (berpasangan).', inputs: ['guru', 'guru2', 'subjek', 'kelas'] },
+                { id: 'g_keutamaan_slot', label: 'Keutamaan Slot (Priority)', desc: 'Memaksa AI untuk meletakkan guru ini terlebih dahulu pada slot dan hari ini sebelum menyusun jadual lain.', inputs: ['guru', 'hari', 'slot_masa'] }
             ],
             kelas: [
-                { id: 'k_max_subjek_sehari', label: 'Max Waktu Subjek Sehari', desc: 'Kelas tidak boleh mengambil subjek yang sama melebihi had sehari.', inputs: ['kelas', 'subjek', 'number'] },
-                { id: 'm_01_kepelbagaian_subjek', label: 'Kepelbagaian Subjek Harian', desc: 'Memastikan murid menerima kombinasi subjek pelbagai dalam sehari.', inputs: ['kelas'] },
-                { id: 'm_02_subjek_seimbang', label: 'Subjek Seimbang Sepanjang Minggu', desc: 'Mengagihkan subjek secara seimbang.', inputs: ['kelas'] }
+                { id: 'k_max_subjek_sehari', label: 'Max Waktu Subjek Sehari', desc: 'Menghadkan supaya sesebuah kelas tidak dibanjiri oleh subjek yang sama melebihi had (cth: maksimum 2 waktu Matematik sehari).', inputs: ['kelas', 'subjek', 'number'] },
+                { id: 'm_01_kepelbagaian_subjek', label: 'Kepelbagaian Subjek Harian', desc: 'Memaksa AI untuk mencampur-adukkan subjek; mengelakkan kelas belajar subjek yang sama atau jenis yang sama sepanjang hari.', inputs: ['kelas'] },
+                { id: 'm_02_subjek_seimbang', label: 'Subjek Seimbang Sepanjang Minggu', desc: 'Mengagihkan keberadaan subjek agar tidak menumpuk di hari-hari tertentu (cth: subjek 5 waktu mesti dipecah ke 5 hari).', inputs: ['kelas'] }
             ],
             subjek: [
-                { id: 's_sebelum_rehat', label: 'Sebelum Rehat Sahaja', desc: 'Subjek ini mesti diletakkan sebelum waktu rehat.', inputs: ['subjek'] },
-                { id: 's_selepas_rehat', label: 'Selepas Rehat Sahaja', desc: 'Subjek ini mesti diletakkan selepas waktu rehat.', inputs: ['subjek'] },
-                { id: 's_awal_pagi', label: 'Waktu Awal Pagi Sahaja', desc: 'Subjek ini hanya sesuai pada Slot 1 atau 2 pagi.', inputs: ['subjek'] },
-                { id: 's_lewat_petang', label: 'Waktu Lewat Petang Sahaja', desc: 'Subjek ini hanya sesuai pada 2 slot terakhir sesi.', inputs: ['subjek'] },
-                { id: 's_double_period', label: 'Galakkan Double Period', desc: 'Mengutamakan subjek disusun 2 waktu berturut-turut.', inputs: ['subjek'] },
-                { id: 's_elak_ulang_hari', label: 'Elak Ulangan (Max 1 Sesi/Hari)', desc: 'Hanya boleh diajar 1 sesi sehari untuk kelas yang sama.', inputs: ['subjek'] },
-                { id: 's_solo_sahaja', label: 'Slot Solo Sahaja (Single Period Only)', desc: 'Maksimum 1 waktu sehari, 5 waktu seminggu.', inputs: ['subjek'] },
-                { id: 's_elak_pisah_rehat', label: 'Elak Terpisah Oleh Rehat', desc: 'Elakkan subjek diajar separuh sebelum dan separuh selepas waktu rehat.', inputs: ['subjek'] }
+                { id: 's_sebelum_rehat', label: 'Sebelum Rehat Sahaja', desc: 'Memastikan subjek ini hanya disusun pada waktu pagi sebelum loceng rehat berbunyi.', inputs: ['subjek'] },
+                { id: 's_selepas_rehat', label: 'Selepas Rehat Sahaja', desc: 'Memastikan subjek ini hanya disusun selepas waktu rehat murid.', inputs: ['subjek'] },
+                { id: 's_awal_pagi', label: 'Waktu Awal Pagi Sahaja', desc: 'AI wajib menyusun subjek ini pada Slot 1 atau Slot 2 sahaja pada hari tersebut.', inputs: ['subjek'] },
+                { id: 's_lewat_petang', label: 'Waktu Lewat Petang Sahaja', desc: 'AI wajib menyusun subjek ini pada 2 slot terakhir hari berkenaan.', inputs: ['subjek'] },
+                { id: 's_double_period', label: 'Galakkan Double Period', desc: 'AI akan menyusun subjek ini sebagai 2 masa (berturut-turut) sekiranya jumlah agihan mingguan mengizinkan.', inputs: ['subjek'] },
+                { id: 's_elak_ulang_hari', label: 'Elak Ulangan (Max 1 Sesi/Hari)', desc: 'Subjek tidak boleh diajar 2 kali sehari secara terasing (contoh: Pagi Math, kemudian Selepas Rehat Math sekali lagi).', inputs: ['subjek'] },
+                { id: 's_solo_sahaja', label: 'Slot Solo Sahaja (Single Period)', desc: 'Memaksa subjek ini sentiasa diecerkan 1 masa 1 masa, tidak boleh double period.', inputs: ['subjek'] },
+                { id: 's_elak_pisah_rehat', label: 'Elak Terpisah Oleh Rehat', desc: 'Mengelakkan fenomena subjek terbahagi (contoh: 1 masa sebelum rehat, 1 masa lagi selepas rehat berturut-turut).', inputs: ['subjek'] }
             ]
         };
 
@@ -634,7 +633,7 @@
             });
         } else {
             currentUser = { uid: "lokal_offline" };
-            setTimeout(() => window.onUserLoggedIn(), 100);
+            window.onUserLoggedIn();
         }
 
         window.onUserLoggedIn = function() {
@@ -1027,6 +1026,84 @@
             });
         };
 
+        window.editKelas = function(oldName) {
+            let inputHTML = `
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Kelas Baharu:</label>
+                        <input type="text" id="editNamaKelasInput" value="${oldName}" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+            `;
+            
+            window.customDialog("Sunting Maklumat Kelas", inputHTML, true, () => {
+                let newName = document.getElementById('editNamaKelasInput').value.trim();
+                
+                if(!newName) return window.customDialog("Ralat", "<p>Nama kelas tidak boleh dibiarkan kosong.</p>");
+                if(newName !== oldName && window.appState.kelas.includes(newName)) return setTimeout(() => window.customDialog("Ralat", "<p>Nama kelas ini sudah wujud.</p>"), 300);
+
+                if(newName !== oldName) {
+                    let idx = window.appState.kelas.indexOf(oldName);
+                    if(idx !== -1) window.appState.kelas[idx] = newName;
+
+                    if(window.appState.agihan) window.appState.agihan.forEach(a => { if(a.kelas === oldName) a.kelas = newName; });
+                    if(window.appState.kekangan) window.appState.kekangan.forEach(k => {
+                        if(k.kondisi?.kelas === oldName) k.kondisi.kelas = newName;
+                    });
+                    if(window.appState.jadual) {
+                        for(let h in window.appState.jadual) {
+                            if(window.appState.jadual[h][oldName]) {
+                                window.appState.jadual[h][newName] = window.appState.jadual[h][oldName];
+                                delete window.appState.jadual[h][oldName];
+                            }
+                        }
+                    }
+                }
+
+                window.simpanData(); window.refreshUIAll(); setTimeout(() => window.paparSenarai('kelas'), 300);
+            });
+        };
+
+        window.editSubjek = function(oldName) {
+            let inputHTML = `
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Subjek Baharu:</label>
+                        <input type="text" id="editNamaSubjekInput" value="${oldName}" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+            `;
+            
+            window.customDialog("Sunting Maklumat Subjek", inputHTML, true, () => {
+                let newName = document.getElementById('editNamaSubjekInput').value.trim();
+                
+                if(!newName) return window.customDialog("Ralat", "<p>Nama subjek tidak boleh dibiarkan kosong.</p>");
+                if(newName !== oldName && window.appState.subjek.includes(newName)) return setTimeout(() => window.customDialog("Ralat", "<p>Nama subjek ini sudah wujud.</p>"), 300);
+
+                if(newName !== oldName) {
+                    let idx = window.appState.subjek.indexOf(oldName);
+                    if(idx !== -1) window.appState.subjek[idx] = newName;
+
+                    if(window.appState.agihan) window.appState.agihan.forEach(a => { if(a.subjek === oldName) a.subjek = newName; });
+                    if(window.appState.kekangan) window.appState.kekangan.forEach(k => {
+                        if(k.kondisi?.subjek === oldName) k.kondisi.subjek = newName;
+                    });
+                    if(window.appState.jadual) {
+                        for(let h in window.appState.jadual) {
+                            for(let kls in window.appState.jadual[h]) {
+                                for(let slot in window.appState.jadual[h][kls]) {
+                                    let cell = window.appState.jadual[h][kls][slot];
+                                    if(cell && cell.subjek === oldName) cell.subjek = newName;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                window.simpanData(); window.refreshUIAll(); setTimeout(() => window.paparSenarai('subjek'), 300);
+            });
+        };
+
         window.paparSenarai = function(jenis, sorted = false) {
             let tajuk = "", dataArr = [];
             if(jenis === 'guru') { tajuk = "Senarai Guru Berdaftar"; dataArr = [...window.appState.guru]; }
@@ -1048,7 +1125,11 @@
                     let ic = window.appState.guruIC?.[item] || '';
                     let details = ic ? `<br><span class="text-[10px] text-slate-400 font-normal">IC: ${ic}</span>` : '';
                     label = `<div>${item} <span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[10px] ml-2 font-bold">${kod}</span>${details}</div>`;
-                    editBtn = `<button onclick="window.editGuru('${item}')" class="text-blue-500 hover:text-blue-700 font-bold text-xs bg-blue-50 p-1.5 rounded transition mr-1" title="Sunting">✏️</button>`;
+                    editBtn = `<button onclick="window.editGuru('${item}')" class="text-blue-500 hover:text-blue-700 font-bold text-xs bg-blue-50 p-1.5 rounded transition mr-1" title="Sunting Maklumat Guru">✏️</button>`;
+                } else if(jenis === 'kelas') {
+                    editBtn = `<button onclick="window.editKelas('${item}')" class="text-blue-500 hover:text-blue-700 font-bold text-xs bg-blue-50 p-1.5 rounded transition mr-1" title="Sunting Nama Kelas">✏️</button>`;
+                } else if(jenis === 'subjek') {
+                    editBtn = `<button onclick="window.editSubjek('${item}')" class="text-blue-500 hover:text-blue-700 font-bold text-xs bg-blue-50 p-1.5 rounded transition mr-1" title="Sunting Nama Subjek">✏️</button>`;
                 }
                 return `<div class="flex justify-between items-center bg-slate-50 border border-slate-200 px-3 py-2 rounded-lg text-sm mb-2"><div class="font-medium text-slate-700 flex items-start gap-2"><span class="mt-0.5">${idx + 1}.</span> ${label}</div><div class="flex items-center shrink-0">${editBtn}<button onclick="window.padamItem('${jenis}', '${item}')" class="text-red-500 hover:text-red-700 font-bold text-xs bg-red-50 p-1.5 rounded transition" title="Padam">🗑️</button></div></div>`;
             }).join('');
@@ -1714,6 +1795,46 @@
             let tempSrc = window.appState.jadual[src.h]?.[src.kls]?.[src.slotId];
             let tempTarget = window.appState.jadual[targetH]?.[targetKls]?.[targetSlotId];
 
+            // --- SEMAKAN PERTINDIHAN JADUAL UNTUK DRAG & DROP ---
+            let clashSrcMsg = "", clashTargetMsg = "";
+            
+            // Semak adakah kotak asal (tempSrc) boleh diletakkan di masa target
+            if (tempSrc) {
+                let g1 = tempSrc.guru, g2 = tempSrc.coTeacher;
+                for (let k of Object.keys(window.appState.jadual[targetH] || {})) {
+                    if (k !== targetKls) {
+                        let c = window.appState.jadual[targetH][k][targetSlotId];
+                        if (c) {
+                            if (g1 && (c.guru === g1 || c.coTeacher === g1)) clashSrcMsg = `Cikgu ${g1} sedang mengajar kelas ${k} pada masa tersebut.`;
+                            if (g2 && (c.guru === g2 || c.coTeacher === g2)) clashSrcMsg = `Cikgu ${g2} sedang mengajar kelas ${k} pada masa tersebut.`;
+                        }
+                    }
+                }
+            }
+
+            // Semak adakah kotak target (tempTarget) jika ada isi, boleh diletakkan di masa asal (src)
+            if (tempTarget) {
+                let g1 = tempTarget.guru, g2 = tempTarget.coTeacher;
+                for (let k of Object.keys(window.appState.jadual[src.h] || {})) {
+                    if (k !== src.kls) {
+                        let c = window.appState.jadual[src.h][k][src.slotId];
+                        if (c) {
+                            if (g1 && (c.guru === g1 || c.coTeacher === g1)) clashTargetMsg = `Cikgu ${g1} sedang mengajar kelas ${k} pada masa tersebut.`;
+                            if (g2 && (c.guru === g2 || c.coTeacher === g2)) clashTargetMsg = `Cikgu ${g2} sedang mengajar kelas ${k} pada masa tersebut.`;
+                        }
+                    }
+                }
+            }
+
+            if (clashSrcMsg || clashTargetMsg) {
+                let errHtml = `<p class="text-sm font-semibold text-slate-700 mb-2">Tindakan disekat kerana guru akan bertindih (clash) di kelas lain:</p><ul class="list-disc pl-5 text-xs text-red-600 space-y-1">`;
+                if(clashSrcMsg) errHtml += `<li>${clashSrcMsg}</li>`;
+                if(clashTargetMsg) errHtml += `<li>${clashTargetMsg}</li>`;
+                errHtml += `</ul>`;
+                return window.customDialog("Pertindihan Jadual Dikesan 🔴", errHtml);
+            }
+            // --- TAMAT SEMAKAN PERTINDIHAN ---
+
             if(!window.appState.jadual[src.h]) window.appState.jadual[src.h] = {};
             if(!window.appState.jadual[src.h][src.kls]) window.appState.jadual[src.h][src.kls] = {};
             if(!window.appState.jadual[targetH]) window.appState.jadual[targetH] = {};
@@ -1933,7 +2054,11 @@
             if(hiddenFooter) { hiddenFooter.classList.remove('hidden', 'print:flex'); hiddenFooter.classList.add('flex', 'mt-8', 'justify-between', 'items-end'); }
 
             let printWrapper = document.createElement('div');
-            printWrapper.style.padding = '30px'; printWrapper.style.backgroundColor = 'white'; printWrapper.appendChild(clone);
+            printWrapper.style.padding = '30px'; 
+            printWrapper.style.backgroundColor = 'white'; 
+            printWrapper.style.width = '1200px'; // Paksa lebar penuh 1200px supaya UI PDF tidak berterabur/mampat di skrin telefon
+            printWrapper.appendChild(clone);
+            
             let sasaran = document.getElementById('paparJenisMode').value === 'guru' ? document.getElementById('paparGuruSelect').value : document.getElementById('paparKelasSelect').value;
             let fileName = `Jadual_${sasaran.replace(/[^a-z0-9]/gi, '_')}.pdf`;
             let opt = { margin: 0.3, filename: fileName, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } };
