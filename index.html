@@ -1568,7 +1568,44 @@
                 }
 
                 if(kek.jenis === 'g_seimbang_rehat' && kek.kondisi.guru === guru) {
-                    if(Math.abs(countGuruBeforeRehat - countGuruAfterRehat) > 1) { p += (kek.penalti || 20); if(kek.tahap === 'HARD') hardViolation = true; }
+                    let oldBefore = countGuruBeforeRehat - (s_idx <= conf.rehat ? 1 : 0);
+                    let oldAfter = countGuruAfterRehat - (s_idx > conf.rehat ? 1 : 0);
+                    let oldDiff = Math.abs(oldBefore - oldAfter);
+                    let newDiff = Math.abs(countGuruBeforeRehat - countGuruAfterRehat);
+                    
+                    // Hanya kenakan penalti/halangan jika perbezaan keseimbangan SEMAKIN TERUK
+                    if (newDiff > 1 && newDiff > oldDiff) {
+                        p += (kek.penalti || 20);
+                        // Toleransi ditingkatkan kepada > 2 untuk AI yang menyusun dari pagi ke petang (Greedy Algorithm)
+                        if(kek.tahap === 'HARD' && newDiff > 2) hardViolation = true; 
+                    } else if (newDiff < oldDiff) {
+                        r += 30; // Beri ganjaran (reward) kepada AI kerana berjaya mengimbangkan jadual
+                    }
+                }
+
+                // TAMBAHAN: Penguatkuasaan Kekangan Maksimum Sehari & Berturut-turut (Sebelum ini tiada dalam sistem AI)
+                if (kek.jenis === 'g_max_sehari' && kek.kondisi.guru === guru) {
+                    let had = kek.kondisi.number || 5;
+                    if (countGuruHariIni > had) { p += (kek.penalti || 50); if (kek.tahap === 'HARD') hardViolation = true; }
+                }
+
+                if (kek.jenis === 'g_max_turut' && kek.kondisi.guru === guru) {
+                    let maxConsecutive = kek.kondisi.number || 3;
+                    let consecutiveCount = 1;
+                    for (let i = s_idx - 1; i >= 1; i--) {
+                        let act = window.getriezmannTeacherActivity(curJadual, h, `${h}_s${i}`, guru);
+                        if (act) consecutiveCount++; else break;
+                    }
+                    if (consecutiveCount > maxConsecutive) { p += (kek.penalti || 50); if (kek.tahap === 'HARD') hardViolation = true; }
+                }
+
+                if (kek.jenis === 'k_max_subjek_sehari' && kek.kondisi.kelas === kls && kek.kondisi.subjek === subjek) {
+                    let had = kek.kondisi.number || 2;
+                    if (countSubjekHariIni > had) { p += (kek.penalti || 50); if (kek.tahap === 'HARD') hardViolation = true; }
+                }
+
+                if (kek.jenis === 'g_keutamaan_slot' && kek.kondisi.guru === guru) {
+                    if (kek.kondisi.hari === h && kek.kondisi.slot_masa === s_idx) { r += 500; } // Ganjaran tinggi untuk slot pilihan
                 }
 
                 if(kek.jenis === 'g_jarak_double_period' && kek.kondisi.guru === guru) {
@@ -2169,7 +2206,7 @@
             container.innerHTML = listHTML === "" ? `<p class="text-center text-xs text-slate-400 py-4">Tiada versi direkodkan.</p>` : listHTML;
         };
 
-        window.binaHtmlSenaraiVersi = function(data) {
+        function binaHtmlSenaraiVersi(data) {
             return `<div class="bg-white border rounded-lg p-3 flex justify-between items-center shadow-sm">
                 <div><div class="font-bold text-xs text-indigo-700">${data.nama}</div><div class="text-[10px] text-slate-500">${data.tarikh}</div></div>
                 <div class="flex gap-2">
@@ -2177,7 +2214,7 @@
                     <button onclick="window.padamVersiSistem('${data.id}')" class="px-2 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[10px] rounded border border-red-200 transition">🗑️</button>
                 </div>
             </div>`;
-        };
+        }
 
         window.muatVersiKeSistem = async function(vId) {
             window.customDialog("Pengesahan", "<p>Tindakan ini akan <b>MENGGANTIKAN</b> jadual semasa anda. Teruskan?</p>", true, async () => {
