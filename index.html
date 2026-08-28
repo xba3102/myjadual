@@ -1193,9 +1193,12 @@
             window.appState.guru.forEach(g => {
                 let sesi = window.appState.guruSesi[g] || 'pagi';
                 let kod = window.appState.guruKod?.[g] || '-';
-                html += `<div class="bg-slate-50 border p-3 rounded-lg flex justify-between items-center text-xs">
-                    <div><span class="font-bold text-slate-700 block">${g}</span><span class="text-[10px] text-indigo-600 font-bold">Kod: ${kod}</span></div>
-                    <select onchange="window.tukarSesiGuru('${g}', this.value)" class="border rounded px-2 py-1 font-semibold text-indigo-700 bg-white">
+                html += `<div class="bg-slate-50 border border-slate-200 hover:border-indigo-300 p-3 rounded-lg flex justify-between items-center text-xs transition shadow-sm">
+                    <div class="cursor-pointer group flex-1 py-1 -my-1" onclick="window.pilihGuruUntukAgihan('${g}')" title="Klik untuk daftar agihan beban mengajar">
+                        <span class="font-bold text-slate-700 block group-hover:text-indigo-600 transition flex items-center gap-1">${g} <span class="text-[9px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded hidden group-hover:inline-block">Pilih 👆</span></span>
+                        <span class="text-[10px] text-indigo-600 font-bold">Kod: ${kod}</span>
+                    </div>
+                    <select onchange="window.tukarSesiGuru('${g}', this.value)" class="border rounded px-2 py-1 font-semibold text-indigo-700 bg-white ml-2 shrink-0">
                         <option value="pagi" ${sesi==='pagi'?'selected':''}>Sesi Pagi</option>
                         <option value="petang" ${sesi==='petang'?'selected':''}>Sesi Petang</option>
                         <option value="bergabung" ${sesi==='bergabung'?'selected':''}>Bergabung</option>
@@ -1203,6 +1206,20 @@
                 </div>`;
             });
             container.innerHTML = html;
+        };
+
+        window.pilihGuruUntukAgihan = function(guru) {
+            let selectGuru = document.getElementById('agihanGuru');
+            if(selectGuru) {
+                selectGuru.value = guru;
+                selectGuru.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Tambah kesan fokus
+                selectGuru.focus();
+                selectGuru.classList.add('ring-2', 'ring-indigo-600', 'ring-offset-2');
+                setTimeout(() => { 
+                    selectGuru.classList.remove('ring-2', 'ring-indigo-600', 'ring-offset-2'); 
+                }, 1500);
+            }
         };
 
         window.tukarSesiGuru = function(guru, val) {
