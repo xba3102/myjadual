@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Jadual Waktu Pintar</title>
+    <title>Sistem Jadual Waktu Pintar AI</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- HTML2PDF CDN untuk Fungsi Cetak ke PDF -->
@@ -1496,7 +1496,7 @@
             container.innerHTML = html;
         };
 
-        window.getriezmannTeacherActivity = function(curJadual, h, s_id, guruTarget) {
+        window.getTeacherActivity = function(curJadual, h, s_id, guruTarget) {
             if(!curJadual[h]) return null;
             for(let kls in curJadual[h]) {
                 let cell = curJadual[h][kls][s_id];
@@ -1531,6 +1531,15 @@
         window.validateConstraint = function(h, s_idx, kls, guru, subjek, curJadual, conf) {
             if(!window.appState.kekangan) return { isHardViolated: false, penalti: 0, reward: 0, coTeacher: null };
             let p = 0, r = 0, hardViolation = false, coTeacher = null;
+
+            // SEMAKAN SESI GURU (Pagi / Petang / Bergabung)
+            let guruSesiVal = window.appState.guruSesi?.[guru] || 'pagi';
+            let jenisSekolah = window.appState.jenisSesiSekolah || 'pagi';
+            if (jenisSekolah === 'bergabung' && guruSesiVal !== 'bergabung') {
+                let isSlotPagi = s_idx <= conf.rehat;
+                if (guruSesiVal === 'pagi' && !isSlotPagi) { hardViolation = true; p += 1000; }
+                else if (guruSesiVal === 'petang' && isSlotPagi) { hardViolation = true; p += 1000; }
+            }
 
             let countSubjekHariIni = 0, countGuruHariIni = 0, countGuruBeforeRehat = 0, countGuruAfterRehat = 0;
 
@@ -1573,17 +1582,14 @@
                     let oldDiff = Math.abs(oldBefore - oldAfter);
                     let newDiff = Math.abs(countGuruBeforeRehat - countGuruAfterRehat);
                     
-                    // Hanya kenakan penalti/halangan jika perbezaan keseimbangan SEMAKIN TERUK
                     if (newDiff > 1 && newDiff > oldDiff) {
                         p += (kek.penalti || 20);
-                        // Toleransi ditingkatkan kepada > 2 untuk AI yang menyusun dari pagi ke petang (Greedy Algorithm)
                         if(kek.tahap === 'HARD' && newDiff > 2) hardViolation = true; 
                     } else if (newDiff < oldDiff) {
-                        r += 30; // Beri ganjaran (reward) kepada AI kerana berjaya mengimbangkan jadual
+                        r += 30;
                     }
                 }
 
-                // TAMBAHAN: Penguatkuasaan Kekangan Maksimum Sehari & Berturut-turut (Sebelum ini tiada dalam sistem AI)
                 if (kek.jenis === 'g_max_sehari' && kek.kondisi.guru === guru) {
                     let had = kek.kondisi.number || 5;
                     if (countGuruHariIni > had) { p += (kek.penalti || 50); if (kek.tahap === 'HARD') hardViolation = true; }
@@ -1593,7 +1599,7 @@
                     let maxConsecutive = kek.kondisi.number || 3;
                     let consecutiveCount = 1;
                     for (let i = s_idx - 1; i >= 1; i--) {
-                        let act = window.getriezmannTeacherActivity(curJadual, h, `${h}_s${i}`, guru);
+                        let act = window.getTeacherActivity(curJadual, h, `${h}_s${i}`, guru);
                         if (act) consecutiveCount++; else break;
                     }
                     if (consecutiveCount > maxConsecutive) { p += (kek.penalti || 50); if (kek.tahap === 'HARD') hardViolation = true; }
@@ -1605,14 +1611,14 @@
                 }
 
                 if (kek.jenis === 'g_keutamaan_slot' && kek.kondisi.guru === guru) {
-                    if (kek.kondisi.hari === h && kek.kondisi.slot_masa === s_idx) { r += 500; } // Ganjaran tinggi untuk slot pilihan
+                    if (kek.kondisi.hari === h && kek.kondisi.slot_masa === s_idx) { r += 500; }
                 }
 
                 if(kek.jenis === 'g_jarak_double_period' && kek.kondisi.guru === guru) {
                     let s_prev1 = s_idx - 1, s_prev2 = s_idx - 2;
                     if(s_prev1 >= 1 && s_prev2 >= 1) {
-                        let act1 = window.getriezmannTeacherActivity(curJadual, h, `${h}_s${s_prev1}`, guru);
-                        let act2 = window.getriezmannTeacherActivity(curJadual, h, `${h}_s${s_prev2}`, guru);
+                        let act1 = window.getTeacherActivity(curJadual, h, `${h}_s${s_prev1}`, guru);
+                        let act2 = window.getTeacherActivity(curJadual, h, `${h}_s${s_prev2}`, guru);
                         if(act1 && act2 && act1.class === act2.class && act1.subject === act2.subject) { p += (kek.penalti || 50); if(kek.tahap === 'HARD') hardViolation = true; }
                     }
                 }
@@ -1625,7 +1631,9 @@
 
                 if(kek.jenis === 's_double_period' && kek.kondisi.subjek === subjek) {
                     let prevSlotId = `${h}_s${s_idx - 1}`;
-                    if(curJadual[h]?.[kls]?.[prevSlotId]?.subjek === subjek) r += 300; else p += 300;
+                    if (s_idx > 1) {
+                        if(curJadual[h]?.[kls]?.[prevSlotId]?.subjek === subjek) r += 300;
+                    }
                 }
 
                 if(kek.jenis === 's_solo_sahaja' && kek.kondisi.subjek === subjek && countSubjekHariIni > 1) { p += kek.penalti || 500; if(kek.tahap === 'HARD') hardViolation = true; }
@@ -1669,10 +1677,17 @@
                 for(let i=0; i<a.waktu; i++) poolAgihan.push({ guru: a.guru, subjek: a.subjek, kelas: a.kelas, sesi: sesiGuru });
             });
 
+            // Lakukan rombakan rawak (shuffle) untuk keadilan agihan subjek
             for (let i = poolAgihan.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [poolAgihan[i], poolAgihan[j]] = [poolAgihan[j], poolAgihan[i]];
             }
+            
+            // Susun semula sedikit untuk menggalakkan 'Double Period' dengan merapatkan subjek yang sama
+            poolAgihan.sort((a, b) => {
+                if (a.kelas === b.kelas && a.subjek === b.subjek) return -1;
+                return 0;
+            });
 
             let newJadual = {}, gagalCount = 0;
             let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
@@ -1767,8 +1782,8 @@
             });
 
             window.appState.jadual = newJadual; window.simpanData(); window.renderJadualDropdowns();
-            if(gagalCount > 0) window.customDialog("Jadual Selesai", `<p class="mb-2 text-amber-700 font-bold">⚠️ Selesai dengan beberapa slot kosong (${gagalCount} slot).</p>`);
-            else window.customDialog("✨ Berjaya!", "<p>Jadual waktu berjaya dijana sepenuhnya!</p>");
+            if(gagalCount > 0) window.customDialog("Jadual Selesai", `<p class="mb-2 text-amber-700 font-bold">⚠️ Selesai dengan beberapa slot kosong (${gagalCount} slot) disebabkan pertindihan guru.</p>`);
+            else window.customDialog("✨ Berjaya!", "<p>Jadual waktu berjaya dijana sepenuhnya 100%!</p>");
         };
 
         window.formatMins = function(mins) {
@@ -1833,10 +1848,8 @@
             let tempSrc = window.appState.jadual[src.h]?.[src.kls]?.[src.slotId];
             let tempTarget = window.appState.jadual[targetH]?.[targetKls]?.[targetSlotId];
 
-            // --- SEMAKAN PERTINDIHAN JADUAL UNTUK DRAG & DROP ---
             let clashSrcMsg = "", clashTargetMsg = "";
             
-            // Semak adakah kotak asal (tempSrc) boleh diletakkan di masa target
             if (tempSrc) {
                 let g1 = tempSrc.guru, g2 = tempSrc.coTeacher;
                 for (let k of Object.keys(window.appState.jadual[targetH] || {})) {
@@ -1850,7 +1863,6 @@
                 }
             }
 
-            // Semak adakah kotak target (tempTarget) jika ada isi, boleh diletakkan di masa asal (src)
             if (tempTarget) {
                 let g1 = tempTarget.guru, g2 = tempTarget.coTeacher;
                 for (let k of Object.keys(window.appState.jadual[src.h] || {})) {
@@ -1871,7 +1883,6 @@
                 errHtml += `</ul>`;
                 return window.customDialog("Pertindihan Jadual Dikesan 🔴", errHtml);
             }
-            // --- TAMAT SEMAKAN PERTINDIHAN ---
 
             if(!window.appState.jadual[src.h]) window.appState.jadual[src.h] = {};
             if(!window.appState.jadual[src.h][src.kls]) window.appState.jadual[src.h][src.kls] = {};
@@ -2094,7 +2105,7 @@
             let printWrapper = document.createElement('div');
             printWrapper.style.padding = '30px'; 
             printWrapper.style.backgroundColor = 'white'; 
-            printWrapper.style.width = '1200px'; // Paksa lebar penuh 1200px supaya UI PDF tidak berterabur/mampat di skrin telefon
+            printWrapper.style.width = '1200px';
             printWrapper.appendChild(clone);
             
             let sasaran = document.getElementById('paparJenisMode').value === 'guru' ? document.getElementById('paparGuruSelect').value : document.getElementById('paparKelasSelect').value;
