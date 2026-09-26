@@ -572,7 +572,7 @@
                     <label class="block w-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-300 border-dashed rounded-lg p-4 text-center cursor-pointer transition">
                         <span class="block text-xl mb-1">📂</span>
                         <span class="block text-xs font-bold text-indigo-600">Pilih Fail Excel / CSV</span>
-                        <span class="block text-[10px] text-slate-500 mt-1">.xlsx, .xls, .csv disokong</span>
+                        <span class="block text-[10px] text-slate-500 mt-1">.xlsx, .xls, .csv, .tsv disokong</span>
                         <input type="file" id="fileUploadPukal" accept=".xlsx, .xls, .csv, .tsv" onchange="window.prosesFailPukalGuru(event)" class="hidden">
                     </label>
                 </div>
@@ -3381,8 +3381,8 @@
             `;
 
             try {
-                // Panggil Gemini API
-                const apiKey = ""; // API Key disediakan secara auto oleh Canvas
+                // Panggil Gemini API dengan API Key yang dikemas kini
+                const apiKey = "AQ.Ab8RN6IRJ82eabsQ4LTD7tdly0KLV0go4zc_P-ayjXYsb08S-A";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
                 
                 const payload = {
