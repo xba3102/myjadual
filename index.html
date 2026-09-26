@@ -523,7 +523,46 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
+            
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if(user) {
+                    document.getElementById('userName').innerText = user.displayName || "Pentadbir AI";
+                    document.getElementById('userEmail').innerText = user.email || "Disambung ke pangkalan data";
+                    document.getElementById('authBtnText').innerText = "Log Keluar";
+                } else {
+                    document.getElementById('userName').innerText = "Mod Luar Talian";
+                    document.getElementById('userEmail').innerText = "Disimpan di memori pelayar";
+                    document.getElementById('authBtnText').innerText = "Log Masuk Awan";
+                }
+            });
         } catch (e) { console.warn("Firebase warning:", e); }
+
+        window.handleAuthClick = async function() {
+            if (!auth) {
+                alert("Sambungan Firebase gagal. Sila semak capaian internet.");
+                return;
+            }
+            
+            if (currentUser) {
+                // Proses Log Keluar
+                try {
+                    document.getElementById('authBtnText').innerText = "Log Keluar...";
+                    await signOut(auth);
+                } catch (e) { console.error("Ralat Log Keluar", e); }
+            } else {
+                // Proses Log Masuk dengan Popup Google
+                const provider = new GoogleAuthProvider();
+                try {
+                    document.getElementById('authBtnText').innerText = "Memuatkan...";
+                    await signInWithPopup(auth, provider);
+                } catch (e) { 
+                    console.error("Log Masuk Gagal:", e);
+                    alert("Ralat Log Masuk: Pastikan URL (domain) aplikasi ini dibenarkan dalam Firebase Authentication.");
+                    document.getElementById('authBtnText').innerText = "Log Masuk Awan";
+                }
+            }
+        };
 
         window.appState = {
             schoolName: "SK / SMK Pintar", logoUrl: "", guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, guruIC: {}, guruDelima: {},
