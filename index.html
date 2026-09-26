@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Jadual Waktu Pintar AI - Versi Round-Robin</title>
+    <title>Sistem Jadual Waktu Pintar AI</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- HTML2PDF CDN untuk Fungsi Cetak ke PDF -->
@@ -25,6 +25,10 @@
             table { width: 100% !important; border-collapse: collapse !important; page-break-inside: avoid; }
             th, td { border: 1px solid #475569 !important; color: #000000 !important; }
             #paparanJadualContainer { overflow: visible !important; width: 100% !important; }
+            
+            /* Sembunyikan elemen UI semasa cetakan jadual peperiksaan */
+            #paparanJadualPeperiksaan .print-hidden-btn { display: none !important; }
+            #paparanJadualPeperiksaan .ujian-kad { border: 1px solid #94a3b8 !important; break-inside: avoid; }
         }
     </style>
 </head>
@@ -37,7 +41,7 @@
                 <span class="text-2xl">🗓️</span>
                 <div>
                     <h1 class="text-lg font-bold tracking-tight">Sistem Jadual Waktu Pintar</h1>
-                    <p class="text-xs text-indigo-200">Enjin Penjadualan Round-Robin AI</p>
+                    <p class="text-xs text-indigo-200">Modul Penjadualan Auto & Kekangan Mikro Sekolah</p>
                 </div>
             </div>
             <div class="flex items-center space-x-3">
@@ -72,7 +76,7 @@
                     <span>⚡</span> 4. Jadual Waktu & AI
                 </button>
                 <button onclick="window.switchTab('peperiksaan')" id="tab-peperiksaan" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">
-                    <span>📝</span> 5. Jadual Peperiksaan
+                    <span>📝</span> 5. Jadual Ujian / Peperiksaan
                 </button>
                 <button onclick="window.switchTab('tetapan')" id="tab-tetapan" class="tab-btn px-6 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">
                     <span>⚙️</span> 6. Tetapan
@@ -266,7 +270,8 @@
                                 <label class="text-xs font-bold text-slate-700">Papar Mengikut:</label>
                                 <select id="paparJenisMode" onchange="window.toggleModePapar()" class="text-xs border rounded-lg px-2.5 py-2 font-bold text-indigo-700 bg-white shadow-sm">
                                     <option value="kelas">Kelas</option>
-                                    <option value="guru">Guru</option>
+                                    <option value="guru">Guru Tunggal</option>
+                                    <option value="banding_guru">Banding 2 Guru (Side-by-Side)</option>
                                 </select>
                             </div>
                             <div id="wrapperPaparKelas" class="flex items-center gap-2">
@@ -279,6 +284,15 @@
                                 <label class="text-xs font-bold text-slate-700">Pilih Guru:</label>
                                 <select id="paparGuruSelect" onchange="window.renderJadualGuru()" class="text-xs border rounded-lg px-3 py-2 font-bold text-indigo-700 bg-white shadow-sm">
                                     <option value="">-- Pilih Guru --</option>
+                                </select>
+                            </div>
+                            <div id="wrapperPaparBandingGuru" class="hidden flex items-center gap-2">
+                                <select id="paparBandingGuruSelect1" onchange="window.renderJadualBandingGuru()" class="text-xs border rounded-lg px-3 py-2 font-bold text-blue-700 bg-white shadow-sm">
+                                    <option value="">-- Guru 1 --</option>
+                                </select>
+                                <span class="text-xs font-bold text-slate-400">VS</span>
+                                <select id="paparBandingGuruSelect2" onchange="window.renderJadualBandingGuru()" class="text-xs border rounded-lg px-3 py-2 font-bold text-orange-700 bg-white shadow-sm">
+                                    <option value="">-- Guru 2 --</option>
                                 </select>
                             </div>
                         </div>
@@ -296,78 +310,64 @@
                     </div>
 
                     <div id="paparanJadualContainer" class="overflow-x-auto">
-                        <p class="text-center text-xs text-slate-400 py-12">Sila klik butang "Jana Jadual Pintar AI" di atas atau pilih kelas untuk melihat jadual.</p>
+                        <p class="text-center text-xs text-slate-400 py-12">Sila klik butang "Jana Jadual Pintar AI" di atas atau pilih paparan untuk melihat jadual.</p>
                     </div>
                 </div>
 
             </div>
 
-            <!-- ================= TAB 5: PEPERIKSAAN ================= -->
+            <!-- ================= TAB 5: JADUAL PEPERIKSAAN ================= -->
             <div id="section-peperiksaan" class="tab-content hidden space-y-6">
                 
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex justify-between items-center print:hidden">
-                    <div>
-                        <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2"><span>📝</span> Pengurusan Jadual Peperiksaan (UASA / Percubaan)</h3>
-                        <p class="text-xs text-slate-500">Bina slot masa khas (custom time) untuk ujian dan tetapkan guru pengawas berasingan dari jadual rasmi.</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <input type="text" id="inputTajukExam" placeholder="Nama Exam (Cth: UASA 2026)" class="text-xs border rounded-lg px-3 py-2 font-bold w-48 focus:ring-2 focus:ring-indigo-500">
-                        <button onclick="window.simpanTajukExam()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition">Simpan Tajuk</button>
-                    </div>
-                </div>
-
-                <!-- TAMBAH SLOT EXAM -->
+                <!-- KOTAK TAMBAH PEPERIKSAAN -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 print:hidden">
-                    <h4 class="font-bold text-sm text-indigo-700 mb-4 border-b pb-2">➕ Tambah Slot Kertas Peperiksaan</h4>
+                    <h3 class="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2"><span>📝</span> Bina Jadual Ujian / Peperiksaan Baharu</h3>
+                    <p class="text-xs text-slate-500 mb-4">Pilih kelas yang terlibat, tetapkan tarikh dan slot waktu bebas, kemudian tetapkan guru pengawas.</p>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-700 block mb-1">Tarikh:</label>
-                            <input type="date" id="examTarikh" class="w-full text-xs border rounded-lg px-3 py-2 bg-slate-50">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="col-span-1 md:col-span-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <label class="text-[10px] font-bold text-slate-700 block mb-1.5">Pilih Kelas-kelas Terlibat:</label>
+                            <div id="peperiksaanKelasCheckboxes" class="flex flex-wrap gap-2 text-xs">
+                                <!-- Checkboxes diisi oleh JS -->
+                            </div>
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-slate-700 block mb-1">Masa Mula:</label>
-                            <input type="time" id="examMula" class="w-full text-xs border rounded-lg px-3 py-2 bg-slate-50">
+                            <label class="text-[10px] font-bold text-slate-700 block mb-1">Tarikh Ujian:</label>
+                            <input type="date" id="peperiksaanTarikh" class="w-full text-xs border rounded-lg px-3 py-2 font-semibold">
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-slate-700 block mb-1">Masa Tamat:</label>
-                            <input type="time" id="examTamat" class="w-full text-xs border rounded-lg px-3 py-2 bg-slate-50">
+                            <label class="text-[10px] font-bold text-slate-700 block mb-1">Waktu Mula:</label>
+                            <input type="time" id="peperiksaanMasaMula" class="w-full text-xs border rounded-lg px-3 py-2 font-semibold">
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-slate-700 block mb-1">Kertas Subjek:</label>
-                            <input type="text" id="examSubjek" placeholder="Cth: Matematik Kertas 1" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+                            <label class="text-[10px] font-bold text-slate-700 block mb-1">Waktu Tamat:</label>
+                            <input type="time" id="peperiksaanMasaTamat" class="w-full text-xs border rounded-lg px-3 py-2 font-semibold">
+                        </div>
+                        <div class="col-span-1 md:col-span-2">
+                            <label class="text-[10px] font-bold text-slate-700 block mb-1">Kertas Subjek Peperiksaan:</label>
+                            <select id="peperiksaanSubjek" class="w-full text-xs border rounded-lg px-3 py-2 bg-white">
+                                <!-- Diisi oleh JS -->
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="window.tambahSesiPeperiksaan()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition">➕ Tambah Slot Ujian</button>
                         </div>
                     </div>
-                    
-                    <div class="mb-4">
-                        <label class="text-[10px] font-bold text-slate-700 block mb-2">Pilih Kelas Terlibat:</label>
-                        <div id="examKelasContainer" class="flex flex-wrap gap-2 p-3 bg-slate-50 border rounded-lg max-h-32 overflow-y-auto">
-                            <!-- Dijana JS -->
-                        </div>
-                    </div>
-                    
-                    <button onclick="window.tambahSlotExam()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow transition">Tambah Kertas Peperiksaan</button>
                 </div>
 
-                <!-- PAPARAN JADUAL EXAM -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <div class="flex justify-between items-center mb-4 print:hidden">
-                        <h4 class="font-bold text-sm text-indigo-700">🗓️ Paparan Jadual & Agihan Pengawas</h4>
-                        <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3 py-2 rounded-lg border transition flex items-center gap-1.5">
+                <!-- PAPARAN SENARAI PEPERIKSAAN -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 print:p-0 print:border-none print:shadow-none">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 print:border-b-2 print:border-slate-800">
+                        <h3 class="font-bold text-sm text-slate-800">Jadual Pengawasan Peperiksaan</h3>
+                        <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3 py-2 rounded-lg border transition flex items-center gap-1.5 print:hidden">
                             <span>🖨️</span> Cetak Jadual Peperiksaan
                         </button>
                     </div>
 
-                    <div class="hidden print:block text-center mb-6 print-color-adjust">
-                        <h2 class="text-2xl font-bold uppercase text-slate-900 mb-1" id="printNamaSekolahExam">Nama Sekolah</h2>
-                        <h3 class="text-xl font-bold text-slate-800 uppercase" id="printTajukExam">JADUAL PEPERIKSAAN</h3>
-                    </div>
-
-                    <div id="jadualExamContainer" class="overflow-x-auto print:overflow-visible">
-                        <p class="text-center text-xs text-slate-400 py-8">Tiada slot peperiksaan direkodkan lagi.</p>
+                    <div id="paparanJadualPeperiksaan" class="space-y-6">
+                        <p class="text-center text-xs text-slate-400 py-6">Belum ada slot peperiksaan didaftarkan.</p>
                     </div>
                 </div>
-
             </div>
 
             <!-- ================= TAB 6: TETAPAN ================= -->
@@ -398,6 +398,21 @@
                             </label>
                             <button onclick="window.hantarKeGoogleSheets()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
                                 <span>📊</span> Hantar Sandaran ke Google Sheets
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-100">
+
+                    <!-- INTEGRASI ASC TIMETABLES -->
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold text-sm text-blue-900 mb-1 flex items-center gap-2"><span>🔄</span> Integrasi Data aSc Timetables</h3>
+                                <p class="text-xs text-blue-700 mb-3 max-w-2xl">Import Senarai Guru, Kelas, Subjek, dan Agihan Beban dari perisian aSc Timetables. Gunakan fungsi <b>Eksport > MS Excel</b> (sebaiknya eksport format <i>List of Lessons</i> atau Jadual Grid) dari aSc.</p>
+                            </div>
+                            <button onclick="window.bukaModalImportAsc()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 rounded-lg shadow transition flex items-center gap-2 shrink-0">
+                                <span>📥</span> Import Fail aSc (Excel / HTML)
                             </button>
                         </div>
                     </div>
@@ -439,29 +454,79 @@
 
     </main>
 
-    <!-- MODAL PENGAWAS PEPERIKSAAN -->
-    <div id="modalPengawasExam" class="fixed inset-0 z-[85] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-[90%] max-w-sm animate-modal">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h3 class="text-base font-bold text-slate-800">Set Guru Pengawas</h3>
-                <button onclick="window.tutupModalPengawasExam()" class="text-slate-400 hover:text-red-500 font-bold">✕</button>
+    <!-- MODAL IMPORT ASC TIMETABLES -->
+    <div id="modalImportAsc" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-[90%] max-w-lg animate-modal flex flex-col">
+            <div class="flex justify-between items-center p-5 border-b shrink-0">
+                <h3 class="text-lg font-bold text-slate-800">Import Data aSc Timetables</h3>
+                <button onclick="window.tutupModalImportAsc()" class="text-slate-400 hover:text-red-500 font-bold text-lg">✕</button>
             </div>
-            <div class="space-y-4">
-                <div class="bg-indigo-50 p-3 rounded-lg text-xs text-indigo-800">
-                    <div class="font-bold mb-1" id="pengawasInfoSubjek">Subjek</div>
-                    <div id="pengawasInfoMasa">Tarikh & Masa</div>
-                    <div class="mt-1 font-bold">Kelas: <span id="pengawasInfoKelas" class="text-indigo-600"></span></div>
+            <div class="p-5 space-y-4">
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">
+                    <p class="font-bold mb-1">Panduan Eksport dari aSc Timetables:</p>
+                    <ol class="list-decimal pl-4 space-y-1">
+                        <li>Buka perisian aSc Timetables.</li>
+                        <li>Pergi ke menu <b>File > Export > MS Excel</b> atau <b>Export to HTML</b>.</li>
+                        <li>(Disyorkan) Pilih eksport format <b>List of Lessons</b> kerana ia lebih mudah diproses.</li>
+                        <li>Muat naik fail <span class="font-mono bg-amber-100 px-1 rounded">.xlsx</span>, <span class="font-mono bg-amber-100 px-1 rounded">.xls</span>, atau <span class="font-mono bg-amber-100 px-1 rounded">.html</span> tersebut di bawah.</li>
+                    </ol>
                 </div>
+                
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Guru Pengawas:</label>
-                    <select id="selectPengawasExam" class="w-full text-xs border rounded-lg px-3 py-2 bg-white font-bold text-indigo-700">
-                        <option value="">-- Tiada Pengawas --</option>
-                    </select>
+                    <label class="block w-full bg-slate-50 hover:bg-slate-100 text-slate-700 border-2 border-slate-300 border-dashed rounded-lg p-6 text-center cursor-pointer transition">
+                        <span class="block text-3xl mb-2">📥</span>
+                        <span class="block text-sm font-bold text-indigo-600">Pilih Fail aSc (Excel / HTML)</span>
+                        <span class="block text-[11px] text-slate-500 mt-1">Hanya format .xlsx, .xls, .html disokong</span>
+                        <input type="file" id="fileUploadAsc" accept=".xlsx, .xls, .html, .htm" onchange="window.prosesFailAsc(event)" class="hidden">
+                    </label>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 mt-6 border-t pt-3">
-                <button onclick="window.tutupModalPengawasExam()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Batal</button>
-                <button onclick="window.simpanPengawasExam()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan</button>
+            <div class="flex justify-end gap-2 p-4 border-t shrink-0">
+                <button onclick="window.tutupModalImportAsc()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition w-full">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH GURU PUKAL -->
+    <div id="modalPukalGuru" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-[90%] max-w-lg animate-modal flex flex-col">
+            <div class="flex justify-between items-center p-5 border-b shrink-0">
+                <h3 class="text-lg font-bold text-slate-800">Tambah Guru Secara Pukal</h3>
+                <button onclick="window.tutupModalPukalGuru()" class="text-slate-400 hover:text-red-500 font-bold text-lg">✕</button>
+            </div>
+            <div class="p-5 space-y-3">
+                <div class="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-800">
+                    <p class="font-bold mb-1">Pengecaman Pintar (Smart Parsing):</p>
+                    <p>Sistem ini mengecam <b>Nama</b>, <b>No. IC</b>, dan <b>ID DELIMa</b> secara automatik. Jika nama sudah wujud, sistem akan mengemas kini IC & ID DELIMa tersebut.</p>
+                </div>
+                
+                <!-- Kaedah 1: Tampal (Paste) -->
+                <div>
+                    <label class="text-[11px] font-bold text-slate-700 block mb-1">Kaedah 1: Salin & Tampal</label>
+                    <p class="text-[10px] text-slate-500 mb-1.5">Salin jadual dari Excel dan tampal di bawah.</p>
+                    <textarea id="textareaPukalGuru" rows="4" placeholder="Cth:&#10;Ahmad bin Ali, 801010-01-1234, g-123456@moe-dl.edu.my" class="w-full text-xs border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                    <button onclick="window.prosesTambahPukalGuru()" class="mt-2 w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Simpan Teks Tampalan</button>
+                </div>
+
+                <div class="flex items-center gap-4 py-1">
+                    <div class="flex-1 border-t border-slate-200"></div>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">ATAU</span>
+                    <div class="flex-1 border-t border-slate-200"></div>
+                </div>
+
+                <!-- Kaedah 2: Muat Naik Fail -->
+                <div>
+                    <label class="text-[11px] font-bold text-slate-700 block mb-1">Kaedah 2: Muat Naik Fail (Excel / CSV)</label>
+                    <label class="block w-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-300 border-dashed rounded-lg p-4 text-center cursor-pointer transition">
+                        <span class="block text-xl mb-1">📂</span>
+                        <span class="block text-xs font-bold text-indigo-600">Pilih Fail Excel / CSV</span>
+                        <span class="block text-[10px] text-slate-500 mt-1">.xlsx, .xls, .csv disokong</span>
+                        <input type="file" id="fileUploadPukal" accept=".xlsx, .xls, .csv, .tsv" onchange="window.prosesFailPukalGuru(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 p-4 border-t shrink-0">
+                <button onclick="window.tutupModalPukalGuru()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition w-full">Tutup</button>
             </div>
         </div>
     </div>
@@ -625,7 +690,7 @@
             agihan: [],
             kekangan: [],
             jadual: {},
-            peperiksaan: { tajuk: "Jadual Ujian / Peperiksaan", jadual: [] }
+            peperiksaan: [] // State baru untuk jadual peperiksaan
         };
 
         window.editIndexKekangan = null;
@@ -725,11 +790,16 @@
             if(saved) {
                 try { window.appState = JSON.parse(saved); } catch(e){}
             }
+            if (!window.appState.peperiksaan) window.appState.peperiksaan = [];
+
             if(db && activeUid !== "lokal_offline") {
                 try {
                     const docRef = doc(db, "artifacts", "sistem-jadual", "users", activeUid, "data", "state");
                     const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) window.appState = docSnap.data();
+                    if (docSnap.exists()) {
+                        window.appState = docSnap.data();
+                        if (!window.appState.peperiksaan) window.appState.peperiksaan = [];
+                    }
                 } catch(e) {}
             }
             window.refreshUIAll();
@@ -782,6 +852,7 @@
             btn.classList.add('border-indigo-600', 'text-indigo-600');
             btn.classList.remove('border-transparent', 'text-slate-500');
             if(tabId === 'agihan') { window.renderGuruSesi(); window.renderConfigMasa(); }
+            if(tabId === 'peperiksaan') { window.renderPeperiksaanForm(); window.renderPaparanPeperiksaan(); }
         };
 
         window.refreshUIAll = function() {
@@ -790,18 +861,14 @@
             document.getElementById('countSubjek').innerText = (window.appState.subjek || []).length;
             document.getElementById('inputNamaSekolah').value = window.appState.schoolName || "";
             document.getElementById('jenisSesiSekolah').value = window.appState.jenisSesiSekolah || "pagi";
-            
-            if (!window.appState.peperiksaan) window.appState.peperiksaan = { tajuk: "Jadual Ujian / Peperiksaan", jadual: [] };
-            document.getElementById('inputTajukExam').value = window.appState.peperiksaan.tajuk || "";
-            
             window.renderConfigMasa();
             window.renderAgihanDropdowns();
             window.renderSenaraiAgihan();
             window.renderKekanganList();
             window.renderJadualDropdowns();
             window.renderGuruSesi();
-            window.renderKelasCheckboxExam();
-            window.renderExamJadual();
+            window.renderPeperiksaanForm();
+            window.renderPaparanPeperiksaan();
         };
 
         window.getColorForSubjek = function(subjek) {
@@ -884,227 +951,6 @@
             inputEl.value = "";
             window.simpanData();
             window.refreshUIAll();
-        };
-
-        window.renderKelasCheckboxExam = function() {
-            let container = document.getElementById('examKelasContainer');
-            if(!container) return;
-            if(!window.appState.kelas || window.appState.kelas.length === 0) {
-                container.innerHTML = `<span class="text-xs text-slate-400 italic">Sila tambah kelas di Tab Data Induk dahulu.</span>`;
-                return;
-            }
-            let html = window.appState.kelas.map(k => `
-                <label class="inline-flex items-center bg-white border border-slate-200 px-2.5 py-1.5 rounded cursor-pointer hover:bg-indigo-50 transition">
-                    <input type="checkbox" value="${k}" class="exam-kelas-cb rounded border-slate-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                    <span class="ml-2 text-[11px] font-bold text-slate-700">${k}</span>
-                </label>
-            `).join('');
-            container.innerHTML = html;
-        };
-
-        window.simpanTajukExam = function() {
-            if (!window.appState.peperiksaan) window.appState.peperiksaan = { tajuk: "Jadual Ujian / Peperiksaan", jadual: [] };
-            window.appState.peperiksaan.tajuk = document.getElementById('inputTajukExam').value.trim() || "Jadual Peperiksaan";
-            window.simpanData();
-            window.renderExamJadual();
-            window.customDialog("Berjaya", "<p>Tajuk peperiksaan disimpan.</p>");
-        };
-
-        window.tambahSlotExam = function() {
-            let tarikh = document.getElementById('examTarikh').value;
-            let mula = document.getElementById('examMula').value;
-            let tamat = document.getElementById('examTamat').value;
-            let subjek = document.getElementById('examSubjek').value.trim();
-            
-            let checkedKls = Array.from(document.querySelectorAll('.exam-kelas-cb:checked')).map(cb => cb.value);
-
-            if(!tarikh || !mula || !tamat || !subjek || checkedKls.length === 0) {
-                return window.customDialog("Maklumat Tidak Lengkap", "<p>Sila isikan tarikh, masa, nama kertas, dan pilih sekurang-kurangnya satu kelas.</p>");
-            }
-
-            if (!window.appState.peperiksaan) window.appState.peperiksaan = { tajuk: "Jadual Peperiksaan", jadual: [] };
-            if (!window.appState.peperiksaan.jadual) window.appState.peperiksaan.jadual = [];
-
-            let idSlot = 'ex_' + Date.now().toString(36);
-            window.appState.peperiksaan.jadual.push({
-                id: idSlot,
-                tarikh: tarikh,
-                mula: mula,
-                tamat: tamat,
-                subjek: subjek,
-                kelas: checkedKls,
-                pengawas: {} // format: { "Nama Kelas": "Nama Guru" }
-            });
-
-            // Reset Form
-            document.getElementById('examSubjek').value = "";
-            document.querySelectorAll('.exam-kelas-cb').forEach(cb => cb.checked = false);
-            
-            window.simpanData();
-            window.renderExamJadual();
-        };
-
-        window.padamSlotExam = function(slotId) {
-            window.customDialog("Pengesahan Padam", "<p>Anda pasti mahu memadam slot peperiksaan ini?</p>", true, () => {
-                window.appState.peperiksaan.jadual = window.appState.peperiksaan.jadual.filter(s => s.id !== slotId);
-                window.simpanData();
-                window.renderExamJadual();
-            });
-        };
-
-        let tempExamSlotId = null;
-        let tempExamKelas = null;
-
-        window.bukaModalPengawasExam = function(slotId, kls) {
-            let slot = window.appState.peperiksaan.jadual.find(s => s.id === slotId);
-            if(!slot) return;
-            
-            tempExamSlotId = slotId;
-            tempExamKelas = kls;
-
-            document.getElementById('pengawasInfoSubjek').innerText = slot.subjek;
-            document.getElementById('pengawasInfoMasa').innerText = `${slot.tarikh} | ${window.formatMins(window.timeToMins(slot.mula))} - ${window.formatMins(window.timeToMins(slot.tamat))}`;
-            document.getElementById('pengawasInfoKelas').innerText = kls;
-
-            let gOpt = `<option value="">-- Tiada Pengawas --</option>` + (window.appState.guru || []).map(g => `<option value="${g}">${g}</option>`).join('');
-            let sel = document.getElementById('selectPengawasExam');
-            sel.innerHTML = gOpt;
-            sel.value = slot.pengawas[kls] || "";
-
-            document.getElementById('modalPengawasExam').classList.remove('hidden');
-            document.getElementById('modalPengawasExam').classList.add('flex');
-        };
-
-        window.tutupModalPengawasExam = function() {
-            document.getElementById('modalPengawasExam').classList.add('hidden');
-            document.getElementById('modalPengawasExam').classList.remove('flex');
-            tempExamSlotId = null; tempExamKelas = null;
-        };
-
-        window.timeToMins = function(timeStr) {
-            let parts = timeStr.split(':');
-            return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-        };
-
-        window.simpanPengawasExam = function() {
-            let guru = document.getElementById('selectPengawasExam').value;
-            let slot = window.appState.peperiksaan.jadual.find(s => s.id === tempExamSlotId);
-            
-            if (guru) {
-                // Semak CLASH: Adakah guru ini sedang jaga exam di kelas lain pada slot masa ini?
-                let slotMulaMins = window.timeToMins(slot.mula);
-                let slotTamatMins = window.timeToMins(slot.tamat);
-                let clash = null;
-
-                // Cek semua slot di hari yang sama
-                window.appState.peperiksaan.jadual.forEach(s => {
-                    if (s.tarikh === slot.tarikh) {
-                        let curMula = window.timeToMins(s.mula);
-                        let curTamat = window.timeToMins(s.tamat);
-                        
-                        // Cek overlap masa
-                        if (Math.max(slotMulaMins, curMula) < Math.min(slotTamatMins, curTamat)) {
-                            // Masa overlap, semak pengawas
-                            for (let k in s.pengawas) {
-                                if ((s.id !== tempExamSlotId || k !== tempExamKelas) && s.pengawas[k] === guru) {
-                                    clash = { subjek: s.subjek, kelas: k, mula: s.mula, tamat: s.tamat };
-                                }
-                            }
-                        }
-                    }
-                });
-
-                if (clash) {
-                    return window.customDialog("⚠️ Pertindihan Pengawas", `<p class="text-xs text-red-600 font-bold mb-2">Guru ini sudah ditugaskan mengawas pada waktu yang bertindih.</p><div class="bg-red-50 p-2 border border-red-200 rounded text-xs"><b>Subjek:</b> ${clash.subjek}<br><b>Kelas:</b> ${clash.kelas}<br><b>Masa:</b> ${clash.mula} - ${clash.tamat}</div>`);
-                }
-            }
-
-            if (!slot.pengawas) slot.pengawas = {};
-            if (guru) {
-                slot.pengawas[tempExamKelas] = guru;
-            } else {
-                delete slot.pengawas[tempExamKelas];
-            }
-            
-            window.simpanData();
-            window.tutupModalPengawasExam();
-            window.renderExamJadual();
-        };
-
-        window.renderExamJadual = function() {
-            let container = document.getElementById('jadualExamContainer');
-            if (!container) return;
-
-            let printName = document.getElementById('printNamaSekolahExam');
-            if (printName) printName.innerText = window.appState.schoolName || "Sekolah";
-            let printTajuk = document.getElementById('printTajukExam');
-            if (printTajuk) printTajuk.innerText = (window.appState.peperiksaan?.tajuk || "JADUAL PEPERIKSAAN").toUpperCase();
-
-            if (!window.appState.peperiksaan || !window.appState.peperiksaan.jadual || window.appState.peperiksaan.jadual.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-slate-400 py-8">Tiada slot peperiksaan direkodkan.</p>`;
-                return;
-            }
-
-            // Kumpul mengikut tarikh
-            let peperiksaanSort = [...window.appState.peperiksaan.jadual].sort((a, b) => {
-                let dA = new Date(`${a.tarikh}T${a.mula}`);
-                let dB = new Date(`${b.tarikh}T${b.mula}`);
-                return dA - dB;
-            });
-
-            let groupedByDate = {};
-            peperiksaanSort.forEach(s => {
-                if(!groupedByDate[s.tarikh]) groupedByDate[s.tarikh] = [];
-                groupedByDate[s.tarikh].push(s);
-            });
-
-            let html = "";
-            for (let tarikh in groupedByDate) {
-                let displayDate = new Date(tarikh).toLocaleDateString('ms-MY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                
-                html += `<div class="mb-6 page-break-inside-avoid"><h5 class="font-bold text-sm bg-indigo-700 text-white px-4 py-2 rounded-t-lg print:bg-slate-200 print:text-black print:border-b-2 print:border-black">${displayDate}</h5>
-                <table class="w-full border-collapse border border-slate-200 text-xs">
-                    <thead>
-                        <tr class="bg-indigo-50 text-indigo-900 print:bg-white">
-                            <th class="border border-slate-200 p-2 w-32 text-left">Masa</th>
-                            <th class="border border-slate-200 p-2 w-48 text-left">Kertas / Subjek</th>
-                            <th class="border border-slate-200 p-2 text-left">Kelas Terlibat & Pengawas</th>
-                            <th class="border border-slate-200 p-2 w-20 text-center print:hidden">Tindakan</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-                
-                groupedByDate[tarikh].forEach(slot => {
-                    let masaDisp = `${window.formatMins(window.timeToMins(slot.mula))} - ${window.formatMins(window.timeToMins(slot.tamat))}`;
-                    let bgSubjek = window.getColorForSubjek(slot.subjek);
-                    
-                    let klsHtml = `<div class="flex flex-wrap gap-2">`;
-                    slot.kelas.forEach(k => {
-                        let pg = slot.pengawas?.[k];
-                        let statusPg = pg ? `<span class="text-[10px] text-indigo-700 font-bold bg-indigo-100 px-1.5 rounded">${pg}</span>` : `<span class="text-[9px] text-red-500 font-bold italic underline">Tiada Pengawas</span>`;
-                        klsHtml += `<div onclick="window.bukaModalPengawasExam('${slot.id}', '${k}')" class="border border-slate-200 bg-white rounded p-1.5 cursor-pointer hover:ring-2 hover:ring-indigo-300 transition flex flex-col gap-0.5 shadow-sm print:shadow-none print:border-slate-400 min-w-[80px]">
-                            <div class="text-[10px] font-bold text-slate-800 text-center border-b pb-0.5">${k}</div>
-                            <div class="text-center mt-0.5">${statusPg}</div>
-                        </div>`;
-                    });
-                    klsHtml += `</div>`;
-
-                    html += `<tr>
-                        <td class="border border-slate-200 p-3 font-semibold text-slate-700 whitespace-nowrap align-top">${masaDisp}</td>
-                        <td class="border border-slate-200 p-3 align-top">
-                            <div class="inline-block px-2 py-1 rounded font-bold text-slate-800 text-xs shadow-sm" style="background-color: ${bgSubjek}">${slot.subjek}</div>
-                        </td>
-                        <td class="border border-slate-200 p-3 bg-slate-50 print:bg-transparent align-top">${klsHtml}</td>
-                        <td class="border border-slate-200 p-3 text-center align-top print:hidden">
-                            <button onclick="window.padamSlotExam('${slot.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-2.5 py-1.5 rounded text-xs font-bold transition shadow-sm">🗑️ Padam</button>
-                        </td>
-                    </tr>`;
-                });
-                
-                html += `</tbody></table></div>`;
-            }
-
-            container.innerHTML = html;
         };
 
         window.janaSubjekSK = function() {
@@ -1297,6 +1143,15 @@
                             }
                         }
                     }
+                    if (window.appState.peperiksaan) {
+                        window.appState.peperiksaan.forEach(p => {
+                            if (p.pengawas) {
+                                for (let k in p.pengawas) {
+                                    if (p.pengawas[k] === oldName) p.pengawas[k] = newName;
+                                }
+                            }
+                        });
+                    }
                 }
 
                 if(!window.appState.guruIC) window.appState.guruIC = {};
@@ -1341,6 +1196,16 @@
                             }
                         }
                     }
+                    if (window.appState.peperiksaan) {
+                        window.appState.peperiksaan.forEach(p => {
+                            let kIdx = p.kelas.indexOf(oldName);
+                            if (kIdx !== -1) p.kelas[kIdx] = newName;
+                            if (p.pengawas && p.pengawas[oldName]) {
+                                p.pengawas[newName] = p.pengawas[oldName];
+                                delete p.pengawas[oldName];
+                            }
+                        });
+                    }
                 }
 
                 window.simpanData(); window.refreshUIAll(); setTimeout(() => window.paparSenarai('kelas'), 300);
@@ -1380,6 +1245,11 @@
                                 }
                             }
                         }
+                    }
+                    if (window.appState.peperiksaan) {
+                        window.appState.peperiksaan.forEach(p => {
+                            if (p.subjek === oldName) p.subjek = newName;
+                        });
                     }
                 }
 
@@ -1451,14 +1321,30 @@
                     if(window.appState.guruIC) delete window.appState.guruIC[nilai];
                     if(window.appState.guruDelima) delete window.appState.guruDelima[nilai];
                     window.bersihkanJadual(jenis, nilai);
+                    if(window.appState.peperiksaan) {
+                        window.appState.peperiksaan.forEach(p => {
+                            if(p.pengawas) {
+                                for(let k in p.pengawas) { if(p.pengawas[k] === nilai) delete p.pengawas[k]; }
+                            }
+                        });
+                    }
                 } else if (jenis === 'kelas') {
                     if(window.appState.agihan) window.appState.agihan = window.appState.agihan.filter(a => a.kelas !== nilai);
                     if(window.appState.kekangan) window.appState.kekangan = window.appState.kekangan.filter(k => k.kondisi?.kelas !== nilai);
                     if(window.appState.jadual) for(let h in window.appState.jadual) delete window.appState.jadual[h][nilai];
+                    if(window.appState.peperiksaan) {
+                        window.appState.peperiksaan.forEach(p => {
+                            p.kelas = p.kelas.filter(c => c !== nilai);
+                            if(p.pengawas && p.pengawas[nilai]) delete p.pengawas[nilai];
+                        });
+                    }
                 } else if (jenis === 'subjek') {
                     if(window.appState.agihan) window.appState.agihan = window.appState.agihan.filter(a => a.subjek !== nilai);
                     if(window.appState.kekangan) window.appState.kekangan = window.appState.kekangan.filter(k => k.kondisi?.subjek !== nilai);
                     window.bersihkanJadual(jenis, nilai);
+                    if(window.appState.peperiksaan) {
+                        window.appState.peperiksaan = window.appState.peperiksaan.filter(p => p.subjek !== nilai);
+                    }
                 }
 
                 window.simpanData(); window.refreshUIAll(); window.paparSenarai(jenis);
@@ -1498,9 +1384,7 @@
                 selectGuru.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 selectGuru.focus();
                 selectGuru.classList.add('ring-2', 'ring-indigo-600', 'ring-offset-2');
-                setTimeout(() => { 
-                    selectGuru.classList.remove('ring-2', 'ring-indigo-600', 'ring-offset-2'); 
-                }, 1500);
+                setTimeout(() => { selectGuru.classList.remove('ring-2', 'ring-indigo-600', 'ring-offset-2'); }, 1500);
             }
         };
 
@@ -1852,7 +1736,6 @@
             if(!window.appState.kekangan) return { isHardViolated: false, penalti: 0, reward: 0, coTeacher: null };
             let p = 0, r = 0, hardViolation = false, coTeacher = null;
 
-            // SEMAKAN SESI GURU (Pagi / Petang / Bergabung)
             let guruSesiVal = window.appState.guruSesi?.[guru] || 'pagi';
             let jenisSekolah = window.appState.jenisSesiSekolah || 'pagi';
             if (jenisSekolah === 'bergabung' && guruSesiVal !== 'bergabung') {
@@ -1991,24 +1874,20 @@
             let diagIssues = window.runDiagnostics();
             if(diagIssues.length > 0) return window.customDialog("🔴 Jadual TIDAK Boleh Dijana", `<p class="mb-2 font-bold text-red-600">Punca Utama Masalah:</p><ul class="list-disc pl-5 space-y-1 mb-3">${diagIssues.map(i=>`<li>${i}</li>`).join('')}</ul><p class="text-xs text-slate-500">Sila kurangkan waktu subjek atau tambah slot masa.</p>`);
 
-            // PENAMBAHBAIKAN 1: Inisialisasi Pendekatan Horizontal (Round-Robin) & Pemeringkatan Fasa
             let newJadual = {}, gagalCount = 0;
             let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
             
-            // Sediakan ruang array untuk jadual kosong
             hariList.forEach(h => { 
                 newJadual[h] = {}; 
                 window.appState.kelas.forEach(kls => { newJadual[h][kls] = {}; }); 
             });
 
-            // PENAMBAHBAIKAN 2: Asingkan agihan (workload) mengikut Kelas berbanding bercampur aduk
             let agihanByKelas = {};
             window.appState.kelas.forEach(k => agihanByKelas[k] = []);
             window.appState.agihan.forEach(a => {
                 if(agihanByKelas[a.kelas]) agihanByKelas[a.kelas].push({...a});
             });
 
-            // Helper function
             const isSlotEmpty = (h, kls, slot) => !newJadual[h][kls][`${h}_s${slot}`];
             const isGuruSibuk = (h, slotId, guruUtama, coTeacher) => {
                 for(let k in newJadual[h]) {
@@ -2021,21 +1900,17 @@
                 return false;
             };
 
-            // FASA PENJADUALAN
             window.appState.kelas.forEach(kls => {
                 let senaraiSubjek = agihanByKelas[kls];
-                
-                // PENAMBAHBAIKAN 3: Pemeringkatan (Multi-Phase) - Utamakan subjek berat/teras dahulu
                 senaraiSubjek.sort((a,b) => b.waktu - a.waktu);
 
                 senaraiSubjek.forEach(item => {
                     let bakiWaktu = item.waktu;
-                    // PENAMBAHBAIKAN 4: Penunjuk Hari untuk agihan rata "Round-Robin"
                     let hariPointer = 0; 
                     let pusinganGagal = 0;
 
                     while(bakiWaktu > 0 && pusinganGagal < 15) {
-                        let h = hariList[hariPointer % hariList.length]; // Kitaran: Isnin -> Selasa -> Rabu...
+                        let h = hariList[hariPointer % hariList.length];
                         let conf = window.appState.configMasa[h] || { jumlah: 8, rehat: 4 };
                         
                         let bestSlot = -1, bestScore = -999999;
@@ -2046,7 +1921,6 @@
                             if(!isSlotEmpty(h, kls, s)) continue;
                             if(isGuruSibuk(h, slotId, item.guru, null)) continue;
                             
-                            // Kekangan Had (Hard Limits) berkuasa penuh di sini
                             let valResult = window.validateConstraint(h, s, kls, item.guru, item.subjek, newJadual, conf);
                             if(valResult.isHardViolated) continue;
                             if(valResult.coTeacher && isGuruSibuk(h, slotId, valResult.coTeacher, null)) continue;
@@ -2054,15 +1928,13 @@
                             let score = 100 - valResult.penalti + valResult.reward;
                             let canDouble = false;
                             
-                            // PENAMBAHBAIKAN 5: Sistem Penalti Berwajaran untuk Double Period
-                            // Hanya benarkan Double Period jika baki waktu mencukupi dan algoritma tidak terhalang oleh rehat
                             if (bakiWaktu >= 2 && s < conf.jumlah && s !== conf.rehat) {
                                 let nextS = s + 1;
                                 let nextSlotId = `${h}_s${nextS}`;
                                 if(isSlotEmpty(h, kls, nextS) && !isGuruSibuk(h, nextSlotId, item.guru, null)) {
                                     let valNext = window.validateConstraint(h, nextS, kls, item.guru, item.subjek, newJadual, conf);
                                     if(!valNext.isHardViolated && (!valNext.coTeacher || !isGuruSibuk(h, nextSlotId, valNext.coTeacher, null))) {
-                                        score += 500; // Bonus skor tinggi agar AI mengejar Double Period
+                                        score += 500;
                                         canDouble = true;
                                     }
                                 }
@@ -2084,18 +1956,15 @@
                                 bakiWaktu--;
                             }
                             
-                            hariPointer++; // Bergerak secara memanjang (Isnin -> Selasa) untuk sebaran rata
+                            hariPointer++;
                             pusinganGagal = 0;
                         } else {
-                            // Lompat ke hari seterusnya jika hari ini sudah penuh / melanggar Hard Constraints
                             hariPointer++;
                             pusinganGagal++;
                         }
                     }
                     
                     if(bakiWaktu > 0) {
-                        // PENAMBAHBAIKAN 6: Heuristik Backtracking Ringkas
-                        // Jika algoritma tersangkut, ia akan memaksa selitan (insert) ke mana-mana slot kosong yang tertinggal selagi tiada guru bertindih
                         let swapped = false;
                         for(let h of hariList) {
                             let conf = window.appState.configMasa[h] || { jumlah: 8, rehat: 4 };
@@ -2175,62 +2044,85 @@
             if(!window.modSuntinganAktif) return;
             e.preventDefault(); setTimeout(() => window.isDragging = false, 100);
             if(!window.draggedSlot) return;
-            let src = window.draggedSlot;
             
-            if(src.h === targetH && src.kls === targetKls && src.slotId === targetSlotId) return;
-            if(src.kls !== targetKls) return window.customDialog("Makluman", "<p>Pertukaran hanya dibenarkan di dalam kelas yang sama sahaja.</p>");
+            let src = window.draggedSlot;
+            let srcH = src.h, srcKls = src.kls, srcSlot = src.slotId;
+            let tgtH = targetH, tgtSlot = targetSlotId;
+            
+            let tgtKls = targetKls || src.kls;
+            if(tgtKls === 'null' || tgtKls === 'undefined' || tgtKls === '') tgtKls = src.kls;
 
-            let tempSrc = window.appState.jadual[src.h]?.[src.kls]?.[src.slotId];
-            let tempTarget = window.appState.jadual[targetH]?.[targetKls]?.[targetSlotId];
+            if(srcH === tgtH && srcKls === tgtKls && srcSlot === tgtSlot) return;
+
+            let tempSrc = window.appState.jadual[srcH]?.[srcKls]?.[srcSlot];
+            let tempTarget = window.appState.jadual[tgtH]?.[tgtKls]?.[tgtSlot];
 
             let clashSrcMsg = "", clashTargetMsg = "";
             
             if (tempSrc) {
                 let g1 = tempSrc.guru, g2 = tempSrc.coTeacher;
-                for (let k of Object.keys(window.appState.jadual[targetH] || {})) {
-                    if (k !== targetKls) {
-                        let c = window.appState.jadual[targetH][k][targetSlotId];
-                        if (c) {
+                for (let k of Object.keys(window.appState.jadual[tgtH] || {})) {
+                    if (k !== srcKls) {
+                        let c = window.appState.jadual[tgtH][k][tgtSlot];
+                        if (c && c !== tempTarget) {
                             if (g1 && (c.guru === g1 || c.coTeacher === g1)) clashSrcMsg = `Cikgu ${g1} sedang mengajar kelas ${k} pada masa tersebut.`;
                             if (g2 && (c.guru === g2 || c.coTeacher === g2)) clashSrcMsg = `Cikgu ${g2} sedang mengajar kelas ${k} pada masa tersebut.`;
                         }
                     }
                 }
+                let existingClassCell = window.appState.jadual[tgtH]?.[srcKls]?.[tgtSlot];
+                if (existingClassCell && existingClassCell !== tempTarget) {
+                     clashSrcMsg = `Kelas ${srcKls} sudah mempunyai kelas ${existingClassCell.subjek} pada slot tersebut.`;
+                }
             }
 
             if (tempTarget) {
                 let g1 = tempTarget.guru, g2 = tempTarget.coTeacher;
-                for (let k of Object.keys(window.appState.jadual[src.h] || {})) {
-                    if (k !== src.kls) {
-                        let c = window.appState.jadual[src.h][k][src.slotId];
-                        if (c) {
+                for (let k of Object.keys(window.appState.jadual[srcH] || {})) {
+                    if (k !== tgtKls) {
+                        let c = window.appState.jadual[srcH][k][srcSlot];
+                        if (c && c !== tempSrc) {
                             if (g1 && (c.guru === g1 || c.coTeacher === g1)) clashTargetMsg = `Cikgu ${g1} sedang mengajar kelas ${k} pada masa tersebut.`;
                             if (g2 && (c.guru === g2 || c.coTeacher === g2)) clashTargetMsg = `Cikgu ${g2} sedang mengajar kelas ${k} pada masa tersebut.`;
                         }
                     }
                 }
+                let existingClassCell = window.appState.jadual[srcH]?.[tgtKls]?.[srcSlot];
+                if (existingClassCell && existingClassCell !== tempSrc) {
+                     clashTargetMsg = `Kelas ${tgtKls} sudah mempunyai kelas ${existingClassCell.subjek} pada slot tersebut.`;
+                }
             }
 
             if (clashSrcMsg || clashTargetMsg) {
-                let errHtml = `<p class="text-sm font-semibold text-slate-700 mb-2">Tindakan disekat kerana guru akan bertindih (clash) di kelas lain:</p><ul class="list-disc pl-5 text-xs text-red-600 space-y-1">`;
+                let errHtml = `<p class="text-sm font-semibold text-slate-700 mb-2">Tindakan pertukaran disekat kerana pertindihan dikesan:</p><ul class="list-disc pl-5 text-xs text-red-600 space-y-1">`;
                 if(clashSrcMsg) errHtml += `<li>${clashSrcMsg}</li>`;
                 if(clashTargetMsg) errHtml += `<li>${clashTargetMsg}</li>`;
                 errHtml += `</ul>`;
                 return window.customDialog("Pertindihan Jadual Dikesan 🔴", errHtml);
             }
 
-            if(!window.appState.jadual[src.h]) window.appState.jadual[src.h] = {};
-            if(!window.appState.jadual[src.h][src.kls]) window.appState.jadual[src.h][src.kls] = {};
-            if(!window.appState.jadual[targetH]) window.appState.jadual[targetH] = {};
-            if(!window.appState.jadual[targetH][targetKls]) window.appState.jadual[targetH][targetKls] = {};
+            if(!window.appState.jadual[srcH]) window.appState.jadual[srcH] = {};
+            if(!window.appState.jadual[srcH][srcKls]) window.appState.jadual[srcH][srcKls] = {};
+            if(!window.appState.jadual[srcH][tgtKls]) window.appState.jadual[srcH][tgtKls] = {};
+            
+            if(!window.appState.jadual[tgtH]) window.appState.jadual[tgtH] = {};
+            if(!window.appState.jadual[tgtH][srcKls]) window.appState.jadual[tgtH][srcKls] = {};
+            if(!window.appState.jadual[tgtH][tgtKls]) window.appState.jadual[tgtH][tgtKls] = {};
 
-            if(tempTarget) window.appState.jadual[src.h][src.kls][src.slotId] = tempTarget;
-            else delete window.appState.jadual[src.h][src.kls][src.slotId];
+            if (tempSrc) delete window.appState.jadual[srcH][srcKls][srcSlot];
+            if (tempTarget) delete window.appState.jadual[tgtH][tgtKls][tgtSlot];
 
-            if(tempSrc) window.appState.jadual[targetH][targetKls][targetSlotId] = tempSrc;
-            else delete window.appState.jadual[targetH][targetKls][targetSlotId];
+            if (tempTarget) window.appState.jadual[srcH][tgtKls][srcSlot] = tempTarget;
+            if (tempSrc) window.appState.jadual[tgtH][srcKls][tgtSlot] = tempSrc;
 
-            window.simpanData(); window.renderJadualKelas(); window.draggedSlot = null;
+            window.simpanData(); 
+            
+            let mode = document.getElementById('paparJenisMode').value;
+            if(mode === 'kelas') window.renderJadualKelas();
+            else if(mode === 'guru') window.renderJadualGuru();
+            else if(mode === 'banding_guru') window.renderJadualBandingGuru();
+            
+            window.draggedSlot = null;
         };
 
         window.renderJadualDropdowns = function() {
@@ -2240,19 +2132,48 @@
                 selKls.innerHTML = `<option value="">-- Pilih Kelas --</option>` + (window.appState.kelas || []).map(k => `<option value="${k}" ${k===curKls?'selected':''}>${k}</option>`).join('');
                 if(window.appState.kelas?.length > 0 && !curKls) selKls.value = window.appState.kelas[0];
             }
+            
+            let guruOpts = `<option value="">-- Pilih Guru --</option>` + (window.appState.guru || []).map(g => `<option value="${g}">${g}</option>`).join('');
+            
             let selGuru = document.getElementById('paparGuruSelect');
             if(selGuru) {
                 let curGuru = selGuru.value;
-                selGuru.innerHTML = `<option value="">-- Pilih Guru --</option>` + (window.appState.guru || []).map(g => `<option value="${g}" ${g===curGuru?'selected':''}>${g}</option>`).join('');
+                selGuru.innerHTML = guruOpts;
                 if(window.appState.guru?.length > 0 && !curGuru) selGuru.value = window.appState.guru[0];
             }
+            
+            let selBand1 = document.getElementById('paparBandingGuruSelect1');
+            let selBand2 = document.getElementById('paparBandingGuruSelect2');
+            if(selBand1) {
+                let cur1 = selBand1.value;
+                selBand1.innerHTML = guruOpts;
+                if(cur1) selBand1.value = cur1; else if(window.appState.guru?.length > 0) selBand1.value = window.appState.guru[0];
+            }
+            if(selBand2) {
+                let cur2 = selBand2.value;
+                selBand2.innerHTML = guruOpts;
+                if(cur2) selBand2.value = cur2; else if(window.appState.guru?.length > 1) selBand2.value = window.appState.guru[1];
+            }
+            
             window.toggleModePapar();
         };
 
         window.toggleModePapar = function() {
             let mode = document.getElementById('paparJenisMode').value;
-            if(mode === 'guru') { document.getElementById('wrapperPaparKelas').classList.add('hidden'); document.getElementById('wrapperPaparGuru').classList.remove('hidden'); window.renderJadualGuru(); } 
-            else { document.getElementById('wrapperPaparGuru').classList.add('hidden'); document.getElementById('wrapperPaparKelas').classList.remove('hidden'); window.renderJadualKelas(); }
+            document.getElementById('wrapperPaparKelas').classList.add('hidden');
+            document.getElementById('wrapperPaparGuru').classList.add('hidden');
+            document.getElementById('wrapperPaparBandingGuru').classList.add('hidden');
+            
+            if(mode === 'guru') { 
+                document.getElementById('wrapperPaparGuru').classList.remove('hidden'); 
+                window.renderJadualGuru(); 
+            } else if (mode === 'banding_guru') {
+                document.getElementById('wrapperPaparBandingGuru').classList.remove('hidden'); 
+                window.renderJadualBandingGuru();
+            } else { 
+                document.getElementById('wrapperPaparKelas').classList.remove('hidden'); 
+                window.renderJadualKelas(); 
+            }
         };
 
         window.toggleModSuntingan = function() {
@@ -2347,11 +2268,153 @@
                     }
 
                     let bgColor = matchedSubjek ? window.getColorForSubjek(matchedSubjek) : '#ffffff';
-                    html += `<td class="border border-slate-200 p-2 text-center shadow-sm" style="background-color: ${bgColor};">${matchedSubjek ? `<div class="font-bold text-slate-800">${matchedSubjek}</div><div class="text-[10px] text-slate-600 font-semibold">${matchedClass}</div>` : `<span class="text-slate-300 italic">Bebas</span>`}</td>`;
+                    
+                    let clickAction = "", dragEvents = "";
+                    let cursorStyle = matchedSubjek ? "cursor-default" : "text-slate-300 italic";
+                    if(window.modSuntinganAktif) {
+                        cursorStyle = matchedSubjek ? "cursor-grab hover:ring-2 hover:ring-indigo-400 opacity-90 hover:opacity-100" : "cursor-pointer hover:bg-slate-100 border-dashed border-2 border-slate-300";
+                        let editClass = matchedClass || "";
+                        
+                        dragEvents = `ondragover="window.handleDragOver(event)" ondrop="window.handleDrop(event, '${h}', '${editClass}', '${slotId}')"`;
+                        if(matchedSubjek && matchedClass) {
+                            dragEvents += ` draggable="true" ondragstart="window.handleDragStart(event, '${h}', '${matchedClass}', '${slotId}')"`;
+                        }
+
+                        if(!matchedClass && window.appState.kelas && window.appState.kelas.length > 0) {
+                             editClass = window.appState.kelas[0]; 
+                        }
+                        if(editClass) {
+                            clickAction = `onclick="if(!window.isDragging) window.bukaModalSuntingManual('${h}', '${editClass}', '${slotId}')"`;
+                        }
+                    }
+
+                    html += `<td class="border border-slate-200 p-2 text-center shadow-sm ${cursorStyle}" style="background-color: ${bgColor};" ${dragEvents} ${clickAction}>${matchedSubjek ? `<div class="font-bold text-slate-800">${matchedSubjek}</div><div class="text-[10px] text-slate-600 font-semibold">${matchedClass}</div>` : `<span class="text-slate-300 italic">Bebas</span>`}</td>`;
                 }
                 html += `</tr>`;
             });
             html += `</tbody></table><div class="hidden print:flex mt-8 justify-between items-end text-xs font-bold text-slate-800 print-color-adjust"><div>Pengesahan Pengetua/Guru Besar:<br><br><br>....................................................................</div><div class="text-right">Tarikh Dijana: ${new Date().toLocaleDateString('ms-MY')}<br>Sistem Penjadualan Pintar AI</div></div>`;
+            container.innerHTML = html;
+        };
+
+        window.renderJadualBandingGuru = function() {
+            let guru1 = document.getElementById('paparBandingGuruSelect1').value;
+            let guru2 = document.getElementById('paparBandingGuruSelect2').value;
+            let container = document.getElementById('paparanJadualContainer');
+            
+            if(!container) return;
+            if(!guru1 || !guru2) return container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Sila pilih kedua-dua guru untuk dibandingkan.</p>`;
+            if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) return container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Belum ada jadual dijana.</p>`;
+            if(guru1 === guru2) return container.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">Sila pilih dua guru yang berbeza.</p>`;
+
+            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'], maxSlot = 8;
+            for(let h of hariList) { let conf = window.appState.configMasa[h] || { jumlah: 8 }; if(conf.jumlah > maxSlot) maxSlot = conf.jumlah; }
+            let stdRehat = (window.appState.configMasa['Isnin'] || {rehat: 4}).rehat;
+            
+            let html = `<div class="hidden print:block text-center mb-6 print-color-adjust"><h2 class="text-xl font-bold uppercase text-slate-900 mb-1">Perbandingan Jadual Guru</h2><h3 class="text-lg font-bold text-slate-800 uppercase"><span class="text-blue-700">${guru1}</span> vs <span class="text-orange-700">${guru2}</span></h3></div>
+            <div class="overflow-x-auto pb-4">
+                <table class="w-full border-collapse border border-slate-200 text-xs print-color-adjust min-w-[800px]">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-800">
+                            <th class="border border-slate-200 p-2.5 w-24">Hari / Slot</th>`;
+            
+            for(let s=1; s<=maxSlot; s++) {
+                if(s === stdRehat + 1) html += `<th class="border border-slate-200 p-2.5 bg-amber-100/60 text-amber-800 leading-tight">REHAT<br><span class="text-[9px] font-normal text-amber-700/80">${window.getRehatTimeText('Isnin')}</span></th>`;
+                html += `<th class="border border-slate-200 p-2.5 leading-tight">Slot ${s}<br><span class="text-[9px] font-normal text-slate-500">${window.getSlotTimeText(s, 'Isnin')}</span></th>`;
+            }
+            html += `</tr></thead><tbody>`;
+
+            hariList.forEach(h => {
+                let conf = window.appState.configMasa[h] || { jumlah: 8, rehat: 4 };
+                
+                html += `<tr><td class="border border-slate-200 p-2 font-bold bg-blue-50 text-blue-900 align-middle text-center" rowspan="2">${h}</td>`;
+                for(let s=1; s<=maxSlot; s++) {
+                    if(s === stdRehat + 1) html += `<td class="border border-slate-200 p-1 bg-amber-50 text-center font-bold text-amber-700 text-[9px] align-middle" rowspan="2">REHAT</td>`;
+                    if(s > conf.jumlah) { html += `<td class="border border-slate-200 p-2 bg-slate-100 text-center text-slate-300">-</td>`; continue; }
+                    
+                    let slotId = `${h}_s${s}`, matchedClass = "", matchedSubjek = "";
+                    for(let kls of (window.appState.kelas || [])) {
+                        let cell = window.appState.jadual[h]?.[kls]?.[slotId];
+                        if(cell && (cell.guru === guru1 || cell.coTeacher === guru1)) { matchedClass = kls; matchedSubjek = cell.subjek; break; }
+                    }
+
+                    let clashClass = "", isClashing = false;
+                    for(let kls of (window.appState.kelas || [])) {
+                        let cell = window.appState.jadual[h]?.[kls]?.[slotId];
+                        if(cell && (cell.guru === guru2 || cell.coTeacher === guru2)) { clashClass = kls; break; }
+                    }
+                    if(matchedClass && clashClass && matchedClass !== clashClass) isClashing = true;
+                    if(matchedClass && clashClass && matchedClass === clashClass) {
+                        let cellCheck = window.appState.jadual[h]?.[matchedClass]?.[slotId];
+                        if(cellCheck && cellCheck.guru !== cellCheck.coTeacher && ((cellCheck.guru===guru1 && cellCheck.coTeacher===guru2) || (cellCheck.guru===guru2 && cellCheck.coTeacher===guru1))) {
+                            isClashing = false;
+                        } else if(cellCheck && cellCheck.guru === cellCheck.coTeacher) {
+                             isClashing = true; 
+                        }
+                    }
+
+                    let bgColor = matchedSubjek ? window.getColorForSubjek(matchedSubjek) : '#ffffff';
+                    let clashBorder = isClashing ? 'border-4 border-red-500 relative' : '';
+                    let clashLabel = isClashing ? `<div class="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1 py-0.5 rounded shadow z-10 animate-pulse">⚠️ CLASH</div>` : '';
+                    
+                    let clickAction = "", dragEvents = "";
+                    let cursorStyle = "";
+                    if(window.modSuntinganAktif) {
+                        cursorStyle = matchedSubjek ? "cursor-grab hover:ring-2 hover:ring-blue-400 opacity-90 hover:opacity-100" : "cursor-pointer hover:bg-slate-100 border-dashed border-2 border-slate-300";
+                        let editClass = matchedClass || "";
+                        
+                        dragEvents = `ondragover="window.handleDragOver(event)" ondrop="window.handleDrop(event, '${h}', '${editClass}', '${slotId}')"`;
+                        if(matchedSubjek && matchedClass) {
+                            dragEvents += ` draggable="true" ondragstart="window.handleDragStart(event, '${h}', '${matchedClass}', '${slotId}')"`;
+                        }
+
+                        if(!matchedClass && window.appState.kelas && window.appState.kelas.length > 0) editClass = window.appState.kelas[0];
+                        if(editClass) clickAction = `onclick="if(!window.isDragging) window.bukaModalSuntingManual('${h}', '${editClass}', '${slotId}')"`;
+                    }
+
+                    html += `<td class="border border-slate-200 p-2 text-center shadow-sm ${clashBorder} ${cursorStyle}" style="background-color: ${bgColor};" ${dragEvents} ${clickAction}>
+                        ${clashLabel}
+                        <div class="text-[9px] font-bold text-blue-700 mb-0.5">${window.appState.guruKod?.[guru1]||guru1}</div>
+                        ${matchedSubjek ? `<div class="font-bold text-slate-800 leading-tight">${matchedSubjek}</div><div class="text-[10px] text-slate-600 font-semibold">${matchedClass}</div>` : `<span class="text-slate-300 italic text-[10px]">Bebas</span>`}
+                    </td>`;
+                }
+                html += `</tr>`;
+
+                html += `<tr>`;
+                for(let s=1; s<=maxSlot; s++) {
+                    if(s === stdRehat + 1) continue; 
+                    if(s > conf.jumlah) { html += `<td class="border border-slate-200 p-2 bg-slate-100 text-center text-slate-300">-</td>`; continue; }
+                    
+                    let slotId = `${h}_s${s}`, matchedClass = "", matchedSubjek = "";
+                    for(let kls of (window.appState.kelas || [])) {
+                        let cell = window.appState.jadual[h]?.[kls]?.[slotId];
+                        if(cell && (cell.guru === guru2 || cell.coTeacher === guru2)) { matchedClass = kls; matchedSubjek = cell.subjek; break; }
+                    }
+
+                    let bgColor = matchedSubjek ? window.getColorForSubjek(matchedSubjek) : '#ffffff';
+                    
+                    let clickAction = "", dragEvents = "";
+                    let cursorStyle = "";
+                    if(window.modSuntinganAktif) {
+                        cursorStyle = matchedSubjek ? "cursor-grab hover:ring-2 hover:ring-orange-400 opacity-90 hover:opacity-100" : "cursor-pointer hover:bg-slate-100 border-dashed border-2 border-slate-300";
+                        let editClass = matchedClass || "";
+                        
+                        dragEvents = `ondragover="window.handleDragOver(event)" ondrop="window.handleDrop(event, '${h}', '${editClass}', '${slotId}')"`;
+                        if(matchedSubjek && matchedClass) {
+                            dragEvents += ` draggable="true" ondragstart="window.handleDragStart(event, '${h}', '${matchedClass}', '${slotId}')"`;
+                        }
+
+                        if(!matchedClass && window.appState.kelas && window.appState.kelas.length > 0) editClass = window.appState.kelas[0];
+                        if(editClass) clickAction = `onclick="if(!window.isDragging) window.bukaModalSuntingManual('${h}', '${editClass}', '${slotId}')"`;
+                    }
+
+                    html += `<td class="border border-slate-200 p-2 text-center shadow-sm ${cursorStyle}" style="background-color: ${bgColor}; border-top-style: dashed;" ${dragEvents} ${clickAction}>
+                        <div class="text-[9px] font-bold text-orange-700 mb-0.5">${window.appState.guruKod?.[guru2]||guru2}</div>
+                        ${matchedSubjek ? `<div class="font-bold text-slate-800 leading-tight">${matchedSubjek}</div><div class="text-[10px] text-slate-600 font-semibold">${matchedClass}</div>` : `<span class="text-slate-300 italic text-[10px]">Bebas</span>`}
+                    </td>`;
+                }
+                html += `</tr>`;
+            });
+            html += `</tbody></table></div>`;
             container.innerHTML = html;
         };
 
@@ -2443,7 +2506,12 @@
             printWrapper.style.width = '1200px';
             printWrapper.appendChild(clone);
             
-            let sasaran = document.getElementById('paparJenisMode').value === 'guru' ? document.getElementById('paparGuruSelect').value : document.getElementById('paparKelasSelect').value;
+            let mode = document.getElementById('paparJenisMode').value;
+            let sasaran = "Jadual";
+            if(mode === 'guru') sasaran = document.getElementById('paparGuruSelect').value;
+            else if(mode === 'kelas') sasaran = document.getElementById('paparKelasSelect').value;
+            else sasaran = `Banding_${document.getElementById('paparBandingGuruSelect1').value}_${document.getElementById('paparBandingGuruSelect2').value}`;
+
             let fileName = `Jadual_${sasaran.replace(/[^a-z0-9]/gi, '_')}.pdf`;
             let opt = { margin: 0.3, filename: fileName, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } };
 
@@ -2493,7 +2561,95 @@
             document.getElementById('modalJadualInduk').classList.remove('hidden'); document.getElementById('modalJadualInduk').classList.add('flex');
         };
 
-        window.simpanNamaSekolah = function() { window.appState.schoolName = document.getElementById('inputNamaSekolah').value; window.simpanData(); window.customDialog("Berjaya", "<p>Nama sekolah berjaya dikemas kini.</p>"); };
+        window.simpanNamaSekolah = function() {
+            let newName = document.getElementById('inputNamaSekolah').value.trim();
+            let oldName = window.appState.schoolName;
+
+            if(!newName) return window.customDialog("Ralat", "<p>Sila masukkan nama sekolah.</p>");
+            if(newName === oldName) {
+                window.simpanData();
+                return window.customDialog("Berjaya", "<p>Maklumat telah dikemas kini.</p>");
+            }
+
+            let html = `
+                <p class="text-xs text-slate-700 mb-3">Sila pilih tindakan untuk penukaran nama kepada <b>${newName}</b>:</p>
+                <div class="space-y-2">
+                    <button onclick="window.tukarProfilSekolah('${newName.replace(/'/g, "\\'")}', true)" class="w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg font-bold text-xs transition">
+                        🏢 Buka / Cipta Profil Sekolah Baharu<br>
+                        <span class="font-normal text-[10px] text-blue-600">Data semasa (${oldName}) akan disimpan dan ditukar ke pangkalan data baharu.</span>
+                    </button>
+                    <button onclick="window.tukarProfilSekolah('${newName.replace(/'/g, "\\'")}', false)" class="w-full text-left px-4 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg font-bold text-xs transition">
+                        ✏️ Sekadar Betulkan Ejaan<br>
+                        <span class="font-normal text-[10px] text-emerald-600">Kekalkan semua jadual & data sedia ada pada nama baharu ini.</span>
+                    </button>
+                </div>
+            `;
+            
+            window.customDialog("Pengurusan Profil Sekolah", html);
+            document.getElementById('modalBtnOk').classList.add('hidden');
+            document.getElementById('modalBtnCancel').classList.remove('hidden');
+            document.getElementById('modalBtnCancel').innerText = "Batal";
+        };
+
+        window.tukarProfilSekolah = async function(newName, isNewProfile) {
+            document.getElementById('customModal').classList.add('hidden');
+            document.getElementById('customModal').classList.remove('flex');
+            document.getElementById('modalBtnOk').classList.remove('hidden');
+            document.getElementById('modalBtnCancel').innerText = "Batal";
+
+            if (!isNewProfile) {
+                window.appState.schoolName = newName;
+                window.simpanData();
+                window.refreshUIAll();
+                window.customDialog("Berjaya", "<p>Ejaan nama sekolah berjaya dikemas kini.</p>");
+                return;
+            }
+
+            window.customDialog("Memproses...", "<p class='text-center py-4 font-bold text-indigo-700'>Sedang menukar profil sekolah, sila tunggu... ⏳</p>");
+            document.getElementById('modalBtnOk').classList.add('hidden');
+            document.getElementById('modalBtnCancel').classList.add('hidden');
+
+            let activeUid = currentUser ? currentUser.uid : "lokal_offline";
+            let oldName = window.appState.schoolName;
+            let safeOldName = oldName.replace(/[\/\\#?]/g, '-');
+            let safeNewName = newName.replace(/[\/\\#?]/g, '-');
+
+            try {
+                let backupData = JSON.parse(JSON.stringify(window.appState));
+                if (db && activeUid !== "lokal_offline") {
+                    await setDoc(doc(db, "artifacts", "sistem-jadual", "users", activeUid, "schools", safeOldName), backupData);
+                }
+                localStorage.setItem(`jadualOfflineSchool_${activeUid}_${safeOldName}`, JSON.stringify(backupData));
+            } catch(e) {}
+
+            let loadedData = null;
+            try {
+                if (db && activeUid !== "lokal_offline") {
+                    let docSnap = await getDoc(doc(db, "artifacts", "sistem-jadual", "users", activeUid, "schools", safeNewName));
+                    if (docSnap.exists()) loadedData = docSnap.data();
+                }
+                if (!loadedData) {
+                    let localSaved = localStorage.getItem(`jadualOfflineSchool_${activeUid}_${safeNewName}`);
+                    if (localSaved) loadedData = JSON.parse(localSaved);
+                }
+            } catch(e) {}
+
+            if (loadedData) {
+                window.appState = loadedData;
+            } else {
+                window.appState = { 
+                    schoolName: newName, guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, guruIC: {}, guruDelima: {},
+                    masaSekolah: { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20 }, 
+                    configMasa: { Isnin: {jumlah:8, rehat:4}, Selasa: {jumlah:8, rehat:4}, Rabu: {jumlah:8, rehat:4}, Khamis: {jumlah:8, rehat:4}, Jumaat: {jumlah:6, rehat:3} }, 
+                    jenisSesiSekolah: "pagi", agihan: [], kekangan: [], jadual: {}, peperiksaan: [] 
+                };
+            }
+
+            await window.simpanData();
+            window.refreshUIAll();
+            document.getElementById('modalBtnOk').classList.remove('hidden');
+            window.customDialog("Berjaya!", `<p>Ruang kerja untuk <b>${newName}</b> kini sedia digunakan.</p>`);
+        };
 
         window.exportDataJSON = function() {
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.appState, null, 2));
@@ -2505,18 +2661,33 @@
             let file = event.target.files[0]; if(!file) return;
             let reader = new FileReader();
             reader.onload = function(e) {
-                try { window.appState = JSON.parse(e.target.result); window.simpanData(); window.refreshUIAll(); window.customDialog("Berjaya", "<p>Data berjaya diimport ke akaun anda!</p>"); } 
+                try { 
+                    window.appState = JSON.parse(e.target.result); 
+                    if (!window.appState.peperiksaan) window.appState.peperiksaan = [];
+                    window.simpanData(); window.refreshUIAll(); window.customDialog("Berjaya", "<p>Data berjaya diimport ke akaun anda!</p>"); 
+                } 
                 catch(err) { window.customDialog("Ralat", "<p>Fail JSON tidak sah.</p>"); }
             };
             reader.readAsText(file);
+            event.target.value = '';
         };
 
         window.simpanVersiBaharu = async function() {
             let namaVersi = document.getElementById('inputNamaVersi').value.trim();
             if(!namaVersi) return window.customDialog("Makluman", "<p>Sila masukkan nama versi jadual.</p>");
-            if(!window.appState.jadual || Object.keys(window.appState.jadual).length === 0) return window.customDialog("Ralat", "<p>Tiada jadual untuk disimpan.</p>");
+            
+            let hasJadual = (window.appState.jadual && Object.keys(window.appState.jadual).length > 0);
+            let hasPeperiksaan = (window.appState.peperiksaan && window.appState.peperiksaan.length > 0);
+            
+            if(!hasJadual && !hasPeperiksaan) return window.customDialog("Ralat", "<p>Tiada jadual waktu atau jadual peperiksaan untuk disimpan.</p>");
 
-            let versiObj = { id: 'v_' + Date.now().toString(), nama: namaVersi, tarikh: new Date().toLocaleString('ms-MY'), jadual: JSON.parse(JSON.stringify(window.appState.jadual)) };
+            let versiObj = { 
+                id: 'v_' + Date.now().toString(), 
+                nama: namaVersi, 
+                tarikh: new Date().toLocaleString('ms-MY'), 
+                jadual: window.appState.jadual ? JSON.parse(JSON.stringify(window.appState.jadual)) : {},
+                peperiksaan: window.appState.peperiksaan ? JSON.parse(JSON.stringify(window.appState.peperiksaan)) : []
+            };
             document.getElementById('inputNamaVersi').value = "";
             let activeUid = currentUser ? currentUser.uid : "lokal_offline";
             
@@ -2552,9 +2723,16 @@
             container.innerHTML = listHTML === "" ? `<p class="text-center text-xs text-slate-400 py-4">Tiada versi direkodkan.</p>` : listHTML;
         };
 
-        function binaHtmlSenaraiVersi(data) {
+        window.binaHtmlSenaraiVersi = function(data) {
+            let info = "";
+            if (data.jadual && Object.keys(data.jadual).length > 0) info += "<span class='bg-indigo-100 text-indigo-700 px-1 rounded text-[9px] mr-1'>Jadual Kelas</span>";
+            if (data.peperiksaan && data.peperiksaan.length > 0) info += "<span class='bg-emerald-100 text-emerald-700 px-1 rounded text-[9px]'>Peperiksaan</span>";
+
             return `<div class="bg-white border rounded-lg p-3 flex justify-between items-center shadow-sm">
-                <div><div class="font-bold text-xs text-indigo-700">${data.nama}</div><div class="text-[10px] text-slate-500">${data.tarikh}</div></div>
+                <div>
+                    <div class="font-bold text-xs text-indigo-700">${data.nama}</div>
+                    <div class="text-[10px] text-slate-500">${data.tarikh} ${info}</div>
+                </div>
                 <div class="flex gap-2">
                     <button onclick="window.muatVersiKeSistem('${data.id}')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded border border-emerald-200 transition">🔄 Muat</button>
                     <button onclick="window.padamVersiSistem('${data.id}')" class="px-2 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[10px] rounded border border-red-200 transition">🗑️</button>
@@ -2564,15 +2742,21 @@
 
         window.muatVersiKeSistem = async function(vId) {
             window.customDialog("Pengesahan", "<p>Tindakan ini akan <b>MENGGANTIKAN</b> jadual semasa anda. Teruskan?</p>", true, async () => {
-                let activeUid = currentUser ? currentUser.uid : "lokal_offline", targetJadual = null;
+                let activeUid = currentUser ? currentUser.uid : "lokal_offline", targetData = null;
                 if (db && activeUid !== "lokal_offline") {
                     let docSnap = await getDoc(doc(db, "artifacts", "sistem-jadual", "users", activeUid, "versions", vId));
-                    if(docSnap.exists()) targetJadual = docSnap.data().jadual;
+                    if(docSnap.exists()) targetData = docSnap.data();
                 } else {
                     let localV = JSON.parse(localStorage.getItem(`jadualVersi_${activeUid}`)) || [];
-                    let found = localV.find(v => v.id === vId); if(found) targetJadual = found.jadual;
+                    targetData = localV.find(v => v.id === vId);
                 }
-                if(targetJadual) { window.appState.jadual = targetJadual; window.simpanData(); window.renderJadualDropdowns(); window.customDialog("Selesai", "<p>Jadual versi berjaya dimuatkan ke ruang kerja.</p>"); }
+                if(targetData) { 
+                    window.appState.jadual = targetData.jadual || {}; 
+                    window.appState.peperiksaan = targetData.peperiksaan || []; 
+                    window.simpanData(); 
+                    window.refreshUIAll();
+                    window.customDialog("Selesai", "<p>Jadual versi berjaya dimuatkan ke ruang kerja.</p>"); 
+                }
             });
         };
 
@@ -2599,15 +2783,256 @@
         };
 
         window.resetDataSemasa = function() {
-            window.customDialog("Pengesahan PENTING", "<p class='text-red-600 font-bold'>ZON BAHAYA: Adakah anda pasti mahu memadam SEMUA rekod (Guru, Kelas, Subjek, Jadual)?</p>", true, () => {
+            window.customDialog("Pengesahan PENTING", "<p class='text-red-600 font-bold'>ZON BAHAYA: Adakah anda pasti mahu memadam SEMUA rekod (Guru, Kelas, Subjek, Jadual, Peperiksaan)?</p>", true, () => {
                 window.appState = { 
                     schoolName: "SK / SMK Pintar", guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, guruIC: {}, guruDelima: {},
                     masaSekolah: { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20 }, 
                     configMasa: { Isnin: {jumlah:8, rehat:4}, Selasa: {jumlah:8, rehat:4}, Rabu: {jumlah:8, rehat:4}, Khamis: {jumlah:8, rehat:4}, Jumaat: {jumlah:6, rehat:3} }, 
-                    jenisSesiSekolah: "pagi", agihan: [], kekangan: [], jadual: {} 
+                    jenisSesiSekolah: "pagi", agihan: [], kekangan: [], jadual: {}, peperiksaan: []
                 };
                 window.simpanData(); window.refreshUIAll(); window.customDialog("Selesai", "<p>Semua pangkalan data ruang kerja ini telah dikosongkan.</p>");
             });
+        };
+
+        window.bukaModalImportAsc = function() {
+            document.getElementById('modalImportAsc').classList.remove('hidden');
+            document.getElementById('modalImportAsc').classList.add('flex');
+            document.getElementById('fileUploadAsc').value = "";
+        };
+
+        window.tutupModalImportAsc = function() {
+            document.getElementById('modalImportAsc').classList.add('hidden');
+            document.getElementById('modalImportAsc').classList.remove('flex');
+        };
+
+        window.prosesFailAsc = function(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+
+            window.customDialog("Memproses Fail aSc...", "<p class='text-center py-3'>Menghurai (parsing) matriks dan senarai aSc, sila tunggu ⏳</p>");
+            
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let data = new Uint8Array(e.target.result);
+                try {
+                    let workbook = XLSX.read(data, { type: 'array' });
+                    let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    let json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    let foundKelas = new Set();
+                    let foundGuru = new Set();
+                    let foundSubjek = new Set();
+                    let agihanBaru = [];
+
+                    json.forEach(row => {
+                        if (!row || row.length < 3) return;
+
+                        let val1 = row[0] ? row[0].toString().trim() : "";
+                        let val2 = row[1] ? row[1].toString().trim() : "";
+                        let val3 = row[2] ? row[2].toString().trim() : "";
+                        let val4 = row[3] ? row[3].toString().trim() : "1"; 
+
+                        if (val1 && val2 && val3 && val1.toLowerCase() !== 'class' && val1.toLowerCase() !== 'kelas' && val1.toLowerCase() !== 'teacher') {
+                            let k = val1, s = val2, g = val3;
+                            
+                            if (k.length < 15) foundKelas.add(k);
+                            if (s.length < 30) foundSubjek.add(s);
+                            if (g.length > 2 && g.length < 50) foundGuru.add(g);
+
+                            agihanBaru.push({
+                                kelas: k, subjek: s, guru: g, waktu: parseInt(val4) || 1
+                            });
+                        }
+                    });
+
+                    if (foundKelas.size === 0 && foundGuru.size === 0) {
+                        json.forEach(row => {
+                            if (!row) return;
+                            row.forEach(cell => {
+                                if (typeof cell !== 'string') return;
+                                let text = cell.trim();
+                                if (text.length < 2 || text.length > 40) return;
+                                
+                                if (/^[1-6]\s*[A-Z][a-z]*$/.test(text) || /^(Tahun|Tingkatan)\s*\d/.test(text) || /^\d[A-Z]{1,2}$/.test(text)) {
+                                    foundKelas.add(text);
+                                } else {
+                                    foundSubjek.add(text);
+                                }
+                            });
+                        });
+                    }
+
+                    foundKelas.forEach(k => { if(!window.appState.kelas.includes(k)) window.appState.kelas.push(k); });
+                    foundSubjek.forEach(s => { if(!window.appState.subjek.includes(s)) window.appState.subjek.push(s); });
+                    foundGuru.forEach(g => { 
+                        if(!window.appState.guru.includes(g)) {
+                            window.appState.guru.push(g); 
+                            window.appState.guruKod[g] = g.substring(0,4).toUpperCase();
+                            window.appState.guruSesi[g] = 'pagi';
+                        }
+                    });
+
+                    if (!window.appState.agihan) window.appState.agihan = [];
+                    agihanBaru.forEach(a => {
+                        let existing = window.appState.agihan.find(x => x.kelas === a.kelas && x.subjek === a.subjek && x.guru === a.guru);
+                        if (existing) {
+                            existing.waktu += a.waktu;
+                        } else {
+                            window.appState.agihan.push(a);
+                        }
+                    });
+
+                    window.simpanData();
+                    window.refreshUIAll();
+                    window.tutupModalImportAsc();
+                    document.getElementById('fileUploadAsc').value = "";
+                    
+                    window.customDialog("Import Berjaya 🎉", `<p>Data dari fail aSc Timetable berjaya diekstrak!</p><ul class="list-disc pl-5 mt-2 text-xs text-slate-700 font-medium"><li><b>${foundGuru.size}</b> Guru direkodkan</li><li><b>${foundKelas.size}</b> Kelas direkodkan</li><li><b>${foundSubjek.size}</b> Subjek direkodkan</li><li><b>${agihanBaru.length}</b> Agihan beban dimasukkan</li></ul>`);
+
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById('fileUploadAsc').value = "";
+                    window.customDialog("Ralat Pengekstrakan", "<p>Gagal membaca fail aSc. Sila pastikan anda mengeksportnya menggunakan mod <b>List of Lessons</b> dalam bentuk Excel (XLSX/XLS).</p>");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        // --- MODUL PEPERIKSAAN (TAB 5) ---
+        window.renderPeperiksaanForm = function() {
+            let container = document.getElementById('peperiksaanKelasCheckboxes');
+            let subjekSelect = document.getElementById('peperiksaanSubjek');
+            if(!container || !subjekSelect) return;
+
+            let kelasList = window.appState.kelas || [];
+            if(kelasList.length === 0) {
+                container.innerHTML = `<span class="text-xs text-slate-400 italic">Sila daftar kelas di Tab 1 dahulu.</span>`;
+            } else {
+                container.innerHTML = kelasList.map(k => `
+                    <label class="inline-flex items-center gap-1.5 bg-white border px-2.5 py-1 rounded-md shadow-sm cursor-pointer hover:border-indigo-400">
+                        <input type="checkbox" name="peperiksaanKelas" value="${k}" class="rounded text-indigo-600 focus:ring-indigo-500">
+                        <span class="font-bold text-slate-700">${k}</span>
+                    </label>
+                `).join('');
+            }
+
+            let subjekList = window.appState.subjek || [];
+            subjekSelect.innerHTML = `<option value="">-- Pilih Subjek Peperiksaan --</option>` + subjekList.map(s => `<option value="${s}">${s}</option>`).join('');
+        };
+
+        window.tambahSesiPeperiksaan = function() {
+            let checkedKelas = Array.from(document.querySelectorAll('input[name="peperiksaanKelas"]:checked')).map(el => el.value);
+            let tarikh = document.getElementById('peperiksaanTarikh').value;
+            let mula = document.getElementById('peperiksaanMasaMula').value;
+            let tamat = document.getElementById('peperiksaanMasaTamat').value;
+            let subjek = document.getElementById('peperiksaanSubjek').value;
+
+            if(checkedKelas.length === 0 || !tarikh || !mula || !tamat || !subjek) {
+                return window.customDialog("Ralat", "<p>Sila lengkapkan pilihan kelas, tarikh, masa dan subjek peperiksaan.</p>");
+            }
+
+            if(!window.appState.peperiksaan) window.appState.peperiksaan = [];
+            
+            let idUjian = 'ujian_' + Date.now();
+            window.appState.peperiksaan.push({
+                id: idUjian,
+                kelas: checkedKelas,
+                tarikh,
+                mula,
+                tamat,
+                subjek,
+                pengawas: {} // Mapping: { NamaKelas: NamaGuru }
+            });
+
+            window.simpanData();
+            window.renderPaparanPeperiksaan();
+            window.customDialog("Berjaya", "<p>Slot peperiksaan berjaya ditambah. Sila tetapkan guru pengawas di bawah.</p>");
+        };
+
+        window.padamSesiPeperiksaan = function(id) {
+            window.customDialog("Pengesahan", "<p>Adakah anda pasti mahu memadam slot peperiksaan ini?</p>", true, () => {
+                window.appState.peperiksaan = window.appState.peperiksaan.filter(p => p.id !== id);
+                window.simpanData();
+                window.renderPaparanPeperiksaan();
+            });
+        };
+
+        window.ubahPengawasUjian = function(ujianId, kelasName, guruName) {
+            let ujian = window.appState.peperiksaan.find(p => p.id === ujianId);
+            if(!ujian) return;
+
+            if (!window.appState.peperiksaan.pengawas) ujian.pengawas = ujian.pengawas || {};
+
+            if (!guruName) {
+                delete ujian.pengawas[kelasName];
+            } else {
+                // Semak clash pengawas (jika guru ini sudah menjaga ujian lain pada tarikh dan masa bertindih)
+                let clashUjian = window.appState.peperiksaan.find(p => {
+                    if (p.id === ujianId) return false;
+                    if (p.tarikh !== ujian.tarikh) return false;
+                    // Semak overlap masa
+                    let overlap = (ujian.mula < p.tamat && ujian.tamat > p.mula);
+                    if (overlap) {
+                        for (let k in p.pengawas) {
+                            if (p.pengawas[k] === guruName) return true;
+                        }
+                    }
+                    return false;
+                });
+
+                if (clashUjian) {
+                    return window.customDialog("Pertindihan Pengawas 🔴", `<p class="text-xs text-red-600 font-bold">Cikgu <b>${guruName}</b> sudah ditugaskan sebagai pengawas untuk subjek <b>${clashUjian.subjek}</b> pada tarikh & masa yang bertindih!</p>`);
+                }
+
+                ujian.pengawas[kelasName] = guruName;
+            }
+
+            window.simpanData();
+            window.renderPaparanPeperiksaan();
+        };
+
+        window.renderPaparanPeperiksaan = function() {
+            let container = document.getElementById('paparanJadualPeperiksaan');
+            if(!container) return;
+            let list = window.appState.peperiksaan || [];
+
+            if(list.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-slate-400 py-6">Belum ada slot peperiksaan didaftarkan.</p>`;
+                return;
+            }
+
+            let guruOpts = `<option value="">-- Pilih Pengawas --</option>` + (window.appState.guru || []).map(g => `<option value="${g}">${g}</option>`).join('');
+
+            let html = list.map((p, idx) => {
+                let kelasCards = p.kelas.map(k => {
+                    let assignedGuru = p.pengawas?.[k] || "";
+                    return `<div class="bg-slate-50 border rounded-lg p-2.5 shadow-smujian-kad">
+                        <div class="font-bold text-xs text-indigo-700 mb-1">Kelas: ${k}</div>
+                        <select onchange="window.ubahPengawasUjian('${p.id}', '${k}', this.value)" class="w-full text-xs border rounded px-2 py-1 bg-white font-medium">
+                            ${guruOpts}
+                        </select>
+                        <script>document.currentScript.previousElementSibling.value = "${assignedGuru}";<\/script>
+                    </div>`;
+                }).join('');
+
+                return `<div class="bg-white border rounded-xl p-4 shadow-sm relative">
+                    <div class="flex justify-between items-start mb-3 border-b pb-2">
+                        <div>
+                            <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2 py-0.5 rounded mr-2">SLOT #${idx + 1}</span>
+                            <h4 class="font-bold text-sm text-slate-900 inline-block">${p.subjek}</h4>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded font-semibold">📅 ${p.tarikh} | ⏰ ${p.mula} - ${p.tamat}</span>
+                            <button onclick="window.padamSesiPeperiksaan('${p.id}')" class="text-red-500 hover:text-red-700 font-bold text-xs bg-red-50 p-1.5 rounded transition print-hidden-btn" title="Padam Ujian">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                        ${kelasCards}
+                    </div>
+                </div>`;
+            }).join('');
+
+            container.innerHTML = html;
         };
     </script>
 </body>
