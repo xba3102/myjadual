@@ -494,6 +494,9 @@
     <!-- KESELURUHAN MODAL DI SINI (DIPENDEKKAN UNTUK PENJIMATAN RUANG) -->
     <!-- Modal Import Asc, Pukal Guru, Kekangan, Jadual Induk, Sunting Manual dikekalkan seperti versi terdahulu -->
     
+    <!-- NOTIFIKASI TOAST TERAPUNG -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
     <!-- GENERAL CUSTOM DIALOG / MODAL -->
     <div id="customModal" class="fixed inset-0 z-[90] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
         <div class="bg-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-md animate-modal">
@@ -570,7 +573,7 @@
             }
         };
 
-        window.simpanData = async function() {
+        window.simpanData = async function(showNotif = true) {
             // Backup ke dalam LocalStorage
             localStorage.setItem('skb_appState', JSON.stringify(window.appState));
             window.kemasKiniPaparanUI();
@@ -579,7 +582,10 @@
             if (currentUser && db) {
                 try {
                     await setDoc(doc(db, "jadual_skbikang", "data_induk"), window.appState);
+                    if(showNotif && window.showToast) window.showToast("Data diselaraskan ke awan (Firebase).", "success");
                 } catch(e) { console.error("Ralat simpan Firebase:", e); }
+            } else {
+                if(showNotif && window.showToast) window.showToast("Data disimpan di memori peranti (Lokal).", "success");
             }
         };
 
@@ -611,26 +617,101 @@
             }
         };
 
+        // FUNGSI NOTIFIKASI & ANIMASI BUTANG (UX PENAMBAHBAIKAN)
+        window.showToast = function(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            if(!toastContainer) return;
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : 'bg-indigo-600');
+            const icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️');
+            
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-xs font-bold transform transition-all duration-300 translate-y-10 opacity-0`;
+            toast.innerHTML = `<span class="text-base">${icon}</span> <span>${message}</span>`;
+            
+            toastContainer.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-10', 'opacity-0'); }, 10);
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
+        window.animasiButangBerjaya = function(btnTarget) {
+            let btn = btnTarget;
+            if (btn && btn.tagName !== 'BUTTON') btn = btn.closest('button');
+            if (!btn) return;
+            
+            const originalHTML = btn.innerHTML;
+            const originalClasses = btn.className;
+            const btnWidth = btn.offsetWidth; // Kunci saiz supaya tidak melompat-lompat
+            
+            btn.style.width = btnWidth + 'px'; 
+            btn.innerHTML = `<span class="animate-bounce">✅</span> Berjaya!`;
+            btn.className = originalClasses.replace(/bg-[a-zA-Z]+-\d00/g, 'bg-emerald-600').replace(/hover:bg-[a-zA-Z]+-\d00/g, 'hover:bg-emerald-700') + ' scale-105 ring-2 ring-emerald-300 transition-all duration-300 flex justify-center items-center gap-2';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.className = originalClasses;
+                btn.style.width = '';
+            }, 2500);
+        };
+
         window.tambahData = function(jenis) {
+            let evt = window.event;
+            let btnTarget = evt ? (evt.currentTarget || evt.target) : null;
+            
             if(jenis === 'guru') {
                 let nama = document.getElementById('inputGuru').value.trim();
                 let kod = document.getElementById('inputKodGuru').value.trim().toUpperCase();
-                if(!nama || !kod) { alert("Sila isi nama dan kod guru."); return; }
+                if(!nama || !kod) { window.customDialog("Makluman", "Sila isi nama dan kod guru."); return; }
                 window.appState.guru.push({ id: 'g_' + Date.now(), nama, kod });
                 document.getElementById('inputGuru').value = ""; document.getElementById('inputKodGuru').value = "";
             } else if(jenis === 'kelas') {
                 let kls = document.getElementById('inputKelas').value.trim();
-                if(!kls) { alert("Sila isi nama kelas."); return; }
+                if(!kls) { window.customDialog("Makluman", "Sila isi nama kelas."); return; }
                 window.appState.kelas.push(kls);
                 document.getElementById('inputKelas').value = "";
             } else if(jenis === 'subjek') {
                 let sub = document.getElementById('inputSubjek').value.trim();
-                if(!sub) { alert("Sila isi nama subjek."); return; }
+                if(!sub) { window.customDialog("Makluman", "Sila isi nama subjek."); return; }
                 window.appState.subjek.push(sub);
                 document.getElementById('inputSubjek').value = "";
             }
-            window.simpanData();
-            alert("Data berjaya ditambah dan diselaraskan ke Awan (Firebase)!");
+            window.simpanData(false);
+            window.animasiButangBerjaya(btnTarget);
+            window.showToast("Maklumat berjaya ditambah!", "success");
+        };
+
+        window.simpanNamaSekolah = function() {
+            let evt = window.event;
+            window.appState.schoolName = document.getElementById('inputNamaSekolah').value || window.appState.schoolName;
+            window.appState.logoUrl = document.getElementById('inputLogoUrl').value || window.appState.logoUrl;
+            window.simpanData(false);
+            window.animasiButangBerjaya(evt ? (evt.currentTarget || evt.target) : null);
+            window.showToast("Maklumat asas sekolah dikemas kini.", "success");
+        };
+
+        window.simpanConfigMasa = function() {
+            let evt = window.event;
+            window.simpanData(false);
+            window.animasiButangBerjaya(evt ? (evt.currentTarget || evt.target) : null);
+            window.showToast("Konfigurasi masa mingguan telah disimpan.", "success");
+        };
+
+        window.tambahAgihanPukal = function() {
+            let evt = window.event;
+            window.simpanData(false);
+            window.animasiButangBerjaya(evt ? (evt.currentTarget || evt.target) : null);
+            window.showToast("Agihan kelas dan subjek berjaya direkodkan.", "success");
+        };
+
+        window.simpanVersiBaharu = function() {
+            let evt = window.event;
+            let namaVersi = document.getElementById('inputNamaVersi').value.trim() || "Versi Baharu";
+            window.simpanData(false);
+            window.animasiButangBerjaya(evt ? (evt.currentTarget || evt.target) : null);
+            window.showToast(`Jadual "${namaVersi}" berjaya diarkibkan.`, "success");
         };
 
         window.customDialog = function(title, messageHTML, isConfirm = false, onConfirm = null) {
