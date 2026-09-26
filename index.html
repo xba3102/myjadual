@@ -3301,7 +3301,8 @@
                 
                 setTimeout(() => {
                     window.janaAI(true); // Lakukan jadual sebenar tanpa alert
-                    window.renderJadualDropdowns();
+                    window.renderKekanganList();
+                    window.toggleModePapar(); // Kemas kini UI jadual secara paksa
                 }, 300);
                 
                 window.pendingKekanganAI = null;
@@ -3335,55 +3336,46 @@
                 properties: {
                     "respon_kpd_pengguna": { 
                         "type": "STRING", 
-                        "description": "Balasan perbualan mesra dalam Bahasa Melayu menerangkan apa yang AI telah ubah/lakukan. (Cth: 'Baik cikgu, saya telah mendaftarkan kekangan supaya anda tidak mengajar pada hari Rabu slot 1. Saya akan menjana semula jadual.')" 
+                        "description": "Balasan perbualan mesra dalam Bahasa Melayu menerangkan apa yang AI telah ubah." 
                     },
                     "tindakan_kekangan": {
                         "type": "ARRAY",
-                        "description": "Senarai kekangan (constraints) mikro yang perlu dimasukkan ke dalam pangkalan data untuk memenuhi permintaan pengguna.",
+                        "description": "Senarai kekangan (constraints) mikro.",
                         "items": {
                             "type": "OBJECT",
                             "properties": {
-                                "jenis": { "type": "STRING", "enum": ["g_tidak_tersedia", "g_elak_2_awal", "g_elak_2_akhir", "g_keutamaan_slot", "s_sebelum_rehat", "s_selepas_rehat"] },
+                                "jenis": { "type": "STRING", "enum": ["g_tidak_tersedia", "g_elak_2_awal", "g_elak_2_akhir", "g_keutamaan_slot", "s_sebelum_rehat", "s_selepas_rehat", "s_awal_pagi", "s_lewat_petang"] },
                                 "hari": { "type": "STRING", "enum": ["Isnin", "Selasa", "Rabu", "Khamis", "Jumaat"] },
-                                "slot_masa": { "type": "NUMBER", "description": "Nombor slot (contoh: 1, 2, 3...)" },
-                                "sasaran_guru": { "type": "STRING", "description": "Nama guru yang terlibat (jika berkaitan)" },
-                                "sasaran_subjek": { "type": "STRING", "description": "Nama subjek yang terlibat (jika berkaitan)" }
+                                "slot_masa": { "type": "NUMBER" },
+                                "sasaran_guru": { "type": "STRING" },
+                                "sasaran_subjek": { "type": "STRING" }
                             }
                         }
                     },
                     "perlu_jana_semula": {
-                        "type": "BOOLEAN",
-                        "description": "Sentiasa set True jika terdapat kekangan (constraints) baru yang dimasukkan supaya sistem boleh apply perubahan tersebut."
+                        "type": "BOOLEAN"
                     }
                 }
             };
 
-            // Bina Data Konteks
             let konteksSistem = `
                 Anda adalah AI Pembantu Penjadualan Sekolah Pintar.
                 Pengguna sedang melihat paparan jadual untuk ${jenisKonteks}: "${sasaran}".
-                Berdasarkan permintaan pengguna, tukarkan permintaan itu kepada arahan sistem (JSON).
-                
-                Hari yang sah: Isnin, Selasa, Rabu, Khamis, Jumaat.
+                Berdasarkan permintaan pengguna, tukarkan permintaan itu kepada arahan sistem JSON SAHAJA (Tanpa markdown).
                 
                 Jenis Kekangan yang anda boleh guna:
-                1. "g_tidak_tersedia" (Kunci masa supaya guru tidak diletak jadual pada Hari dan slot_masa yang dinyatakan). Perlukan 'hari', 'slot_masa', dan 'sasaran_guru'.
+                1. "g_tidak_tersedia" (Kunci masa supaya guru tidak diletak jadual). Perlukan 'hari', 'slot_masa', dan 'sasaran_guru'.
                 2. "g_elak_2_awal" (Guru tidak mahu mengajar 2 slot pertama pagi). Perlukan 'sasaran_guru'.
-                3. "g_elak_2_akhir" (Guru tidak mahu mengajar 2 slot terakhir). Perlukan 'sasaran_guru'.
-                4. "s_sebelum_rehat" (Subjek ini mesti diletakkan sebelum waktu rehat). Perlukan 'sasaran_subjek'.
-                
-                Contoh: Pengguna kata "Saya tak boleh ngajar hari rabu masa pertama".
-                Tindakan: Bina 1 objek dalam tindakan_kekangan -> jenis: "g_tidak_tersedia", hari: "Rabu", slot_masa: 1, sasaran_guru: "${sasaran}".
+                3. "g_keutamaan_slot" (Tetapkan guru ini mengajar pada masa tersebut). Perlukan 'sasaran_guru', 'hari', 'slot_masa'.
             `;
 
             try {
-                // Panggil Gemini API dengan API Key rasmi (DIPERBAIK MODEL API)
-                const apiKey = "AQ.Ab8RN6IRJ82eabsQ4LTD7tdly0KLV0go4zc_P-ayjXYsb08S-A";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                const apiKeyLocal = "AQ.Ab8RN6IRJ82eabsQ4LTD7tdly0KLV0go4zc_P-ayjXYsb08S-A";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyLocal}`;
                 
                 const payload = {
                     contents: [
-                        { role: "user", parts: [{ text: `Permintaan pengguna: "${prompt}"\n\nTolong analisa dan berikan JSON.` }] }
+                        { role: "user", parts: [{ text: `Permintaan pengguna: "${prompt}"\n\nTolong analisa dan berikan JSON SAHAJA tanpa format markdown block.` }] }
                     ],
                     systemInstruction: { parts: [{ text: konteksSistem }] },
                     generationConfig: {
@@ -3399,31 +3391,37 @@
                 });
 
                 if(!response.ok) {
-                   throw new Error("Ralat sambungan API atau Kunci API tidak sah.");
+                   let errText = await response.text();
+                   throw new Error("Ralat HTTP (" + response.status + "): " + errText);
                 }
 
                 const result = await response.json();
                 
                 if (result.candidates && result.candidates.length > 0) {
-                    const jsonRes = JSON.parse(result.candidates[0].content.parts[0].text);
+                    // Penapis Regex: Buang markdown ```json jika AI masih berdegil menghantarnya
+                    let rawText = result.candidates[0].content.parts[0].text;
+                    rawText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                    
+                    let jsonRes;
+                    try {
+                        jsonRes = JSON.parse(rawText);
+                    } catch(e) {
+                        window.tambahMesejKeChat('AI', "Maaf, format data (JSON) daripada AI tidak dapat dibaca oleh sistem. Sila ubah sikit ayat arahan anda.");
+                        throw e; // Hentikan perlaksanaan untuk terus ke blok catch
+                    }
                     
                     if (jsonRes.perlu_jana_semula && jsonRes.tindakan_kekangan && jsonRes.tindakan_kekangan.length > 0) {
-                        // 1. Lakukan Dry Run (Larian Percubaan)
                         let { affected } = window.janaAIDryRun(jsonRes.tindakan_kekangan);
                         
-                        // Buang nama guru yang meminta pertukaran (supaya senarai kesan hanya fokus kepada "orang lain")
-                        if (window.aiContextGuru) {
-                            affected = affected.filter(g => g !== window.aiContextGuru);
-                        }
+                        if (window.aiContextGuru) affected = affected.filter(g => g !== window.aiContextGuru);
 
                         if (affected.length > 0) {
-                            // Terdapat guru lain yang terkesan - Paparkan Dialog Pengesahan Interaktif
                             window.pendingKekanganAI = jsonRes.tindakan_kekangan;
                             
                             let kesanMsg = `${jsonRes.respon_kpd_pengguna}<br>
                             <div class="bg-amber-50 border border-amber-200 p-2.5 rounded text-amber-800 mt-2 mb-2 text-[11px] leading-tight shadow-sm">
                                 <span class="font-bold flex items-center gap-1 mb-1"><span>⚠️</span> Analisis Kesan Penjadualan:</span>
-                                Pertukaran ini menyebabkan jadual guru berikut terpaksa diubah:
+                                Pertukaran ini mengganggu jadual guru berikut:
                                 <br><b class="text-amber-900">${affected.join(', ')}</b>.
                             </div>
                             <div class="text-[10px] font-bold text-slate-700">Adakah anda ingin meneruskan pertukaran ini?</div>`;
@@ -3431,7 +3429,6 @@
                             window.tambahMesejKeChatTindakan('AI', kesanMsg, 'Ya, Teruskan', 'Batal', 'window.teruskanArahanAI', 'window.batalkanArahanAI');
                             
                         } else {
-                            // Tiada guru lain terkesan, terus execute dan trigger regenerate jadual serta rerender UI
                             window.tambahMesejKeChat('AI', jsonRes.respon_kpd_pengguna);
                             window.tambahMesejKeChat('AI', `<i class="text-[10px] text-emerald-600 font-bold">⚙️ Memproses susunan AI berserta syarat baharu...</i>`);
                             
@@ -3449,26 +3446,28 @@
                             });
                             window.simpanData();
 
-                            // Laksana penjadualan semula dan paparkan kemas kini skrin secara serentak
                             setTimeout(() => {
                                 window.janaAI(true);
-                                window.toggleModePapar();
                                 window.renderKekanganList();
+                                window.toggleModePapar(); // Pastikan jadual dirender semula
                                 window.tambahMesejKeChat('AI', `<span class="text-[10px] text-indigo-700 font-bold">✅ Jadual telah berjaya dijana semula mengikut arahan baru anda! Sila semak paparan jadual di atas.</span>`);
                             }, 500);
                         }
                     } else {
-                        // Tiada tindakan kekangan
                         window.tambahMesejKeChat('AI', jsonRes.respon_kpd_pengguna);
                     }
 
                 } else {
-                    window.tambahMesejKeChat('AI', "Maaf, saya menghadapi sedikit masalah teknikal ketika menganalisa jadual. Sila cuba lagi.");
+                    window.tambahMesejKeChat('AI', "Maaf, AI tidak memberikan sebarang respons. Sila cuba lagi.");
                 }
 
             } catch (err) {
-                console.error(err);
-                window.tambahMesejKeChat('AI', "Alamak, kunci API ditolak atau pelayan AI sedang sibuk. Sila pastikan kunci API anda sah.");
+                console.error("AI Error:", err);
+                if(err.message && err.message.includes("JSON Parse")) {
+                    // Ralat telah dikendalikan di blok try-catch dalaman
+                } else {
+                    window.tambahMesejKeChat('AI', "Alamak, ralat rangkaian berlaku atau pelayan sedang sibuk. Sila cuba sebentar lagi.");
+                }
             } finally {
                 inputEl.disabled = false;
                 document.getElementById('btnHantarAI').disabled = false;
