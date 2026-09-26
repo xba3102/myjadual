@@ -2150,8 +2150,8 @@
             let selKls = document.getElementById('paparKelasSelect');
             if(selKls) {
                 let curKls = selKls.value;
-                selKls.innerHTML = `<option value="">-- Pilih Kelas --</option>` + (window.appState.kelas || []).map(k => `<option value="${k}" ${k===curKls?'selected':''}>${k}</option>`).join('');
-                if(window.appState.kelas?.length > 0 && !curKls) selKls.value = window.appState.kelas[0];
+                selKls.innerHTML = `<option value="">-- Pilih Kelas --</option>` + (window.appState.kelas || []).map(k => `<option value="${k}">${k}</option>`).join('');
+                if(curKls) selKls.value = curKls; else if(window.appState.kelas?.length > 0) selKls.value = window.appState.kelas[0];
             }
             
             let guruOpts = `<option value="">-- Pilih Guru --</option>` + (window.appState.guru || []).map(g => `<option value="${g}">${g}</option>`).join('');
@@ -2160,7 +2160,7 @@
             if(selGuru) {
                 let curGuru = selGuru.value;
                 selGuru.innerHTML = guruOpts;
-                if(window.appState.guru?.length > 0 && !curGuru) selGuru.value = window.appState.guru[0];
+                if(curGuru) selGuru.value = curGuru; else if(window.appState.guru?.length > 0) selGuru.value = window.appState.guru[0];
             }
             
             let selBand1 = document.getElementById('paparBandingGuruSelect1');
