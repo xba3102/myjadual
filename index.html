@@ -945,7 +945,7 @@
 
         window.getColorForSubjek = function(subjek) {
             if(!subjek) return '#ffffff';
-            let colors = ['#fecaca', '#fef08a', '#bbf7d0', '#bfdbfe', '#e9d5ff', '#fed7aa', '#99f6e4', '#fbcfe8', '#e2e8f0', '#c7d2fe', '#fecdd3', '#d9f99d', '#a7f3d0', '#fde047', '#cbd5e1'];
+            let colors = ['#fecaca', '#fef08a', '#bbf7d0', '#bfdbfe', '#e9d5ff', '#fed7aa', '#99f6e4', '#fbcfe8', '#e2e8f0', '#c7d2fe', '#d9f99d', '#a7f3d0', '#fde047', '#cbd5e1'];
             let hash = 0;
             for (let i = 0; i < subjek.length; i++) { hash = subjek.charCodeAt(i) + ((hash << 5) - hash); }
             return colors[Math.abs(hash) % colors.length];
@@ -1594,10 +1594,6 @@
 
             cont.innerHTML = html;
             window.renderSenaraiAgihan();
-        };
-
-        window.renderAgihanKelas = function() {
-            // Function dibiarkan kerana telah diintegrasi ke dalam renderAgihanSubjek (Sistem Expandable)
         };
 
         window.tambahAgihanPukal = function() {
@@ -3381,9 +3377,9 @@
             `;
 
             try {
-                // Panggil Gemini API dengan API Key rasmi
+                // Panggil Gemini API dengan API Key rasmi (DIPERBAIK MODEL API)
                 const apiKey = "AQ.Ab8RN6IRJ82eabsQ4LTD7tdly0KLV0go4zc_P-ayjXYsb08S-A";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 
                 const payload = {
                     contents: [
@@ -3401,6 +3397,10 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+
+                if(!response.ok) {
+                   throw new Error("Ralat sambungan API atau Kunci API tidak sah.");
+                }
 
                 const result = await response.json();
                 
@@ -3468,7 +3468,7 @@
 
             } catch (err) {
                 console.error(err);
-                window.tambahMesejKeChat('AI', "Alamak, pelayan AI sedang sibuk. Sila cuba sekali lagi nanti.");
+                window.tambahMesejKeChat('AI', "Alamak, kunci API ditolak atau pelayan AI sedang sibuk. Sila pastikan kunci API anda sah.");
             } finally {
                 inputEl.disabled = false;
                 document.getElementById('btnHantarAI').disabled = false;
