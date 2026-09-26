@@ -312,9 +312,9 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button id="btnToggleSunting" onclick="window.toggleModSuntingan()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5" title="Buka fungsi tukar slot secara klik atau Drag & Drop">
-                                <span>✏️</span> Sunting Manual
-                            </button>
+                        <button id="btnToggleSunting" onclick="window.toggleModSuntingan()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5" title="Buka fungsi tukar slot secara klik atau Drag & Drop">
+                            <span>✏️</span> Sunting Manual
+                        </button>
                             <button onclick="window.kongsiJadual()" class="bg-green-600 hover:bg-green-700 text-white font-bold text-xs px-3 py-2 rounded-lg shadow transition flex items-center gap-1.5">
                                 <span>📱</span> Kongsi (PDF)
                             </button>
@@ -327,6 +327,42 @@
                     <div id="paparanJadualContainer" class="overflow-x-auto">
                         <p class="text-center text-xs text-slate-400 py-12">Sila klik butang "Jana Jadual Pintar AI" di atas atau pilih paparan untuk melihat jadual.</p>
                     </div>
+
+                    <!-- PANEL PEMBANTU AI (AI ASSISTANT) -->
+                    <div id="aiAssistantPanel" class="hidden mt-6 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-5 shadow-inner print:hidden relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 opacity-10 text-8xl">🤖</div>
+                        <div class="relative z-10 flex flex-col md:flex-row gap-4">
+                            <div class="w-full md:w-1/3 border-r border-indigo-100 pr-4">
+                                <h4 class="font-bold text-sm text-indigo-900 flex items-center gap-2 mb-2">
+                                    <span class="bg-indigo-600 text-white p-1 rounded-md text-xs shadow-sm">AI</span> Pembantu Penjadualan
+                                </h4>
+                                <p class="text-[11px] text-indigo-700 leading-relaxed">
+                                    Gunakan bahasa biasa untuk memohon perubahan jadual kepada AI. AI akan menterjemah arahan anda kepada peraturan teknikal dan menyusun semula jadual.
+                                </p>
+                                <div class="mt-3 bg-white p-2 rounded border border-indigo-100 shadow-sm text-[10px] text-slate-600">
+                                    <b>Cth Arahan:</b><br>
+                                    "Tolong kosongkan jadual saya pada hari Rabu slot 1 dan 2."<br>
+                                    "Jangan letak saya mengajar waktu terakhir hari Jumaat."
+                                </div>
+                            </div>
+                            <div class="w-full md:w-2/3 flex flex-col justify-end">
+                                <div id="aiChatHistory" class="flex-1 bg-white rounded-lg border border-indigo-100 mb-3 p-3 text-xs h-32 overflow-y-auto space-y-2 shadow-sm">
+                                    <div class="flex items-start gap-2">
+                                        <div class="bg-indigo-100 p-1.5 rounded-full text-[10px]">🤖</div>
+                                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-r-lg rounded-bl-lg text-slate-700 font-medium">Hai! Saya pembantu AI anda. Beritahu saya apa yang anda ingin ubah pada jadual ini.</div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 relative">
+                                    <input type="text" id="aiPromptInput" placeholder="Cth: Cikgu Ali tak boleh mengajar Isnin pagi..." class="flex-1 text-xs border border-indigo-200 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-sm" onkeypress="if(event.key === 'Enter') window.hantarArahanAI()">
+                                    <button id="btnHantarAI" onclick="window.hantarArahanAI()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition shadow flex items-center gap-2 shrink-0">
+                                        <span>✨</span> Proses AI
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- TAMAT PANEL PEMBANTU AI -->
+
                 </div>
 
             </div>
@@ -716,7 +752,10 @@
         
         window.draggedSlot = null;
         window.isDragging = false;
-
+        
+        window.aiContextGuru = null;
+        window.aiContextKelas = null;
+        
         const KEKANGAN_DEFINITIONS = {
             guru: [
                 { id: 'g_elak_2_awal', label: 'Elak 2 Masa Pertama', desc: 'Sistem tidak akan membenarkan guru mengajar pada 2 waktu terawal bagi hari tersebut.', inputs: ['guru'] },
@@ -2021,11 +2060,7 @@
             return { isHardViolated: hardViolation, penalti: p, reward: r, coTeacher };
         };
 
-        window.janaAI = function() {
-            if(!window.appState.agihan || window.appState.agihan.length === 0) return window.customDialog("Ralat", "<p>Sila masukkan agihan mengajar terlebih dahulu.</p>");
-            let diagIssues = window.runDiagnostics();
-            if(diagIssues.length > 0) return window.customDialog("🔴 Jadual TIDAK Boleh Dijana", `<p class="mb-2 font-bold text-red-600">Punca Utama Masalah:</p><ul class="list-disc pl-5 space-y-1 mb-3">${diagIssues.map(i=>`<li>${i}</li>`).join('')}</ul><p class="text-xs text-slate-500">Sila kurangkan waktu subjek atau tambah slot masa.</p>`);
-
+        window.runCoreSchedulingEngine = function() {
             let newJadual = {}, gagalCount = 0;
             let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
             
@@ -2134,12 +2169,30 @@
                 });
             });
 
+            return { newJadual, gagalCount };
+        };
+
+        window.janaAI = function(senyap = false) {
+            if(!window.appState.agihan || window.appState.agihan.length === 0) {
+                if(!senyap) window.customDialog("Ralat", "<p>Sila masukkan agihan mengajar terlebih dahulu.</p>");
+                return;
+            }
+            let diagIssues = window.runDiagnostics();
+            if(diagIssues.length > 0) {
+                if(!senyap) window.customDialog("🔴 Jadual TIDAK Boleh Dijana", `<p class="mb-2 font-bold text-red-600">Punca Utama Masalah:</p><ul class="list-disc pl-5 space-y-1 mb-3">${diagIssues.map(i=>`<li>${i}</li>`).join('')}</ul><p class="text-xs text-slate-500">Sila kurangkan waktu subjek atau tambah slot masa.</p>`);
+                return;
+            }
+
+            let { newJadual, gagalCount } = window.runCoreSchedulingEngine();
+
             window.appState.jadual = newJadual; 
             window.simpanData(); 
             window.renderJadualDropdowns();
             
-            if(gagalCount > 0) window.customDialog("Jadual Selesai", `<p class="mb-2 text-amber-700 font-bold">⚠️ Selesai dengan beberapa slot kosong (${gagalCount} slot) kerana pertindihan guru.</p>`);
-            else window.customDialog("✨ Berjaya!", "<p>Jadual waktu berjaya dijana sepenuhnya menggunakan <b>Sistem Agihan Horizontal (Round-Robin) & Kekangan Had Maksimum!</b></p>");
+            if(!senyap) {
+                if(gagalCount > 0) window.customDialog("Jadual Selesai", `<p class="mb-2 text-amber-700 font-bold">⚠️ Selesai dengan beberapa slot kosong (${gagalCount} slot) kerana pertindihan guru.</p>`);
+                else window.customDialog("✨ Berjaya!", "<p>Jadual waktu berjaya dijana sepenuhnya menggunakan <b>Sistem Agihan Horizontal (Round-Robin) & Kekangan Had Maksimum!</b></p>");
+            }
         };
 
         window.formatMins = function(mins) {
@@ -2316,6 +2369,10 @@
             document.getElementById('wrapperPaparGuru').classList.add('hidden');
             document.getElementById('wrapperPaparBandingGuru').classList.add('hidden');
             
+            window.aiContextGuru = null;
+            window.aiContextKelas = null;
+            document.getElementById('aiAssistantPanel').classList.add('hidden');
+
             if(mode === 'guru') { 
                 document.getElementById('wrapperPaparGuru').classList.remove('hidden'); 
                 window.renderJadualGuru(); 
@@ -2384,6 +2441,10 @@
             });
             html += `</tbody></table><div class="hidden print:flex mt-8 justify-between items-end text-xs font-bold text-slate-800 print-color-adjust"><div>Pengesahan Pengetua/Guru Besar:<br><br><br>....................................................................</div><div class="text-right">Tarikh Dijana: ${tarikh}<br>Sistem Penjadualan Pintar AI</div></div>`;
             container.innerHTML = html;
+            
+            // Papar AI Assistant untuk Kelas
+            window.aiContextKelas = kls;
+            document.getElementById('aiAssistantPanel').classList.remove('hidden');
         };
 
         window.renderJadualGuru = function() {
@@ -2446,6 +2507,10 @@
             });
             html += `</tbody></table><div class="hidden print:flex mt-8 justify-between items-end text-xs font-bold text-slate-800 print-color-adjust"><div>Pengesahan Pengetua/Guru Besar:<br><br><br>....................................................................</div><div class="text-right">Tarikh Dijana: ${new Date().toLocaleDateString('ms-MY')}<br>Sistem Penjadualan Pintar AI</div></div>`;
             container.innerHTML = html;
+            
+            // Papar AI Assistant untuk Guru
+            window.aiContextGuru = guruTarget;
+            document.getElementById('aiAssistantPanel').classList.remove('hidden');
         };
 
         window.renderJadualBandingGuru = function() {
@@ -3114,6 +3179,299 @@
                 window.simpanData();
                 window.renderPaparanPeperiksaan();
             });
+        };
+
+        // ==========================================
+        // ENJIN PEMBANTU AI (GEMINI) & ANALISIS KESAN
+        // ==========================================
+        window.pendingKekanganAI = null;
+
+        window.tambahMesejKeChat = function(sender, text) {
+            let chatBox = document.getElementById('aiChatHistory');
+            let isAI = sender === 'AI';
+            
+            let html = `
+                <div class="flex items-start gap-2 ${isAI ? '' : 'flex-row-reverse'} animate-modal">
+                    <div class="${isAI ? 'bg-indigo-100' : 'bg-slate-200'} p-1.5 rounded-full text-[10px] shrink-0">${isAI ? '🤖' : '👤'}</div>
+                    <div class="${isAI ? 'bg-slate-50 border-slate-100 rounded-r-lg rounded-bl-lg text-slate-700' : 'bg-indigo-600 text-white rounded-l-lg rounded-br-lg'} border p-2 text-xs font-medium max-w-[85%]">
+                        ${text}
+                    </div>
+                </div>
+            `;
+            chatBox.innerHTML += html;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+
+        window.tambahMesejKeChatTindakan = function(sender, text, btn1, btn2, action1, action2) {
+            let chatBox = document.getElementById('aiChatHistory');
+            let actId = 'act_' + Date.now();
+            let html = `
+                <div class="flex items-start gap-2 animate-modal">
+                    <div class="bg-indigo-100 p-1.5 rounded-full text-[10px] shrink-0">🤖</div>
+                    <div class="bg-slate-50 border-slate-100 border p-2 rounded-r-lg rounded-bl-lg text-xs font-medium max-w-[85%] w-full">
+                        ${text}
+                        <div class="mt-3 flex flex-wrap gap-2" id="${actId}">
+                            <button onclick="${action1}('${actId}')" class="bg-emerald-600 text-white px-3 py-1.5 rounded shadow-sm hover:bg-emerald-700 transition font-bold">${btn1}</button>
+                            <button onclick="${action2}('${actId}')" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded hover:bg-slate-300 transition font-bold">${btn2}</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatBox.innerHTML += html;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+
+        window.bandingJadual = function(oldJ, newJ) {
+            let affected = new Set();
+            let hariList = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
+            hariList.forEach(h => {
+                if(!oldJ[h] || !newJ[h]) return;
+                let allKls = new Set([...Object.keys(oldJ[h]), ...Object.keys(newJ[h])]);
+
+                allKls.forEach(kls => {
+                    for(let s=1; s<=15; s++) {
+                        let slotId = `${h}_s${s}`;
+                        let oldCell = oldJ[h][kls] ? oldJ[h][kls][slotId] : null;
+                        let newCell = newJ[h][kls] ? newJ[h][kls][slotId] : null;
+
+                        let oldG1 = oldCell ? oldCell.guru : null;
+                        let oldG2 = oldCell ? oldCell.coTeacher : null;
+                        let newG1 = newCell ? newCell.guru : null;
+                        let newG2 = newCell ? newCell.coTeacher : null;
+
+                        if (oldG1 !== newG1 || oldG2 !== newG2 || (oldCell && newCell && oldCell.subjek !== newCell.subjek)) {
+                            if(oldG1) affected.add(oldG1);
+                            if(newG1) affected.add(newG1);
+                            if(oldG2) affected.add(oldG2);
+                            if(newG2) affected.add(newG2);
+                        }
+                    }
+                });
+            });
+            return Array.from(affected);
+        };
+
+        window.janaAIDryRun = function(tindakanKekanganBaru) {
+            let originalStateString = JSON.stringify(window.appState);
+            let tempState = JSON.parse(originalStateString);
+
+            if(!tempState.kekangan) tempState.kekangan = [];
+            tindakanKekanganBaru.forEach(t => {
+                let kondisi = {};
+                if(t.sasaran_guru) kondisi.guru = t.sasaran_guru;
+                if(t.sasaran_subjek) kondisi.subjek = t.sasaran_subjek;
+                if(t.hari) kondisi.hari = t.hari;
+                if(t.slot_masa) kondisi.slot_masa = t.slot_masa;
+
+                tempState.kekangan.push({
+                    jenis: t.jenis, tahap: "HARD", priority: 10, aktif: true, kondisi: kondisi
+                });
+            });
+
+            // Ganti global state sementara
+            let backupGlobalState = window.appState;
+            window.appState = tempState;
+
+            // Jalankan enjin berkapasiti penuh tanpa memaparkan UI (Dry Run)
+            let result = window.runCoreSchedulingEngine();
+
+            // Kembalikan ke state asal
+            window.appState = backupGlobalState;
+
+            // Kesan perbezaan / impak
+            let affected = window.bandingJadual(window.appState.jadual, result.newJadual);
+
+            return { affected, gagalCount: result.gagalCount, newJadual: result.newJadual };
+        };
+
+        window.teruskanArahanAI = function(containerId) {
+            let container = document.getElementById(containerId);
+            if(container) container.innerHTML = `<span class="text-[10px] text-emerald-600 font-bold">⚙️ Tindakan disahkan. Menjana semula jadual...</span>`;
+
+            if (window.pendingKekanganAI) {
+                if(!window.appState.kekangan) window.appState.kekangan = [];
+                window.pendingKekanganAI.forEach(t => {
+                    let kondisi = {};
+                    if(t.sasaran_guru) kondisi.guru = t.sasaran_guru;
+                    if(t.sasaran_subjek) kondisi.subjek = t.sasaran_subjek;
+                    if(t.hari) kondisi.hari = t.hari;
+                    if(t.slot_masa) kondisi.slot_masa = t.slot_masa;
+
+                    window.appState.kekangan.push({
+                        jenis: t.jenis, tahap: "HARD", priority: 10, aktif: true, kondisi: kondisi
+                    });
+                });
+                window.simpanData();
+                
+                setTimeout(() => {
+                    window.janaAI(true); // Lakukan jadual sebenar tanpa alert
+                    window.renderJadualDropdowns();
+                }, 300);
+                
+                window.pendingKekanganAI = null;
+            }
+        };
+
+        window.batalkanArahanAI = function(containerId) {
+            let container = document.getElementById(containerId);
+            if(container) container.innerHTML = `<span class="text-[10px] text-red-600 font-bold">❌ Tindakan telah dibatalkan.</span>`;
+            window.pendingKekanganAI = null;
+        };
+
+        window.hantarArahanAI = async function() {
+            let inputEl = document.getElementById('aiPromptInput');
+            let prompt = inputEl.value.trim();
+            if(!prompt) return;
+
+            let sasaran = window.aiContextGuru || window.aiContextKelas || "Umum";
+            let jenisKonteks = window.aiContextGuru ? "Guru" : "Kelas";
+
+            inputEl.value = "";
+            inputEl.disabled = true;
+            document.getElementById('btnHantarAI').disabled = true;
+            document.getElementById('btnHantarAI').innerHTML = `<span class="animate-spin inline-block">⏳</span> Memproses...`;
+
+            window.tambahMesejKeChat('User', prompt);
+
+            // Bina Schema JSON untuk direspon oleh Gemini
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    "respon_kpd_pengguna": { 
+                        "type": "STRING", 
+                        "description": "Balasan perbualan mesra dalam Bahasa Melayu menerangkan apa yang AI telah ubah/lakukan. (Cth: 'Baik cikgu, saya telah mendaftarkan kekangan supaya anda tidak mengajar pada hari Rabu slot 1. Saya akan menjana semula jadual.')" 
+                    },
+                    "tindakan_kekangan": {
+                        "type": "ARRAY",
+                        "description": "Senarai kekangan (constraints) mikro yang perlu dimasukkan ke dalam pangkalan data untuk memenuhi permintaan pengguna.",
+                        "items": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "jenis": { "type": "STRING", "enum": ["g_tidak_tersedia", "g_elak_2_awal", "g_elak_2_akhir", "g_keutamaan_slot", "s_sebelum_rehat", "s_selepas_rehat"] },
+                                "hari": { "type": "STRING", "enum": ["Isnin", "Selasa", "Rabu", "Khamis", "Jumaat"] },
+                                "slot_masa": { "type": "NUMBER", "description": "Nombor slot (contoh: 1, 2, 3...)" },
+                                "sasaran_guru": { "type": "STRING", "description": "Nama guru yang terlibat (jika berkaitan)" },
+                                "sasaran_subjek": { "type": "STRING", "description": "Nama subjek yang terlibat (jika berkaitan)" }
+                            }
+                        }
+                    },
+                    "perlu_jana_semula": {
+                        "type": "BOOLEAN",
+                        "description": "Sentiasa set True jika terdapat kekangan (constraints) baru yang dimasukkan supaya sistem boleh apply perubahan tersebut."
+                    }
+                }
+            };
+
+            // Bina Data Konteks
+            let konteksSistem = `
+                Anda adalah AI Pembantu Penjadualan Sekolah Pintar.
+                Pengguna sedang melihat paparan jadual untuk ${jenisKonteks}: "${sasaran}".
+                Berdasarkan permintaan pengguna, tukarkan permintaan itu kepada arahan sistem (JSON).
+                
+                Hari yang sah: Isnin, Selasa, Rabu, Khamis, Jumaat.
+                
+                Jenis Kekangan yang anda boleh guna:
+                1. "g_tidak_tersedia" (Kunci masa supaya guru tidak diletak jadual pada Hari dan slot_masa yang dinyatakan). Perlukan 'hari', 'slot_masa', dan 'sasaran_guru'.
+                2. "g_elak_2_awal" (Guru tidak mahu mengajar 2 slot pertama pagi). Perlukan 'sasaran_guru'.
+                3. "g_elak_2_akhir" (Guru tidak mahu mengajar 2 slot terakhir). Perlukan 'sasaran_guru'.
+                4. "s_sebelum_rehat" (Subjek ini mesti diletakkan sebelum waktu rehat). Perlukan 'sasaran_subjek'.
+                
+                Contoh: Pengguna kata "Saya tak boleh ngajar hari rabu masa pertama".
+                Tindakan: Bina 1 objek dalam tindakan_kekangan -> jenis: "g_tidak_tersedia", hari: "Rabu", slot_masa: 1, sasaran_guru: "${sasaran}".
+            `;
+
+            try {
+                // Panggil Gemini API
+                const apiKey = ""; // API Key disediakan secara auto oleh Canvas
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [
+                        { role: "user", parts: [{ text: `Permintaan pengguna: "${prompt}"\n\nTolong analisa dan berikan JSON.` }] }
+                    ],
+                    systemInstruction: { parts: [{ text: konteksSistem }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: schema
+                    }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0) {
+                    const jsonRes = JSON.parse(result.candidates[0].content.parts[0].text);
+                    
+                    if (jsonRes.perlu_jana_semula && jsonRes.tindakan_kekangan && jsonRes.tindakan_kekangan.length > 0) {
+                        // 1. Lakukan Dry Run (Larian Percubaan)
+                        let { affected } = window.janaAIDryRun(jsonRes.tindakan_kekangan);
+                        
+                        // Buang nama guru yang meminta pertukaran (supaya senarai kesan hanya fokus kepada "orang lain")
+                        if (window.aiContextGuru) {
+                            affected = affected.filter(g => g !== window.aiContextGuru);
+                        }
+
+                        if (affected.length > 0) {
+                            // Terdapat guru lain yang terkesan - Paparkan Dialog Pengesahan Interaktif
+                            window.pendingKekanganAI = jsonRes.tindakan_kekangan;
+                            
+                            let kesanMsg = `${jsonRes.respon_kpd_pengguna}<br>
+                            <div class="bg-amber-50 border border-amber-200 p-2.5 rounded text-amber-800 mt-2 mb-2 text-[11px] leading-tight shadow-sm">
+                                <span class="font-bold flex items-center gap-1 mb-1"><span>⚠️</span> Analisis Kesan Penjadualan:</span>
+                                Pertukaran ini menyebabkan jadual guru berikut terpaksa diubah:
+                                <br><b class="text-amber-900">${affected.join(', ')}</b>.
+                            </div>
+                            <div class="text-[10px] font-bold text-slate-700">Adakah anda ingin meneruskan pertukaran ini?</div>`;
+
+                            window.tambahMesejKeChatTindakan('AI', kesanMsg, 'Ya, Teruskan', 'Batal', 'window.teruskanArahanAI', 'window.batalkanArahanAI');
+                            
+                        } else {
+                            // Tiada guru lain terkesan, terus execute
+                            window.tambahMesejKeChat('AI', jsonRes.respon_kpd_pengguna);
+                            window.tambahMesejKeChat('AI', `<i class="text-[10px] text-emerald-600 font-bold">⚙️ Memproses susunan AI berserta syarat baharu...</i>`);
+                            
+                            if(!window.appState.kekangan) window.appState.kekangan = [];
+                            jsonRes.tindakan_kekangan.forEach(t => {
+                                let kondisi = {};
+                                if(t.sasaran_guru) kondisi.guru = t.sasaran_guru;
+                                if(t.sasaran_subjek) kondisi.subjek = t.sasaran_subjek;
+                                if(t.hari) kondisi.hari = t.hari;
+                                if(t.slot_masa) kondisi.slot_masa = t.slot_masa;
+
+                                window.appState.kekangan.push({
+                                    jenis: t.jenis, tahap: "HARD", priority: 10, aktif: true, kondisi: kondisi
+                                });
+                            });
+                            window.simpanData();
+
+                            setTimeout(() => {
+                                window.janaAI(true);
+                                window.renderJadualDropdowns();
+                            }, 500);
+                        }
+                    } else {
+                        // Tiada tindakan kekangan
+                        window.tambahMesejKeChat('AI', jsonRes.respon_kpd_pengguna);
+                    }
+
+                } else {
+                    window.tambahMesejKeChat('AI', "Maaf, saya menghadapi sedikit masalah teknikal ketika menganalisa jadual. Sila cuba lagi.");
+                }
+
+            } catch (err) {
+                console.error(err);
+                window.tambahMesejKeChat('AI', "Alamak, pelayan AI sedang sibuk. Sila cuba sekali lagi nanti.");
+            } finally {
+                inputEl.disabled = false;
+                document.getElementById('btnHantarAI').disabled = false;
+                document.getElementById('btnHantarAI').innerHTML = `<span>✨</span> Proses AI`;
+                inputEl.focus();
+            }
         };
 
         window.ubahPengawasUjian = function(ujianId, kelasName, guruName) {
