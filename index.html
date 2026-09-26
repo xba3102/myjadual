@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Jadual Waktu Pintar AI</title>
+    <title>Sistem Jadual Waktu Pintar</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- HTML2PDF CDN untuk Fungsi Cetak ke PDF -->
@@ -3381,7 +3381,7 @@
             `;
 
             try {
-                // Panggil Gemini API dengan API Key yang dikemas kini
+                // Panggil Gemini API dengan API Key rasmi
                 const apiKey = "AQ.Ab8RN6IRJ82eabsQ4LTD7tdly0KLV0go4zc_P-ayjXYsb08S-A";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
                 
@@ -3431,7 +3431,7 @@
                             window.tambahMesejKeChatTindakan('AI', kesanMsg, 'Ya, Teruskan', 'Batal', 'window.teruskanArahanAI', 'window.batalkanArahanAI');
                             
                         } else {
-                            // Tiada guru lain terkesan, terus execute
+                            // Tiada guru lain terkesan, terus execute dan trigger regenerate jadual serta rerender UI
                             window.tambahMesejKeChat('AI', jsonRes.respon_kpd_pengguna);
                             window.tambahMesejKeChat('AI', `<i class="text-[10px] text-emerald-600 font-bold">⚙️ Memproses susunan AI berserta syarat baharu...</i>`);
                             
@@ -3449,9 +3449,12 @@
                             });
                             window.simpanData();
 
+                            // Laksana penjadualan semula dan paparkan kemas kini skrin secara serentak
                             setTimeout(() => {
                                 window.janaAI(true);
-                                window.renderJadualDropdowns();
+                                window.toggleModePapar();
+                                window.renderKekanganList();
+                                window.tambahMesejKeChat('AI', `<span class="text-[10px] text-indigo-700 font-bold">✅ Jadual telah berjaya dijana semula mengikut arahan baru anda! Sila semak paparan jadual di atas.</span>`);
                             }, 500);
                         }
                     } else {
