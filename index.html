@@ -38,7 +38,10 @@
     <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-50 print:hidden">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <span class="text-2xl">🗓️</span>
+                <div id="headerLogoContainer" class="w-10 h-10 flex items-center justify-center bg-indigo-800 rounded-lg overflow-hidden shrink-0">
+                    <span id="headerDefaultEmoji" class="text-2xl">🗓️</span>
+                    <img id="headerLogoImg" src="" alt="Logo Sekolah" class="hidden w-full h-full object-cover bg-white">
+                </div>
                 <div>
                     <h1 class="text-lg font-bold tracking-tight">Sistem Jadual Waktu Pintar</h1>
                     <p class="text-xs text-indigo-200">Modul Penjadualan Auto & Kekangan Mikro Sekolah</p>
@@ -376,9 +379,10 @@
                     <div>
                         <h3 class="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2"><span>🏫</span> Maklumat Asas Sekolah</h3>
                         <p class="text-xs text-slate-500 mb-3">Nama sekolah ini akan dipaparkan pada kepala cetakan jadual waktu.</p>
-                        <div class="flex gap-3 max-w-xl">
-                            <input type="text" id="inputNamaSekolah" placeholder="Nama Sekolah (Cth: SMK Seri Damai)" class="flex-1 text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <button onclick="window.simpanNamaSekolah()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm">Simpan</button>
+                        <div class="flex flex-col gap-3 max-w-xl">
+                            <input type="text" id="inputNamaSekolah" placeholder="Nama Sekolah (Cth: SMK Seri Damai)" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <input type="url" id="inputLogoUrl" placeholder="Pautan URL Logo Sekolah (Cth: https://domain.com/logo.png)" class="w-full text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <button onclick="window.simpanNamaSekolah()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm w-fit">Simpan Maklumat</button>
                         </div>
                     </div>
 
@@ -670,6 +674,7 @@
 
         window.appState = {
             schoolName: "SK / SMK Pintar",
+            logoUrl: "",
             guru: [],
             kelas: [],
             subjek: [],
@@ -860,6 +865,22 @@
             document.getElementById('countKelas').innerText = (window.appState.kelas || []).length;
             document.getElementById('countSubjek').innerText = (window.appState.subjek || []).length;
             document.getElementById('inputNamaSekolah').value = window.appState.schoolName || "";
+            
+            let logoInput = document.getElementById('inputLogoUrl');
+            if(logoInput) logoInput.value = window.appState.logoUrl || "";
+            
+            let headerImg = document.getElementById('headerLogoImg');
+            let headerEmoji = document.getElementById('headerDefaultEmoji');
+            if (window.appState.logoUrl && headerImg && headerEmoji) {
+                headerImg.src = window.appState.logoUrl;
+                headerImg.classList.remove('hidden');
+                headerEmoji.classList.add('hidden');
+            } else if (headerImg && headerEmoji) {
+                headerImg.src = "";
+                headerImg.classList.add('hidden');
+                headerEmoji.classList.remove('hidden');
+            }
+
             document.getElementById('jenisSesiSekolah').value = window.appState.jenisSesiSekolah || "pagi";
             window.renderConfigMasa();
             window.renderAgihanDropdowns();
@@ -2563,11 +2584,16 @@
 
         window.simpanNamaSekolah = function() {
             let newName = document.getElementById('inputNamaSekolah').value.trim();
+            let newLogo = document.getElementById('inputLogoUrl').value.trim();
             let oldName = window.appState.schoolName;
 
             if(!newName) return window.customDialog("Ralat", "<p>Sila masukkan nama sekolah.</p>");
+            
+            window.appState.logoUrl = newLogo;
+
             if(newName === oldName) {
                 window.simpanData();
+                window.refreshUIAll();
                 return window.customDialog("Berjaya", "<p>Maklumat telah dikemas kini.</p>");
             }
 
@@ -2638,7 +2664,7 @@
                 window.appState = loadedData;
             } else {
                 window.appState = { 
-                    schoolName: newName, guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, guruIC: {}, guruDelima: {},
+                    schoolName: newName, logoUrl: newLogo, guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, guruIC: {}, guruDelima: {},
                     masaSekolah: { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20 }, 
                     configMasa: { Isnin: {jumlah:8, rehat:4}, Selasa: {jumlah:8, rehat:4}, Rabu: {jumlah:8, rehat:4}, Khamis: {jumlah:8, rehat:4}, Jumaat: {jumlah:6, rehat:3} }, 
                     jenisSesiSekolah: "pagi", agihan: [], kekangan: [], jadual: {}, peperiksaan: [] 
@@ -2785,7 +2811,7 @@
         window.resetDataSemasa = function() {
             window.customDialog("Pengesahan PENTING", "<p class='text-red-600 font-bold'>ZON BAHAYA: Adakah anda pasti mahu memadam SEMUA rekod (Guru, Kelas, Subjek, Jadual, Peperiksaan)?</p>", true, () => {
                 window.appState = { 
-                    schoolName: "SK / SMK Pintar", guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, guruIC: {}, guruDelima: {},
+                    schoolName: "SK / SMK Pintar", logoUrl: "", guru: [], kelas: [], subjek: [], guruSesi: {}, guruKod: {}, guruIC: {}, guruDelima: {},
                     masaSekolah: { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20 }, 
                     configMasa: { Isnin: {jumlah:8, rehat:4}, Selasa: {jumlah:8, rehat:4}, Rabu: {jumlah:8, rehat:4}, Khamis: {jumlah:8, rehat:4}, Jumaat: {jumlah:6, rehat:3} }, 
                     jenisSesiSekolah: "pagi", agihan: [], kekangan: [], jadual: {}, peperiksaan: []
