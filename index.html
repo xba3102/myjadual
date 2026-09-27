@@ -755,6 +755,77 @@
             window.showToast("Maklumat asas sekolah dikemas kini.", "success");
         };
 
+        window.bukaModalPukalGuru = function() {
+            let html = `
+                <div class="space-y-4 text-left">
+                    <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 text-xs text-indigo-800">
+                        Sila muat naik fail <b>Excel (.xlsx)</b> atau <b>CSV</b>. Pastikan susunan lajur fail anda seperti berikut:
+                        <ul class="list-disc ml-4 mt-2 font-semibold">
+                            <li>Lajur A: Nama Penuh Guru</li>
+                            <li>Lajur B: Kod Guru (Singkatan)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-[10px] text-amber-700">
+                        <b>Nota:</b> Sistem akan terus membaca data sebaik sahaja anda memilih fail. Anda tidak perlu menekan butang OK.
+                    </div>
+                    <input type="file" id="failPukalGuru" accept=".xlsx, .xls, .csv" onchange="if(this.files.length > 0) window.prosesFailPukalGuru(this.files[0])" class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-slate-50 cursor-pointer hover:bg-slate-100 transition focus:ring-2 focus:ring-indigo-500">
+                </div>
+            `;
+            
+            // Papar dialog tanpa memfokuskan kepada butang OK
+            window.customDialog("Muat Naik Pukal Guru", html, false);
+        };
+
+        window.prosesFailPukalGuru = function(file) {
+            window.showToast("Sedang membaca fail Excel...", "info");
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    // Pustaka SheetJS akan membaca fail di sini
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
+                    
+                    let addedCount = 0;
+                    if(!window.appState.guru) window.appState.guru = [];
+                    
+                    // Bermula dari i = 1 untuk melangkau baris pertama (header jadual)
+                    for(let i = 1; i < rows.length; i++) {
+                        let nama = rows[i][0];
+                        let kod = rows[i][1];
+                        
+                        if(nama && kod) {
+                            window.appState.guru.push({
+                                id: 'g_' + Date.now() + '_' + Math.floor(Math.random() * 1000) + i,
+                                nama: String(nama).trim(),
+                                kod: String(kod).trim().toUpperCase()
+                            });
+                            addedCount++;
+                        }
+                    }
+                    
+                    if(addedCount > 0) {
+                        window.simpanData(false);
+                        window.showToast(`${addedCount} orang guru berjaya ditambah ke pangkalan data!`, "success");
+                        // Tutup modal secara automatik selepas berjaya
+                        const modal = document.getElementById('customModal');
+                        if(modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                    } else {
+                        window.showToast("Gagal. Pastikan fail mengandungi teks pada Lajur A dan Lajur B.", "error");
+                    }
+                } catch (err) {
+                    console.error("Ralat membaca fail:", err);
+                    window.showToast("Format fail tidak disokong atau rosak.", "error");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
         window.simpanConfigMasa = function() {
             let evt = window.event;
             window.simpanData(false);
