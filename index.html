@@ -683,6 +683,69 @@
             window.showToast("Maklumat berjaya ditambah!", "success");
         };
 
+        window.paparSenarai = function(jenis) {
+            let data = window.appState[jenis] || [];
+            let tajuk = jenis.toUpperCase();
+            
+            if(data.length === 0) {
+                window.customDialog(`Senarai ${tajuk}`, `<p class="text-center text-xs text-slate-500 py-4">Tiada data direkodkan untuk ${tajuk}.</p>`);
+                return;
+            }
+
+            let html = `<div class="max-h-60 overflow-y-auto pr-2"><ul class="space-y-2">`;
+            data.forEach((item, idx) => {
+                let text = typeof item === 'object' ? `<b class="text-slate-800">${item.nama}</b> <span class="text-[10px] text-slate-500 ml-1">(${item.kod})</span>` : item;
+                html += `
+                <li class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs shadow-sm hover:bg-slate-100 transition">
+                    <span>${text}</span>
+                    <button onclick="window.padamData('${jenis}', ${idx})" class="text-red-600 font-bold px-2 py-1 bg-red-50 hover:bg-red-100 rounded border border-red-200 transition">Padam</button>
+                </li>`;
+            });
+            html += `</ul></div>`;
+            window.customDialog(`Senarai ${tajuk}`, html);
+        };
+
+        window.padamData = function(jenis, idx) {
+            if(window.appState[jenis] && window.appState[jenis][idx] !== undefined) {
+                window.appState[jenis].splice(idx, 1);
+                window.simpanData(false);
+                window.showToast("Data berjaya dipadam.", "success");
+                // Segar semula pop-up senarai secara terus
+                window.paparSenarai(jenis);
+            }
+        };
+
+        window.janaSubjekSK = function() {
+            let evt = window.event;
+            let btnTarget = evt ? (evt.currentTarget || evt.target) : null;
+            
+            const subjekSK = [
+                "Bahasa Melayu", "Bahasa Inggeris", "Matematik", "Sains", 
+                "Pendidikan Islam", "Pendidikan Moral", "Sejarah", 
+                "Pendidikan Jasmani", "Pendidikan Kesihatan", 
+                "Reka Bentuk dan Teknologi", "Pendidikan Seni Visual", "Pendidikan Muzik"
+            ];
+            
+            let added = 0;
+            if(!window.appState.subjek) window.appState.subjek = [];
+            
+            subjekSK.forEach(sub => {
+                // Elakkan subjek bertindih/diulang
+                if(!window.appState.subjek.includes(sub)) {
+                    window.appState.subjek.push(sub);
+                    added++;
+                }
+            });
+
+            if(added > 0) {
+                window.simpanData(false);
+                window.animasiButangBerjaya(btnTarget);
+                window.showToast(`${added} subjek Standard KPM berjaya dimuatkan!`, "success");
+            } else {
+                window.showToast("Semua subjek SK telah pun ada di dalam pangkalan data.", "info");
+            }
+        };
+
         window.simpanNamaSekolah = function() {
             let evt = window.event;
             window.appState.schoolName = document.getElementById('inputNamaSekolah').value || window.appState.schoolName;
