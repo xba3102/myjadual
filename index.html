@@ -726,10 +726,48 @@
                 window.appState.guru.push({ id: 'g_' + Date.now(), nama, kod });
                 document.getElementById('inputGuru').value = ""; document.getElementById('inputKodGuru').value = "";
             } else if(jenis === 'kelas') {
-                let kls = document.getElementById('inputKelas').value.trim();
-                if(!kls) { window.customDialog("Makluman", "Sila isi nama kelas."); return; }
+                let inputKls = document.getElementById('inputKelas').value.trim();
+                if(!inputKls) { window.customDialog("Makluman", "Sila isi nama kelas atau formula."); return; }
                 if(!window.appState.kelas) window.appState.kelas = [];
-                window.appState.kelas.push(kls);
+                
+                let processedClasses = [];
+                // 1. Cuba Pengecaman Formula Julat / Range (Cth: "Tahun 1-6", "1 - 5 Amanah")
+                let rangeMatch = inputKls.match(/^(.*?)\s*(\d+)\s*-\s*(\d+)\s*(.*?)$/);
+                
+                if (rangeMatch) {
+                    let prefix = rangeMatch[1].trim(); 
+                    let start = parseInt(rangeMatch[2]);
+                    let end = parseInt(rangeMatch[3]);
+                    let suffix = rangeMatch[4].trim();
+                    
+                    if (start <= end && (end - start) <= 20) { // Keselamatan: Had max 20 kelas janaan
+                        for (let i = start; i <= end; i++) {
+                            let className = (prefix ? prefix + " " : "") + i + (suffix ? " " + suffix : "");
+                            processedClasses.push(className.trim());
+                        }
+                    } else {
+                        processedClasses.push(inputKls);
+                    }
+                } 
+                // 2. Cuba Pengecaman Formula Koma (Cth: "3A, 3B, 4A, 4B")
+                else if (inputKls.includes(',')) {
+                    inputKls.split(',').forEach(p => {
+                        let val = p.trim();
+                        if (val) processedClasses.push(val);
+                    });
+                } 
+                // 3. Masukan Biasa Satu Kelas
+                else {
+                    processedClasses.push(inputKls);
+                }
+
+                // Masukkan kelas ke dalam Pangkalan Data (Elak Duplikasi)
+                processedClasses.forEach(c => {
+                    if (!window.appState.kelas.includes(c)) {
+                        window.appState.kelas.push(c);
+                    }
+                });
+                
                 document.getElementById('inputKelas').value = "";
             } else if(jenis === 'subjek') {
                 let sub = document.getElementById('inputSubjek').value.trim();
