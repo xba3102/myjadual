@@ -69,7 +69,10 @@
         body.role-guest button[onclick*="tambahData"],
         body.role-guest button[onclick*="bukaModalPukalGuru"],
         body.role-guest button[onclick*="janaSubjekSK"] {
-            display: none !important;
+            opacity: 0.4 !important;
+            pointer-events: none !important;
+            cursor: not-allowed !important;
+            filter: grayscale(100%);
         }
         
         body.role-guest input:not([type="search"]) {
@@ -1561,53 +1564,47 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // Membaca pangkalan data Awan Google jika dihidupkan, atau pasang kunci Dummy untuk Ujian
+        // Membaca pangkalan data Awan Google jika dihidupkan dalam persekitaran semasa.
+        // Jika cikgu meletakkan sistem ini di pelayan sendiri (hosting), gantikan dengan Config Firebase cikgu.
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "dummy", authDomain: "dummy", projectId: "dummy"
+            // LETAKKAN FIREBASE CONFIG SEBENAR CIKGU DI SINI UNTUK HOSTING LUAR
+            apiKey: "API_KEY_SEBENAR",
+            authDomain: "DOMAIN_SEBENAR",
+            projectId: "PROJECT_ID"
         };
 
-        let auth, provider;
-        try {
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            provider = new GoogleAuthProvider();
-            
-            // Menguatkuasakan domain MOE-DL supaya hanya cikgu/murid KPM boleh teruskan pendaftaran
-            provider.setCustomParameters({ hd: 'moe-dl.edu.my' }); 
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        
+        // Menguatkuasakan domain MOE-DL supaya hanya cikgu/murid KPM boleh mendaftar & log masuk
+        provider.setCustomParameters({ hd: 'moe-dl.edu.my' }); 
 
-            onAuthStateChanged(auth, (user) => {
-                window.currentUser = user;
-                window.kemasKiniAksesAdmin();
-            });
-        } catch(e) {
-            console.warn("API Kunci Firebase tidak dijumpai dalam prebiu ini. Mod Simulasi diaktifkan.");
-        }
+        // Memantau perubahan status (Log masuk / Log Keluar) secara automatik di latar belakang
+        onAuthStateChanged(auth, (user) => {
+            window.currentUser = user;
+            window.kemasKiniAksesAdmin();
+        });
 
         window.loginDELIMa = function() {
-            if(auth && firebaseConfig.apiKey !== "dummy") {
-                // Mod Penuh - Hubungan ke API Sebenar
-                signInWithPopup(auth, provider).then(() => {
-                    window.showToast("Berjaya Log Masuk DELIMa!", "success");
-                }).catch(err => window.showToast("Ralat Log Masuk: " + err.message, "error"));
-            } else {
-                // MOD SIMULASI UJIAN KANVAS / OFFLINE (Memandangkan tiada Server dihubungkan)
-                let email = prompt("SIMULASI LOGIN DELIMa\n(Sistem Pangkalan Data Awan Tidak Disambung Di Sini)\n\nSila taip emel anda (Taip sekolah-7608@moe-dl.edu.my untuk bertukar menjadi Kuasa Admin Penuh):", "sekolah-7608@moe-dl.edu.my");
-                if(email) {
-                    window.currentUser = { email: email.trim() };
-                    window.kemasKiniAksesAdmin();
-                    window.showToast("Berjaya log masuk (Simulasi)!", "success");
-                }
-            }
+            window.showToast("Menyambung ke Pelayan Google...", "info");
+            
+            // Kod API Sebenar: Memanggil kotak dialog Log Masuk Google (Tiada lagi kotak dialog palsu/simulasi)
+            signInWithPopup(auth, provider).then((result) => {
+                window.showToast("Berjaya Log Masuk sebagai " + result.user.email, "success");
+            }).catch(err => {
+                console.error("Ralat Firebase Auth:", err);
+                window.customDialog("Ralat Log Masuk", `Sistem Firebase menolak akses masuk.<br><br><b>Mesej Sistem:</b> ${err.message}<br><br><span class='text-[10px] text-red-500'>Sekiranya ini projek baru, pastikan kaedah "Google Sign-In" telah diaktifkan dalam menu Authentication di Firebase Console cikgu.</span>`);
+            });
         };
 
         window.logoutDELIMa = function() {
-            if(auth && firebaseConfig.apiKey !== "dummy") {
-                signOut(auth).then(() => window.showToast("Berjaya Log Keluar", "success"));
-            } else {
-                window.currentUser = null;
-                window.kemasKiniAksesAdmin();
+            // Kod API Sebenar: Memutuskan sambungan dari pelayan Firebase
+            signOut(auth).then(() => {
                 window.showToast("Berjaya Log Keluar", "success");
-            }
+            }).catch(err => {
+                window.showToast("Ralat Log Keluar: " + err.message, "error");
+            });
         };
     </script>
 </body>
