@@ -1589,7 +1589,24 @@
         window.loginDELIMa = function() {
             window.showToast("Menyambung ke Pelayan Google...", "info");
             
-            // Kod API Sebenar: Memanggil kotak dialog Log Masuk Google (Tiada lagi kotak dialog palsu/simulasi)
+            // Semakan Keselamatan: Jika belum letak API Key sebenar, kita berikan "Mod Ujian" sementara
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "API_KEY_SEBENAR" || firebaseConfig.apiKey.includes("API_KEY") || typeof __firebase_config !== 'undefined') {
+                window.customDialog("Kunci API Firebase Tiada", 
+                    `Sistem sedang berjalan dalam <b>Mod Pratonton</b>. Kunci API Firebase sebenar belum dimasukkan dalam kod.<br><br>Untuk membolehkan cikgu terus menguji sistem ini sekarang, sila taip e-mel (Simulasi) di bawah:<br><br>
+                    <input type="email" id="testEmail" value="guru@moe-dl.edu.my" class="w-full border border-slate-300 p-2 rounded-lg text-xs mt-2 text-slate-800 font-bold focus:ring-2 focus:ring-indigo-500">
+                    <p class="text-[9px] text-slate-500 mt-2">Nota: Taip <b>sekolah-7608@moe-dl.edu.my</b> untuk menguji kuasa Master Admin.</p>`, 
+                    true, 
+                    () => {
+                        let emel = document.getElementById('testEmail').value;
+                        window.currentUser = { email: emel };
+                        window.kemasKiniAksesAdmin();
+                        window.showToast("Log Masuk Ujian Berjaya: " + emel, "success");
+                    }
+                );
+                return; // Berhenti di sini, elak ralat Firebase.
+            }
+
+            // Kod API Sebenar: Memanggil kotak dialog Log Masuk Google (Berfungsi bila API Key ditukar)
             signInWithPopup(auth, provider).then((result) => {
                 window.showToast("Berjaya Log Masuk sebagai " + result.user.email, "success");
             }).catch(err => {
@@ -1599,6 +1616,14 @@
         };
 
         window.logoutDELIMa = function() {
+            // Jika dalam mod simulasi (tiada Auth sebenar)
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "API_KEY_SEBENAR" || typeof __firebase_config !== 'undefined') {
+                window.currentUser = null;
+                window.kemasKiniAksesAdmin();
+                window.showToast("Berjaya Log Keluar (Mod Ujian)", "success");
+                return;
+            }
+
             // Kod API Sebenar: Memutuskan sambungan dari pelayan Firebase
             signOut(auth).then(() => {
                 window.showToast("Berjaya Log Keluar", "success");
