@@ -421,7 +421,7 @@
                         <select id="paparGuruSelect" onchange="window.renderJadualGuru()" class="text-xs border rounded-lg px-3 py-2 font-bold bg-white shadow-sm max-w-[150px]"><option value="">-- Pilih Guru --</option></select>
                     </div>
                     <div class="ml-auto">
-                        <button onclick="window.print()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-2 rounded-lg border shadow-sm transition">🖨️ Cetak</button>
+                        <button onclick="window.print()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-2 rounded-lg border shadow-sm transition">🖨️️ Cetak</button>
                     </div>
                 </div>
 
@@ -479,7 +479,7 @@
                         <h4 class="text-xs font-bold text-slate-700">Senarai Jadual Peperiksaan Semasa:</h4>
                         <div class="flex gap-2">
                             <button onclick="window.janaSemulaPengawasAI()" class="text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded transition print-hidden shadow-sm">🔄 AI: Kemas Kini Pengawas</button>
-                            <button onclick="window.print()" class="text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border px-3 py-1.5 rounded transition print-hidden">🖨️ Cetak Jadual</button>
+                            <button onclick="window.print()" class="text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border px-3 py-1.5 rounded transition print-hidden">🖨️️ Cetak Jadual</button>
                         </div>
                     </div>
                     
@@ -1189,7 +1189,7 @@
 
         window.janaAI = function() {
             let c = document.getElementById('paparanJadualContainer');
-            c.innerHTML = `<div class="text-center py-16 animate-modal"><div class="animate-spin text-5xl mb-4">⚙️️</div><p class="font-bold text-indigo-700 text-sm">Enjin AI Sedang Menjalankan Algoritma...</p><p class="text-[9px] text-emerald-600 mt-2">Menilai Kekangan Mikro & Keseimbangan Sesi Pagi/Petang...</p></div>`;
+            c.innerHTML = `<div class="text-center py-16 animate-modal"><div class="animate-spin text-5xl mb-4">⚙</div><p class="font-bold text-indigo-700 text-sm">Enjin AI Sedang Menjalankan Algoritma...</p><p class="text-[9px] text-emerald-600 mt-2">Menilai Kekangan Mikro & Keseimbangan Sesi Pagi/Petang...</p></div>`;
             setTimeout(() => {
                 let jK={}, jG={}; let m=window.appState.masaSekolah; let hl=['Isnin','Selasa','Rabu','Khamis','Jumaat'];
                 (window.appState.kelas||[]).forEach(k => { jK[k]={}; hl.forEach(h=>jK[k][h]=new Array(m.hari[h].slot).fill(null)); });
@@ -1458,7 +1458,7 @@
         window.padamLogo = function() {
             window.tempLogoBase64 = "";
             document.getElementById('tetapan_logo').value = "";
-            document.getElementById('previewLogoContainer').innerHTML = '🗓️';
+            document.getElementById('previewLogoContainer').innerHTML = '🗓️️';
         };
 
         window.simpanProfilSekolah = function() {
@@ -1564,13 +1564,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // Membaca pangkalan data Awan Google jika dihidupkan dalam persekitaran semasa.
-        // Jika cikgu meletakkan sistem ini di pelayan sendiri (hosting), gantikan dengan Config Firebase cikgu.
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            // LETAKKAN FIREBASE CONFIG SEBENAR CIKGU DI SINI UNTUK HOSTING LUAR
-            apiKey: "API_KEY_SEBENAR",
-            authDomain: "DOMAIN_SEBENAR",
-            projectId: "PROJECT_ID"
+        // FIREBASE CONFIG SEBENAR CIKGU TELAH DIMASUKKAN
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbH3sUXVouonVnFK4kJ0dZjPb32eZNPvo",
+            authDomain: "makrove6-ef560.firebaseapp.com",
+            databaseURL: "https://makrove6-ef560-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "makrove6-ef560",
+            storageBucket: "makrove6-ef560.firebasestorage.app",
+            messagingSenderId: "708835673590",
+            appId: "1:708835673590:web:e2d2cf66664bb2c4b173d7",
+            measurementId: "G-55Q2BCEXE5"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -1589,7 +1592,7 @@
         window.loginDELIMa = function() {
             window.showToast("Menyambung ke Pelayan Google...", "info");
             
-            // Semakan Keselamatan: Jika belum letak API Key sebenar, kita berikan "Mod Ujian" sementara
+            // Semakan Keselamatan: Kerana API Key Sebenar telah diletakkan, sistem akan bypass Mod Ujian.
             if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "API_KEY_SEBENAR" || firebaseConfig.apiKey.includes("API_KEY") || typeof __firebase_config !== 'undefined') {
                 window.customDialog("Kunci API Firebase Tiada", 
                     `Sistem sedang berjalan dalam <b>Mod Pratonton</b>. Kunci API Firebase sebenar belum dimasukkan dalam kod.<br><br>Untuk membolehkan cikgu terus menguji sistem ini sekarang, sila taip e-mel (Simulasi) di bawah:<br><br>
@@ -1606,7 +1609,7 @@
                 return; // Berhenti di sini, elak ralat Firebase.
             }
 
-            // Kod API Sebenar: Memanggil kotak dialog Log Masuk Google (Berfungsi bila API Key ditukar)
+            // Kod API Sebenar: Memanggil kotak dialog Log Masuk Google (Akan berfungsi secara live)
             signInWithPopup(auth, provider).then((result) => {
                 window.showToast("Berjaya Log Masuk sebagai " + result.user.email, "success");
             }).catch(err => {
