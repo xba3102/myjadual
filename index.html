@@ -1313,32 +1313,107 @@
 
         window.janaAI = function() {
             let c = document.getElementById('paparanJadualContainer');
-            c.innerHTML = `<div class="text-center py-16 animate-modal"><div class="animate-spin text-5xl mb-4">⚙</div><p class="font-bold text-indigo-700 text-sm">Enjin AI Sedang Menjalankan Algoritma...</p><p class="text-[9px] text-emerald-600 mt-2">Menilai Kekangan Mikro & Keseimbangan Sesi Pagi/Petang...</p></div>`;
+            c.innerHTML = `<div class="text-center py-16 animate-modal"><div class="animate-spin text-5xl mb-4">⚙</div><p class="font-bold text-indigo-700 text-sm">Enjin AI Sedang Menjalankan Algoritma...</p><p class="text-[9px] text-emerald-600 mt-2">Menilai Kekangan Mikro, Double Period & Taburan Round-Robin...</p></div>`;
             setTimeout(() => {
                 let jK={}, jG={}; let m=window.appState.masaSekolah; let hl=['Isnin','Selasa','Rabu','Khamis','Jumaat'];
                 (window.appState.kelas||[]).forEach(k => { jK[k]={}; hl.forEach(h=>jK[k][h]=new Array(m.hari[h].slot).fill(null)); });
                 (window.appState.guru||[]).forEach(g => { jG[g.id]={}; hl.forEach(h=>jG[g.id][h]=new Array(m.hari[h].slot).fill(null)); });
                 
+                let kekanganSubjek = (window.appState.kekangan && window.appState.kekangan.subjek) ? window.appState.kekangan.subjek : {};
+
                 (window.appState.agihan||[]).forEach(ag => {
                     let gid=ag.guruId; let sGuru = ag.sesiGuru || 'pagi';
                     (ag.tugas||[]).forEach(t => {
                         let wRem = t.waktu;
-                        for(let h of hl) { 
-                            if(wRem<=0)break; 
-                            for(let i=0; i<m.hari[h].slot; i++) {
-                                if(wRem<=0)break; if(i===m.hari[h].rehat)continue; 
-                                if(!jG[gid]||!jK[t.kelas])break;
-                                if(!jG[gid][h][i] && !jK[t.kelas][h][i]) { 
-                                    jG[gid][h][i]={subjek:t.subjek, kelas:t.kelas, sesi:sGuru}; 
-                                    jK[t.kelas][h][i]={subjek:t.subjek, guru:ag.namaGuru, sesi:sGuru}; 
-                                    wRem--; 
+                        let rules = kekanganSubjek[t.subjek] || {};
+                        let isRobin = rules.robin === true;
+                        let isDouble = rules.double === true;
+                        let isAkhir = rules.akhir === true;
+
+                        let hariStartIdx = 0; // AI mula imbas dari hari Isnin
+                        let maxLoop = 200; // Had keselamatan (elak infinite loop)
+                        let currentLoop = 0;
+
+                        while(wRem > 0 && currentLoop < maxLoop) {
+                            currentLoop++;
+                            let placed = false;
+
+                            // Kitaran hari (Round-Robin logic)
+                            for(let d = 0; d < hl.length; d++) {
+                                let hIdx = (hariStartIdx + d) % hl.length;
+                                let h = hl[hIdx];
+
+                                let slots = m.hari[h].slot;
+                                let rehat = m.hari[h].rehat;
+
+                                // Arah imbasan: dari belakang (jika masa terakhir) atau depan
+                                let startS = isAkhir ? slots - 1 : 0;
+                                let endS = isAkhir ? -1 : slots;
+                                let step = isAkhir ? -1 : 1;
+
+                                // Tentukan saiz blok (Double period atau Single)
+                                let blockSize = (isDouble && wRem >= 2) ? 2 : 1;
+
+                                for(let i = startS; i !== endS; i += step) {
+                                    if(i === rehat) continue; // Langkau waktu rehat
+
+                                    let canPlace = true;
+                                    let checkSlots = [];
+
+                                    // Semak jika blok (1 atau 2 waktu) muat
+                                    for(let b = 0; b < blockSize; b++) {
+                                        let sIdx = isAkhir ? (i - b) : (i + b);
+                                        if(sIdx < 0 || sIdx >= slots || sIdx === rehat) { canPlace = false; break; }
+                                        if(jG[gid][h][sIdx] || jK[t.kelas][h][sIdx]) { canPlace = false; break; }
+                                        checkSlots.push(sIdx);
+                                    }
+
+                                    // Semakan Tambahan: Jika Round Robin, pastikan kelas tidak belajar subjek ini lagi pada hari ini
+                                    if(canPlace && isRobin) {
+                                        let hasToday = false;
+                                        for(let check_i = 0; check_i < slots; check_i++) {
+                                            if(jK[t.kelas][h][check_i] && jK[t.kelas][h][check_i].subjek === t.subjek) {
+                                                hasToday = true; break;
+                                            }
+                                        }
+                                        if(hasToday) canPlace = false;
+                                    }
+
+                                    if(canPlace) {
+                                        // Masukkan ke dalam matriks Guru dan Kelas
+                                        checkSlots.forEach(sIdx => {
+                                            jG[gid][h][sIdx] = {subjek:t.subjek, kelas:t.kelas, sesi:sGuru};
+                                            jK[t.kelas][h][sIdx] = {subjek:t.subjek, guru:ag.namaGuru, sesi:sGuru};
+                                        });
+                                        wRem -= blockSize;
+                                        placed = true;
+
+                                        // Jika Robin, lompat ke hari seterusnya untuk penempatan berikutnya
+                                        if(isRobin) hariStartIdx = hIdx + 1;
+                                        break; 
+                                    }
                                 }
+
+                                if(placed && isRobin) break; // Berhenti imbas hari lain, mula kitaran baru esok
+                                if(placed && wRem <= 0) break;
+                            }
+
+                            // Mekanisme Keselamatan (Fallback) jika jadual padat sangat
+                            if(!placed && isRobin) {
+                                isRobin = false; // Longgarkan syarat harian jika baki waktu masih ada tapi tiada hari kosong
+                            } else if (!placed && isDouble) {
+                                isDouble = false; // Longgarkan kepada single period jika double tak muat
+                            } else if (!placed && isAkhir) {
+                                isAkhir = false; // Longgarkan kedudukan masa akhir
+                            } else if (!placed) {
+                                break; // Jadual penuh / clash mustahil diselesaikan
                             }
                         }
                     });
                 });
+                
                 window.appState.jadual = { status: 'siap', dataKelas: jK, dataGuru: jG };
-                window.simpanData(false); window.customDialog("Berjaya","✅ Penjadualan Matriks AI selesai! Paparan dikemaskini."); window.toggleModePapar();
+                window.simpanData(false); window.customDialog("Berjaya","✅ Penjadualan Matriks AI selesai! Algoritma Kekangan & Round-Robin dilaksanakan."); window.toggleModePapar();
             }, 1000);
         };
 
