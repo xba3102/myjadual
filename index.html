@@ -793,10 +793,55 @@
             let h = `<div class="max-h-60 overflow-y-auto pr-2"><ul class="space-y-1">`;
             dat.forEach((x,i) => {
                 let t = typeof x==='object' ? `<b>${x.nama}</b> <span class="text-[10px] bg-slate-200 px-1 rounded">${x.kod}</span>` : x;
-                h += `<li class="flex justify-between items-center bg-slate-50 border p-2 text-xs rounded shadow-sm"><span>${t}</span><button onclick="window.padamData('${jenis}',${i})" class="text-red-500 font-bold px-3 py-1 bg-red-50 hover:bg-red-100 rounded transition">Padam</button></li>`;
+                h += `<li class="flex justify-between items-center bg-slate-50 border p-2 text-xs rounded shadow-sm">
+                        <span>${t}</span>
+                        <div class="flex gap-1.5">
+                            <button onclick="window.editData('${jenis}',${i})" class="text-indigo-600 font-bold px-3 py-1 bg-indigo-50 hover:bg-indigo-100 rounded border border-indigo-200 transition shadow-sm">✏️ Edit</button>
+                            <button onclick="window.padamData('${jenis}',${i})" class="text-red-500 font-bold px-3 py-1 bg-red-50 hover:bg-red-100 rounded border border-red-200 transition shadow-sm">🗑️ Padam</button>
+                        </div>
+                      </li>`;
             });
             window.customDialog(`Senarai ${jenis.toUpperCase()}`, h + `</ul></div>`);
         };
+
+        window.editData = function(jenis, i) {
+            let lama = typeof window.appState[jenis][i] === 'object' ? window.appState[jenis][i].nama : window.appState[jenis][i];
+            let baru = prompt(`Sila taip nama baharu untuk ganti (${lama}):`, lama);
+            
+            if(baru && baru.trim() !== "" && baru.trim() !== lama) {
+                baru = baru.trim();
+                
+                // Semakan Duplikasi
+                if(jenis === 'kelas' && window.appState.kelas.includes(baru)) return window.showToast("Nama kelas sudah wujud!", "error");
+                if(jenis === 'subjek' && window.appState.subjek.includes(baru)) return window.showToast("Mata pelajaran sudah wujud!", "error");
+                
+                if(jenis === 'kelas') {
+                    window.appState.kelas[i] = baru;
+                    // Auto-Kemas Kini nama kelas ini dalam Jadual Agihan Tugas Guru
+                    (window.appState.agihan||[]).forEach(a => { (a.tugas||[]).forEach(t => { if(t.kelas === lama) t.kelas = baru; }); });
+                    // Auto-Kemas Kini dalam Jadual Peperiksaan (termasuk senarai guru pengawas)
+                    (window.appState.peperiksaan||[]).forEach(p => { 
+                        let idx = p.kelasTerlibat.indexOf(lama); if(idx !== -1) p.kelasTerlibat[idx] = baru;
+                        if(p.guruBertugas && p.guruBertugas[lama]) { p.guruBertugas[baru] = p.guruBertugas[lama]; delete p.guruBertugas[lama]; }
+                    });
+                } else if(jenis === 'subjek') {
+                    window.appState.subjek[i] = baru;
+                    (window.appState.agihan||[]).forEach(a => { (a.tugas||[]).forEach(t => { if(t.subjek === lama) t.subjek = baru; }); });
+                    (window.appState.peperiksaan||[]).forEach(p => { if(p.subjek === lama) p.subjek = baru; });
+                } else if(jenis === 'guru') {
+                    window.appState.guru[i].nama = baru;
+                    (window.appState.agihan||[]).forEach(a => { if(a.guruId === window.appState.guru[i].id) a.namaGuru = baru; });
+                }
+                
+                // Batalkan Jadual AI semasa (jika ada) kerana data dasar sudah bertukar
+                if(window.appState.jadual) window.appState.jadual.status = null; 
+                
+                window.simpanData(false); 
+                window.showToast("Data berjaya dikemas kini!", "success"); 
+                window.paparSenarai(jenis);
+            }
+        };
+
         window.padamData = function(j, i) { window.appState[j].splice(i,1); window.simpanData(false); window.paparSenarai(j); };
 
         window.bukaModalPukalGuru = function() {
