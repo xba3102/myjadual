@@ -42,6 +42,8 @@
         body:not(.role-admin) button[onclick*="simpanConfigMasa"],
         body:not(.role-admin) button[onclick*="tambahAgihanPukal"],
         body:not(.role-admin) button[onclick*="simpanKekanganMikro"],
+        body:not(.role-admin) button[onclick*="tambahKekanganSubjek"],
+        body:not(.role-admin) button[onclick*="padamKekanganSubjek"],
         body:not(.role-admin) button[onclick*="prosesPromptAI"],
         body:not(.role-admin) button[onclick*="janaSemulaPengawasAI"],
         body:not(.role-admin) button[onclick*="tambahPeperiksaan"] {
@@ -53,6 +55,7 @@
         body:not(.role-admin) input[id^="masa_"],
         body:not(.role-admin) input[id^="k_g_"],
         body:not(.role-admin) input[id^="k_k_"],
+        body:not(.role-admin) input[id^="k_s_"],
         body:not(.role-admin) input[id^="tetapan_"],
         body:not(.role-admin) input[id="pep_tarikh"],
         body:not(.role-admin) input[id="pep_mula"],
@@ -84,7 +87,6 @@
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 font-sans antialiased print:bg-white role-guest">
 
-    <!-- HEADER / NAVBAR -->
     <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-50 print-hidden">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
@@ -118,7 +120,6 @@
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
     <main class="max-w-7xl mx-auto px-4 py-6">
         
         <!-- BANTUAN READ-ONLY BANNER -->
@@ -137,10 +138,10 @@
         <div class="flex border-b border-slate-200 mb-6 bg-white rounded-xl shadow-sm overflow-x-auto print-hidden">
             <button onclick="window.switchTab('data')" id="tab-data" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap transition">📁 1. Data Induk</button>
             <button onclick="window.switchTab('agihan')" id="tab-agihan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap transition">📊 2. Agihan & Masa</button>
-            <button onclick="window.switchTab('kekangan')" id="tab-kekangan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap transition">🧠 3. Kekangan Mikro AI</button>
-            <button onclick="window.switchTab('jadual')" id="tab-jadual" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap transition">⚡ 4. Jadual Waktu AI</button>
+            <button onclick="window.switchTab('kekangan')" id="tab-kekangan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap transition">🧠 3. Kekangan AI (Mikro)</button>
+            <button onclick="window.switchTab('jadual')" id="tab-jadual" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap transition">⚡ 4. Jadual Waktu & AI</button>
             <button onclick="window.switchTab('peperiksaan')" id="tab-peperiksaan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap transition">📝 5. Jadual Peperiksaan</button>
-            <button onclick="window.switchTab('tetapan')" id="tab-tetapan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap transition">⚙️ 6. Tetapan & Backup</button>
+            <button onclick="window.switchTab('tetapan')" id="tab-tetapan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap transition">⚙️ 6. Tetapan</button>
         </div>
 
         <!-- ================= TAB 1: DATA INDUK ================= -->
@@ -360,6 +361,53 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- KEKANGAN SUBJEK SPESIFIK -->
+                <div class="mt-6 border-t border-slate-200 pt-6">
+                    <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2 mb-1">📚 Kategori 3: Kekangan Mata Pelajaran Spesifik</h3>
+                    <p class="text-[10px] text-slate-500 mb-4">Tetapkan tingkah laku logik AI untuk subjek tertentu (Contoh: Mesti waktu akhir, digalakkan double period, atau sebaran round-robin harian).</p>
+                    
+                    <div class="bg-slate-50 p-4 rounded-xl border mb-4 shadow-inner">
+                        <div class="mb-3">
+                            <label class="text-[10px] font-bold text-indigo-700 block mb-1">1. Pilih Subjek</label>
+                            <select id="k_s_subjek" class="w-full text-xs border rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500 font-bold shadow-sm">
+                                <option value="">-- Pilih Subjek --</option>
+                            </select>
+                        </div>
+                        <label class="text-[10px] font-bold text-indigo-700 block mb-2">2. Tandakan Kekangan (Boleh lebih dari satu)</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                            <label class="flex items-start gap-2 bg-white p-3 rounded-lg border shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" id="k_s_akhir" class="mt-0.5 w-4 h-4 text-indigo-600 rounded">
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-700">Masa Terakhir Sahaja</div>
+                                    <div class="text-[9px] text-slate-500 leading-tight">Wajib diletakkan pada slot sebelum balik.</div>
+                                </div>
+                            </label>
+                            <label class="flex items-start gap-2 bg-white p-3 rounded-lg border shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" id="k_s_double" class="mt-0.5 w-4 h-4 text-indigo-600 rounded">
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-700">Galak Double Period</div>
+                                    <div class="text-[9px] text-slate-500 leading-tight">Keutamaan berderet 2 waktu (Jika cukup masa).</div>
+                                </div>
+                            </label>
+                            <label class="flex items-start gap-2 bg-white p-3 rounded-lg border shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" id="k_s_robin" class="mt-0.5 w-4 h-4 text-indigo-600 rounded">
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-700">Agihan Round-Robin</div>
+                                    <div class="text-[9px] text-slate-500 leading-tight">Disebarkan secara sekata ke hari-hari berbeza.</div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="flex justify-end">
+                            <button onclick="window.tambahKekanganSubjek()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition">➕ Tambah Syarat Subjek</button>
+                        </div>
+                    </div>
+
+                    <div id="senaraiKekanganSubjek" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <p class="text-xs text-slate-400 italic col-span-full">Belum ada kekangan subjek spesifik direkodkan.</p>
+                    </div>
+                </div>
+
                 <div class="mt-6 border-t pt-4 flex justify-end">
                     <button onclick="window.simpanKekanganMikro()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg transition shadow-sm">💾 Simpan Semua Parameter AI</button>
                 </div>
@@ -381,7 +429,7 @@
                     </div>
                 </div>
                 <div class="flex gap-2 relative z-10">
-                    <input type="text" id="aiPromptInput" placeholder="Cth: Tolong alihkan Cikgu Ahmad (Sains) ke hari Selasa waktu kedua..." class="flex-1 text-xs px-4 py-2.5 rounded-xl text-slate-800 font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-inner">
+                    <input type="text" id="aiPromptInput" onkeypress="if(event.key === 'Enter') window.prosesPromptAI()" placeholder="Cth: Tolong alihkan Cikgu Ahmad (Sains) ke hari Selasa waktu kedua..." class="flex-1 text-xs px-4 py-2.5 rounded-xl text-slate-800 font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-inner">
                     <button onclick="window.prosesPromptAI()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-xs px-6 py-2.5 rounded-xl shadow transition whitespace-nowrap">✨ Laksana AI</button>
                 </div>
             </div>
@@ -421,7 +469,7 @@
                         <select id="paparGuruSelect" onchange="window.renderJadualGuru()" class="text-xs border rounded-lg px-3 py-2 font-bold bg-white shadow-sm max-w-[150px]"><option value="">-- Pilih Guru --</option></select>
                     </div>
                     <div class="ml-auto">
-                        <button onclick="window.print()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-2 rounded-lg border shadow-sm transition">🖨️️ Cetak</button>
+                        <button onclick="window.print()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-2 rounded-lg border shadow-sm transition">🖨 Cetak</button>
                     </div>
                 </div>
 
@@ -479,7 +527,7 @@
                         <h4 class="text-xs font-bold text-slate-700">Senarai Jadual Peperiksaan Semasa:</h4>
                         <div class="flex gap-2">
                             <button onclick="window.janaSemulaPengawasAI()" class="text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded transition print-hidden shadow-sm">🔄 AI: Kemas Kini Pengawas</button>
-                            <button onclick="window.print()" class="text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border px-3 py-1.5 rounded transition print-hidden">🖨️️ Cetak Jadual</button>
+                            <button onclick="window.print()" class="text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border px-3 py-1.5 rounded transition print-hidden">🖨 Cetak Jadual</button>
                         </div>
                     </div>
                     
@@ -508,6 +556,7 @@
         <!-- ================= TAB 6: TETAPAN ================= -->
         <div id="section-tetapan" class="tab-content hidden space-y-6">
             
+            <!-- PROFIL SEKOLAH -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                 <h3 class="font-bold text-sm text-slate-800 mb-4 flex items-center gap-2"><span>🏫</span> Penjenamaan Profil Sekolah Sedia Ada</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -561,6 +610,7 @@
                 </div>
             </div>
 
+            <!-- BACKUP DAN ZON BAHAYA -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Backup & Restore -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -579,7 +629,7 @@
 
                 <!-- Danger Zone -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 border-l-4 border-l-red-500">
-                    <h3 class="font-bold text-sm text-red-600 mb-1 flex items-center gap-2"><span>⚠️</span> Kosongkan Memori (Factory Reset)</h3>
+                    <h3 class="font-bold text-sm text-red-600 mb-1 flex items-center gap-2"><span>⚠️️</span> Kosongkan Memori (Factory Reset)</h3>
                     <p class="text-[10px] text-slate-500 mb-4">Butang ini akan memadam 100% semua data dan fail sandaran dalam pelayar web ini secara kekal. Sistem akan dimulakan semula.</p>
                     <button onclick="window.resetDataSemasa()" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs px-4 py-2.5 rounded-lg border border-red-200 transition shadow-sm">🗑️ Factory Reset Sistem</button>
                 </div>
@@ -589,7 +639,7 @@
 
     </main>
 
-    <!-- TOAST & MODALS -->
+    <!-- TOAST & MODALS UTILITIES -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none"></div>
     <div id="customModal" class="fixed inset-0 z-[90] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
         <div class="bg-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-md animate-modal border-t-4 border-indigo-600">
@@ -694,7 +744,8 @@
                 guru: [], kelas: [], subjek: [], agihan: [], jadual: { status: null, dataKelas: null, dataGuru: null }, peperiksaan: [],
                 kekangan: { 
                     guru: { maxTurut: 3, seimbangHari: true, seimbangRehat: true, jarakDouble: true },
-                    kelas: { maxBerat: 2, elakUlang: true, pjAwal: true }
+                    kelas: { maxBerat: 2, elakUlang: true, pjAwal: true },
+                    subjek: {}
                 },
                 masaSekolah: { 
                     mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20,
@@ -886,6 +937,7 @@
             }
             if(!k.guru) k.guru = { maxTurut: 3, seimbangHari: true, seimbangRehat: true, jarakDouble: true };
             if(!k.kelas) k.kelas = { maxBerat: 2, elakUlang: true, pjAwal: true };
+            if(!k.subjek) k.subjek = {};
 
             if(document.getElementById('k_g_max_turut')) {
                 document.getElementById('k_g_max_turut').value = k.guru.maxTurut || 3;
@@ -897,6 +949,13 @@
                 document.getElementById('k_k_elak_ulang').checked = k.kelas.elakUlang !== false;
                 document.getElementById('k_k_pj_awal').checked = k.kelas.pjAwal !== false;
             }
+            
+            if(document.getElementById('k_s_subjek')) {
+                let v = document.getElementById('k_s_subjek').value;
+                document.getElementById('k_s_subjek').innerHTML = optsSubjek;
+                document.getElementById('k_s_subjek').value = v;
+            }
+            window.renderKekanganSubjek();
             
             // Jaminan Backward Compatibility untuk Profil Lama
             if(!window.appState.admins) window.appState.admins = ['sekolah-7608@moe-dl.edu.my'];
@@ -1156,6 +1215,70 @@
             });
         };
 
+        window.tambahKekanganSubjek = function() {
+            let subjek = document.getElementById('k_s_subjek').value;
+            if(!subjek) return window.showToast("Sila pilih subjek terlebih dahulu.", "error");
+
+            let isAkhir = document.getElementById('k_s_akhir').checked;
+            let isDouble = document.getElementById('k_s_double').checked;
+            let isRobin = document.getElementById('k_s_robin').checked;
+
+            if(!isAkhir && !isDouble && !isRobin) return window.showToast("Sila tanda sekurang-kurangnya satu syarat kekangan.", "error");
+
+            if(!window.appState.kekangan) window.appState.kekangan = {};
+            if(!window.appState.kekangan.subjek) window.appState.kekangan.subjek = {};
+
+            window.appState.kekangan.subjek[subjek] = { akhir: isAkhir, double: isDouble, robin: isRobin };
+
+            document.getElementById('k_s_subjek').value = "";
+            document.getElementById('k_s_akhir').checked = false;
+            document.getElementById('k_s_double').checked = false;
+            document.getElementById('k_s_robin').checked = false;
+
+            window.simpanData(false);
+            window.showToast(`Kekangan untuk ${subjek} direkodkan.`, "success");
+            window.renderKekanganSubjek();
+        };
+
+        window.padamKekanganSubjek = function(subjek) {
+            if(window.appState.kekangan && window.appState.kekangan.subjek && window.appState.kekangan.subjek[subjek]) {
+                delete window.appState.kekangan.subjek[subjek];
+                window.simpanData(false);
+                window.showToast(`Kekangan ${subjek} dibuang.`, "success");
+                window.renderKekanganSubjek();
+            }
+        };
+
+        window.renderKekanganSubjek = function() {
+            let container = document.getElementById('senaraiKekanganSubjek');
+            if(!container) return;
+
+            let data = (window.appState.kekangan && window.appState.kekangan.subjek) ? window.appState.kekangan.subjek : {};
+            let keys = Object.keys(data);
+
+            if(keys.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400 italic col-span-full">Belum ada kekangan subjek spesifik direkodkan.</p>';
+                return;
+            }
+
+            let html = '';
+            keys.forEach(sub => {
+                let tags = [];
+                if(data[sub].akhir) tags.push('<span class="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded text-[9px]">Masa Akhir</span>');
+                if(data[sub].double) tags.push('<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-[9px]">Double Period</span>');
+                if(data[sub].robin) tags.push('<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[9px]">Round-Robin</span>');
+
+                html += `<div class="bg-white border p-3 rounded-xl shadow-sm flex justify-between items-center group hover:border-indigo-300 transition">
+                    <div>
+                        <div class="font-bold text-xs text-slate-800 mb-1.5">${sub}</div>
+                        <div class="flex flex-wrap gap-1.5 font-bold">${tags.join('')}</div>
+                    </div>
+                    <button onclick="window.padamKekanganSubjek('${sub}')" class="text-[10px] bg-red-50 hover:bg-red-100 text-red-600 font-bold px-2 py-1.5 rounded opacity-0 group-hover:opacity-100 transition shadow-sm border border-red-100">🗑️ Buang</button>
+                </div>`;
+            });
+            container.innerHTML = html;
+        };
+
         window.simpanKekanganMikro = function() {
             window.appState.kekangan = { 
                 guru: {
@@ -1168,7 +1291,8 @@
                     maxBerat: parseInt(document.getElementById('k_k_max_berat').value)||2,
                     elakUlang: document.getElementById('k_k_elak_ulang').checked,
                     pjAwal: document.getElementById('k_k_pj_awal').checked
-                }
+                },
+                subjek: (window.appState.kekangan && window.appState.kekangan.subjek) ? window.appState.kekangan.subjek : {}
             };
             window.simpanData(false); window.showToast("Parameter Mikro AI Kesejahteraan (Guru & Kelas) disimpan.","success");
         };
@@ -1400,7 +1524,7 @@
             let data = window.appState.peperiksaan || [];
             
             if(data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400 italic bg-white">Belum ada jadual peperiksaan dimasukkan.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada jadual peperiksaan dimasukkan.</td></tr>';
                 return;
             }
             
@@ -1458,7 +1582,7 @@
         window.padamLogo = function() {
             window.tempLogoBase64 = "";
             document.getElementById('tetapan_logo').value = "";
-            document.getElementById('previewLogoContainer').innerHTML = '🗓️️';
+            document.getElementById('previewLogoContainer').innerHTML = '🗓';
         };
 
         window.simpanProfilSekolah = function() {
@@ -1564,7 +1688,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // FIREBASE CONFIG SEBENAR CIKGU TELAH DIMASUKKAN
+        // FIREBASE CONFIG SEBENAR CIKGU (Berdasarkan maklumat terbaharu yang diberikan)
         const firebaseConfig = {
             apiKey: "AIzaSyBbH3sUXVouonVnFK4kJ0dZjPb32eZNPvo",
             authDomain: "makrove6-ef560.firebaseapp.com",
@@ -1592,23 +1716,6 @@
         window.loginDELIMa = function() {
             window.showToast("Menyambung ke Pelayan Google...", "info");
             
-            // Semakan Keselamatan: Kerana API Key Sebenar telah diletakkan, sistem akan bypass Mod Ujian.
-            if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "API_KEY_SEBENAR" || firebaseConfig.apiKey.includes("API_KEY") || typeof __firebase_config !== 'undefined') {
-                window.customDialog("Kunci API Firebase Tiada", 
-                    `Sistem sedang berjalan dalam <b>Mod Pratonton</b>. Kunci API Firebase sebenar belum dimasukkan dalam kod.<br><br>Untuk membolehkan cikgu terus menguji sistem ini sekarang, sila taip e-mel (Simulasi) di bawah:<br><br>
-                    <input type="email" id="testEmail" value="guru@moe-dl.edu.my" class="w-full border border-slate-300 p-2 rounded-lg text-xs mt-2 text-slate-800 font-bold focus:ring-2 focus:ring-indigo-500">
-                    <p class="text-[9px] text-slate-500 mt-2">Nota: Taip <b>sekolah-7608@moe-dl.edu.my</b> untuk menguji kuasa Master Admin.</p>`, 
-                    true, 
-                    () => {
-                        let emel = document.getElementById('testEmail').value;
-                        window.currentUser = { email: emel };
-                        window.kemasKiniAksesAdmin();
-                        window.showToast("Log Masuk Ujian Berjaya: " + emel, "success");
-                    }
-                );
-                return; // Berhenti di sini, elak ralat Firebase.
-            }
-
             // Kod API Sebenar: Memanggil kotak dialog Log Masuk Google (Akan berfungsi secara live)
             signInWithPopup(auth, provider).then((result) => {
                 window.showToast("Berjaya Log Masuk sebagai " + result.user.email, "success");
@@ -1619,14 +1726,6 @@
         };
 
         window.logoutDELIMa = function() {
-            // Jika dalam mod simulasi (tiada Auth sebenar)
-            if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "API_KEY_SEBENAR" || typeof __firebase_config !== 'undefined') {
-                window.currentUser = null;
-                window.kemasKiniAksesAdmin();
-                window.showToast("Berjaya Log Keluar (Mod Ujian)", "success");
-                return;
-            }
-
             // Kod API Sebenar: Memutuskan sambungan dari pelayan Firebase
             signOut(auth).then(() => {
                 window.showToast("Berjaya Log Keluar", "success");
