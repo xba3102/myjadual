@@ -23,23 +23,70 @@
             #paparanJadualContainer { overflow: visible !important; width: 100% !important; }
             #paparanJadualContainer table { border-spacing: 0 !important; }
         }
+        
+        /* SISTEM AKSES KAWALAN PERANAN (RBAC) - 3 PERINGKAT */
+        
+        /* 1. SEKAT FUNGSI KRITIKAL DARI GURU BIASA & TETAMU (Hanya Admin Sekolah Boleh Akses) */
+        body:not(.role-admin) button[onclick*="padamData"],
+        body:not(.role-admin) button[onclick*="editData"],
+        body:not(.role-admin) button[onclick*="janaAI"],
+        body:not(.role-admin) button[onclick*="padamAgihan"],
+        body:not(.role-admin) button[onclick*="padamProfilSistem"],
+        body:not(.role-admin) button[onclick*="simpanProfilSekolah"],
+        body:not(.role-admin) button[onclick*="resetDataSemasa"],
+        body:not(.role-admin) button[onclick*="tambahProfilBaru"],
+        body:not(.role-admin) button[onclick*="padamLogo"],
+        body:not(.role-admin) button[onclick*="tambahAdmin"],
+        body:not(.role-admin) button[onclick*="buangAdmin"],
+        body:not(.role-admin) button[onclick*="padamPeperiksaan"],
+        body:not(.role-admin) button[onclick*="simpanConfigMasa"],
+        body:not(.role-admin) button[onclick*="tambahAgihanPukal"],
+        body:not(.role-admin) button[onclick*="simpanKekanganMikro"],
+        body:not(.role-admin) button[onclick*="prosesPromptAI"],
+        body:not(.role-admin) button[onclick*="janaSemulaPengawasAI"],
+        body:not(.role-admin) button[onclick*="tambahPeperiksaan"] {
+            display: none !important;
+        }
+
+        /* Sekat input borang tetapan kritikal dari Guru Biasa & Tetamu */
+        body:not(.role-admin) input[id^="cfg_"],
+        body:not(.role-admin) input[id^="masa_"],
+        body:not(.role-admin) input[id^="k_g_"],
+        body:not(.role-admin) input[id^="k_k_"],
+        body:not(.role-admin) input[id^="tetapan_"],
+        body:not(.role-admin) input[id="pep_tarikh"],
+        body:not(.role-admin) input[id="pep_mula"],
+        body:not(.role-admin) input[id="pep_tamat"],
+        body:not(.role-admin) input[type="file"],
+        body:not(.role-admin) input[type="checkbox"],
+        body:not(.role-admin) select:not(#headerProfileSelect):not(#paparJenisMode):not(#paparSesiSelect):not(#paparKelasSelect):not(#paparGuruSelect) {
+            pointer-events: none !important;
+            opacity: 0.6 !important;
+            background-color: #f8fafc !important;
+        }
+
+        /* 2. SEKAT KEMASUKAN DATA (TAB 1) DARI TETAMU SAHAJA (Guru DELIMa Boleh Menambah) */
+        body.role-guest button[onclick*="tambahData"],
+        body.role-guest button[onclick*="bukaModalPukalGuru"],
+        body.role-guest button[onclick*="janaSubjekSK"] {
+            display: none !important;
+        }
+        
+        body.role-guest input:not([type="search"]) {
+            pointer-events: none !important;
+            opacity: 0.6 !important;
+            background-color: #f8fafc !important;
+        }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 font-sans antialiased print:bg-white">
-
-    <!-- HEADER -->
-    <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-50 print-hidden">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div id="headerLogoContainer" class="w-10 h-10 flex items-center justify-center bg-indigo-800 rounded-lg text-2xl overflow-hidden shrink-0">🗓️</div>
-                <div>
-                    <h1 id="headerSchoolName" class="text-lg font-bold tracking-tight">Sistem Jadual Pintar AI</h1>
-                    <p id="headerSubText" class="text-xs text-indigo-200">Pengurusan Jadual Sekolah Dinamik</p>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans antialiased print:bg-white role-guest">
+                    <button onclick="window.loginDELIMa()" id="btnLogin" class="bg-white text-indigo-700 hover:bg-indigo-50 font-bold text-xs px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1.5">
+                        <svg class="w-3 h-3" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.73 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> 
+                        DELIMa
+                    </button>
+                    <button onclick="window.logoutDELIMa()" id="btnLogout" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg transition shadow-sm">Keluar</button>
                 </div>
-            </div>
-            
-            <!-- MULTI-TENANT PROFILE SWITCHER -->
-            <div class="flex items-center gap-2 bg-indigo-800/60 p-1.5 rounded-xl border border-indigo-500/50">
+
                 <select id="headerProfileSelect" onchange="window.tukarProfil(this.value)" class="bg-indigo-700 text-white text-xs border-none rounded-lg px-3 py-1.5 font-bold cursor-pointer focus:outline-none focus:ring-2 focus:ring-white max-w-[200px] truncate shadow-sm">
                     <!-- Loaded by JS -->
                 </select>
@@ -51,6 +98,18 @@
     <!-- MAIN CONTENT -->
     <main class="max-w-7xl mx-auto px-4 py-6">
         
+        <!-- BANTUAN READ-ONLY BANNER -->
+        <div id="readOnlyBanner" class="hidden mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm flex items-center justify-between print-hidden transition-all duration-300">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl" id="bannerIcon">🔒</span>
+                <div>
+                    <h3 id="bannerTitle" class="font-bold text-amber-800 text-sm">Mod Pandang Sahaja (Tetamu)</h3>
+                    <p id="bannerDesc" class="text-xs text-amber-700">Sila log masuk menggunakan akaun DELIMa untuk mula mendaftar data guru, kelas & subjek.</p>
+                </div>
+            </div>
+            <button onclick="window.loginDELIMa()" id="bannerBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm">Log Masuk DELIMa</button>
+        </div>
+
         <!-- TABS NAVIGATION -->
         <div class="flex border-b border-slate-200 mb-6 bg-white rounded-xl shadow-sm overflow-x-auto print-hidden">
             <button onclick="window.switchTab('data')" id="tab-data" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap transition">📁 1. Data Induk</button>
@@ -457,6 +516,28 @@
                 </div>
             </div>
 
+            <!-- PENGURUSAN PENTADBIR (AKSES) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 print-hidden">
+                <h3 class="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2"><span>🛡️</span> Pengurusan Pentadbir (Akses Kuasa)</h3>
+                <p class="text-[10px] text-slate-500 mb-4">Berikan kuasa mengedit, menjana jadual, dan mengurus data kepada e-mel DELIMa guru lain khas untuk profil sekolah ini sahaja.</p>
+                
+                <div class="flex gap-2 mb-4">
+                    <input type="email" id="inputAdminBaru" placeholder="Cth: g-123456@moe-dl.edu.my" class="flex-1 text-xs border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 bg-slate-50">
+                    <button onclick="window.tambahAdmin()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm whitespace-nowrap">➕ Tambah Akses</button>
+                </div>
+                
+                <div class="border rounded-lg overflow-hidden bg-white shadow-sm">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-indigo-50 text-indigo-900 border-b">
+                            <tr><th class="p-2 pl-4 font-bold">E-mel Pentadbir Yang Dibenarkan</th><th class="p-2 w-24 text-center font-bold">Tindakan</th></tr>
+                        </thead>
+                        <tbody id="tbodyAdmins">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Backup & Restore -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -507,11 +588,86 @@
         window.appState = {}; 
         window.tempAgihan = {};
         window.tempLogoBase64 = "";
+        window.currentUser = null;
+
+        // KAWALAN AKSES ADMIN 3 PERINGKAT
+        window.kemasKiniAksesAdmin = function() {
+            let role = 'guest'; // Peringkat Terendah: Tetamu Awam (Pandang Sahaja)
+            let email = "";
+            let master = 'sekolah-7608@moe-dl.edu.my';
+            
+            if(window.currentUser) {
+                email = window.currentUser.email || "";
+                let senaraiAdmin = (window.appState && window.appState.admins) ? window.appState.admins : [master];
+                
+                // Semak Peringkat Tertinggi: Master Admin atau Admin Sekolah Semasa
+                if(email === master || senaraiAdmin.includes(email)) {
+                    role = 'admin';
+                } 
+                // Semak Peringkat Menengah: Guru Biasa menggunakan emel DELIMa
+                else if(email.endsWith('@moe-dl.edu.my') || email !== "") {
+                    role = 'user';
+                }
+            }
+            
+            const loginBtn = document.getElementById('btnLogin');
+            const logoutBtn = document.getElementById('btnLogout');
+            const userInfo = document.getElementById('userInfoText');
+            const readOnlyBanner = document.getElementById('readOnlyBanner');
+            const bannerIcon = document.getElementById('bannerIcon');
+            const bannerTitle = document.getElementById('bannerTitle');
+            const bannerDesc = document.getElementById('bannerDesc');
+            const bannerBtn = document.getElementById('bannerBtn');
+            
+            // Set Kelas Body untuk mengawal butang berdasarkan CSS
+            document.body.classList.remove('role-admin', 'role-user', 'role-guest');
+            document.body.classList.add('role-' + role);
+
+            if(role === 'admin') {
+                loginBtn.classList.add('hidden'); logoutBtn.classList.remove('hidden');
+                let labelAdmin = email === master ? "👑 Master Admin" : "🛡️ Admin Sekolah";
+                userInfo.innerHTML = `<span class="font-bold text-emerald-300">${labelAdmin}</span><br/>${email}`;
+                readOnlyBanner.classList.add('hidden');
+            } 
+            else if(role === 'user') {
+                loginBtn.classList.add('hidden'); logoutBtn.classList.remove('hidden');
+                userInfo.innerHTML = `<span class="font-bold text-blue-300">👨‍🏫 Mod Guru</span><br/>${email}`;
+                
+                readOnlyBanner.classList.remove('hidden');
+                readOnlyBanner.className = "mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl shadow-sm flex items-center justify-between print-hidden";
+                bannerIcon.innerText = "📝";
+                bannerTitle.innerText = "Mod Akses Guru";
+                bannerTitle.className = "font-bold text-blue-800 text-sm";
+                bannerDesc.innerHTML = `Log masuk sebagai <b>${email}</b>. Anda diberi kebenaran <b>menambah data asas</b>, tetapi fungsi memadam data dan menjana jadual disekat khas untuk Pentadbir sahaja.`;
+                bannerDesc.className = "text-xs text-blue-700";
+                
+                bannerBtn.innerText = "Tukar Akaun";
+                bannerBtn.setAttribute("onclick", "window.logoutDELIMa()");
+                bannerBtn.className = "bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-2 rounded-lg border transition";
+            } 
+            else {
+                loginBtn.classList.remove('hidden'); logoutBtn.classList.add('hidden');
+                userInfo.innerHTML = `Status Tetamu<br><span class="font-bold">Pandang Sahaja</span>`;
+                
+                readOnlyBanner.classList.remove('hidden');
+                readOnlyBanner.className = "mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm flex items-center justify-between print-hidden";
+                bannerIcon.innerText = "🔒";
+                bannerTitle.innerText = "Mod Pandang Sahaja (Tetamu)";
+                bannerTitle.className = "font-bold text-amber-800 text-sm";
+                bannerDesc.innerHTML = `Sistem kini dikunci. Sila log masuk menggunakan akaun DELIMa KPM untuk mula mendaftar data guru, kelas & subjek.`;
+                bannerDesc.className = "text-xs text-amber-700";
+                
+                bannerBtn.innerText = "Log Masuk DELIMa";
+                bannerBtn.setAttribute("onclick", "window.loginDELIMa()");
+                bannerBtn.className = "bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm";
+            }
+        };
 
         // Template Data Induk Kosong
         function createDefaultProfileState(schoolName) {
             return {
                 sekolah: { nama: schoolName || "Sekolah Kebangsaan", subteks: "Pengurusan Jadual Sekolah Dinamik", logo: "" },
+                admins: ['sekolah-7608@moe-dl.edu.my'], // Master Admin sebagai asas
                 guru: [], kelas: [], subjek: [], agihan: [], jadual: { status: null, dataKelas: null, dataGuru: null }, peperiksaan: [],
                 kekangan: { 
                     guru: { maxTurut: 3, seimbangHari: true, seimbangRehat: true, jarakDouble: true },
@@ -552,6 +708,9 @@
             window.appState = window.allProfiles[window.currentProfileId];
             window.renderProfileSwitcher();
             window.kemasKiniUI();
+            
+            // Kunci UI sekiranya belum log masuk (sebaik sahaja page dimuatkan)
+            window.kemasKiniAksesAdmin();
         };
 
         window.simpanData = function(showMsg = true) {
@@ -582,6 +741,7 @@
                 window.simpanData(false);
                 window.kemasKiniUI();
                 window.renderProfileSwitcher();
+                window.kemasKiniAksesAdmin(); // Kunci semula akses jika dia bukan admin sekolah baru
                 window.showToast("Profil ditukar kepada " + window.appState.sekolah.nama, "success");
             }
         };
@@ -714,6 +874,9 @@
                 document.getElementById('k_k_elak_ulang').checked = k.kelas.elakUlang !== false;
                 document.getElementById('k_k_pj_awal').checked = k.kelas.pjAwal !== false;
             }
+            
+            // Jaminan Backward Compatibility untuk Profil Lama
+            if(!window.appState.admins) window.appState.admins = ['sekolah-7608@moe-dl.edu.my'];
 
             // Update Profile Visuals
             let sek = window.appState.sekolah || { nama: "Sistem Jadual Pintar", subteks: "Sistem Pengurusan", logo: "" };
@@ -730,6 +893,7 @@
 
             window.paparSenaraiAgihan();
             window.renderJadualPeperiksaan();
+            window.renderSenaraiAdmin();
         };
 
         window.tambahData = function(jenis) {
@@ -1326,6 +1490,105 @@
             });
         };
 
+        // --- PENGURUSAN ADMIN SEKOLAH ---
+        window.renderSenaraiAdmin = function() {
+            let tbody = document.getElementById('tbodyAdmins');
+            if(!tbody) return;
+            let master = 'sekolah-7608@moe-dl.edu.my';
+            let admins = window.appState.admins || [master];
+            
+            let h = '';
+            admins.forEach(email => {
+                let isMaster = email === master;
+                let badge = isMaster ? `<span class="bg-indigo-100 text-indigo-800 text-[8px] px-2 py-0.5 rounded font-bold ml-2 border border-indigo-200">MASTER ADMIN</span>` : '';
+                let btn = isMaster ? `<span class="text-[10px] text-slate-400 italic">Kekal</span>` : `<button onclick="window.buangAdmin('${email}')" class="text-red-500 hover:text-red-700 font-bold bg-red-50 px-2 py-1 rounded text-[10px] border border-red-100 shadow-sm transition">Buang</button>`;
+                
+                h += `<tr class="border-b bg-white hover:bg-slate-50"><td class="p-2 pl-4">${email} ${badge}</td><td class="p-2 text-center">${btn}</td></tr>`;
+            });
+            tbody.innerHTML = h;
+        };
+
+        window.tambahAdmin = function() {
+            let email = document.getElementById('inputAdminBaru').value.trim().toLowerCase();
+            if(!email || !email.includes('@')) return window.showToast("Sila masukkan format e-mel yang sah.", "error");
+            
+            if(!window.appState.admins) window.appState.admins = ['sekolah-7608@moe-dl.edu.my'];
+            if(window.appState.admins.includes(email)) return window.showToast("E-mel ini sudah menjadi pentadbir sekolah ini.", "info");
+            
+            window.appState.admins.push(email);
+            document.getElementById('inputAdminBaru').value = "";
+            window.simpanData(false);
+            window.renderSenaraiAdmin();
+            window.kemasKiniAksesAdmin();
+            window.showToast(`Kuasa penyuntingan sekolah diberikan kepada ${email}`, "success");
+        };
+
+        window.buangAdmin = function(email) {
+            if(email === 'sekolah-7608@moe-dl.edu.my') return window.showToast("Kuasa Master Admin tidak boleh dibuang.", "error");
+            window.customDialog("Lucut Kuasa", `Pasti mahu melucutkan hak pentadbir untuk e-mel <b>${email}</b> bagi profil sekolah ini?`, true, () => {
+                window.appState.admins = window.appState.admins.filter(e => e !== email);
+                window.simpanData(false);
+                window.renderSenaraiAdmin();
+                window.kemasKiniAksesAdmin();
+                window.showToast("Hak pentadbir telah dilucutkan.", "success");
+            });
+        };
+
+    </script>
+    
+    <!-- MODUL PENGESAHAN FIREBASE (DELIMa) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Membaca pangkalan data Awan Google jika dihidupkan, atau pasang kunci Dummy untuk Ujian
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "dummy", authDomain: "dummy", projectId: "dummy"
+        };
+
+        let auth, provider;
+        try {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            provider = new GoogleAuthProvider();
+            
+            // Menguatkuasakan domain MOE-DL supaya hanya cikgu/murid KPM boleh teruskan pendaftaran
+            provider.setCustomParameters({ hd: 'moe-dl.edu.my' }); 
+
+            onAuthStateChanged(auth, (user) => {
+                window.currentUser = user;
+                window.kemasKiniAksesAdmin();
+            });
+        } catch(e) {
+            console.warn("API Kunci Firebase tidak dijumpai dalam prebiu ini. Mod Simulasi diaktifkan.");
+        }
+
+        window.loginDELIMa = function() {
+            if(auth && firebaseConfig.apiKey !== "dummy") {
+                // Mod Penuh - Hubungan ke API Sebenar
+                signInWithPopup(auth, provider).then(() => {
+                    window.showToast("Berjaya Log Masuk DELIMa!", "success");
+                }).catch(err => window.showToast("Ralat Log Masuk: " + err.message, "error"));
+            } else {
+                // MOD SIMULASI UJIAN KANVAS / OFFLINE (Memandangkan tiada Server dihubungkan)
+                let email = prompt("SIMULASI LOGIN DELIMa\n(Sistem Pangkalan Data Awan Tidak Disambung Di Sini)\n\nSila taip emel anda (Taip sekolah-7608@moe-dl.edu.my untuk bertukar menjadi Kuasa Admin Penuh):", "sekolah-7608@moe-dl.edu.my");
+                if(email) {
+                    window.currentUser = { email: email.trim() };
+                    window.kemasKiniAksesAdmin();
+                    window.showToast("Berjaya log masuk (Simulasi)!", "success");
+                }
+            }
+        };
+
+        window.logoutDELIMa = function() {
+            if(auth && firebaseConfig.apiKey !== "dummy") {
+                signOut(auth).then(() => window.showToast("Berjaya Log Keluar", "success"));
+            } else {
+                window.currentUser = null;
+                window.kemasKiniAksesAdmin();
+                window.showToast("Berjaya Log Keluar", "success");
+            }
+        };
     </script>
 </body>
 </html>
