@@ -80,6 +80,26 @@
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 font-sans antialiased print:bg-white role-guest">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-50 print-hidden">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div id="headerLogoContainer" class="w-10 h-10 flex items-center justify-center bg-indigo-800 rounded-lg overflow-hidden shrink-0 border border-indigo-500 shadow-inner">
+                    🗓️
+                </div>
+                <div>
+                    <h1 id="headerSchoolName" class="text-base font-bold tracking-tight leading-tight">Sistem Jadual Pintar AI</h1>
+                    <p id="headerSubText" class="text-[10px] text-indigo-200">Pengurusan Jadual Dinamik</p>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- AUTH USER BAR -->
+                <div class="flex items-center gap-3 bg-indigo-800/50 px-3 py-1.5 rounded-xl border border-indigo-500/30">
+                    <div id="userInfoText" class="text-[9px] text-right text-indigo-100">
+                        Status Tetamu<br><span class="font-bold">Pandang Sahaja</span>
+                    </div>
                     <button onclick="window.loginDELIMa()" id="btnLogin" class="bg-white text-indigo-700 hover:bg-indigo-50 font-bold text-xs px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1.5">
                         <svg class="w-3 h-3" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.73 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> 
                         DELIMa
@@ -379,7 +399,7 @@
                         <label class="text-xs font-bold text-slate-700">Papar Mengikut:</label>
                         <select id="paparJenisMode" onchange="window.toggleModePapar()" class="text-xs border rounded-lg px-3 py-2 font-bold text-indigo-700 bg-white shadow-sm focus:outline-none">
                             <option value="kelas">🏫 Jadual Kelas</option>
-                            <option value="guru">👨‍🏫 Jadual Persendirian Guru</option>
+                            <option value="guru">👨‍‍🏫 Jadual Persendirian Guru</option>
                             <option value="induk">🗺️ Jadual Matriks Induk</option>
                             <option value="beban">📊 Analisis Beban Waktu Guru</option>
                         </select>
@@ -501,7 +521,7 @@
                     <div>
                         <label class="text-xs font-bold text-slate-700 block mb-1">Logo Sekolah (Paparan Sistem):</label>
                         <div class="flex items-center gap-4">
-                            <div id="previewLogoContainer" class="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 overflow-hidden text-2xl shadow-inner shrink-0">🗓️️</div>
+                            <div id="previewLogoContainer" class="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 overflow-hidden text-2xl shadow-inner shrink-0">🗓</div>
                             <div class="flex-1">
                                 <input type="file" id="tetapan_logo" accept="image/png, image/jpeg" onchange="window.previewLogo(this)" class="w-full text-xs border rounded-lg p-1 bg-white cursor-pointer">
                                 <p class="text-[9px] text-slate-400 mt-1">Logo disimpan sebagai Base64 dalam ingatan perisian.</p>
@@ -1166,7 +1186,7 @@
 
         window.janaAI = function() {
             let c = document.getElementById('paparanJadualContainer');
-            c.innerHTML = `<div class="text-center py-16 animate-modal"><div class="animate-spin text-5xl mb-4">⚙️</div><p class="font-bold text-indigo-700 text-sm">Enjin AI Sedang Menjalankan Algoritma...</p><p class="text-[9px] text-emerald-600 mt-2">Menilai Kekangan Mikro & Keseimbangan Sesi Pagi/Petang...</p></div>`;
+            c.innerHTML = `<div class="text-center py-16 animate-modal"><div class="animate-spin text-5xl mb-4">⚙️️</div><p class="font-bold text-indigo-700 text-sm">Enjin AI Sedang Menjalankan Algoritma...</p><p class="text-[9px] text-emerald-600 mt-2">Menilai Kekangan Mikro & Keseimbangan Sesi Pagi/Petang...</p></div>`;
             setTimeout(() => {
                 let jK={}, jG={}; let m=window.appState.masaSekolah; let hl=['Isnin','Selasa','Rabu','Khamis','Jumaat'];
                 (window.appState.kelas||[]).forEach(k => { jK[k]={}; hl.forEach(h=>jK[k][h]=new Array(m.hari[h].slot).fill(null)); });
