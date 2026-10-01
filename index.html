@@ -84,7 +84,7 @@
                 <span class="text-2xl" id="bannerIcon">🔒</span>
                 <div>
                     <h3 id="bannerTitle" class="font-bold text-amber-800 text-sm">Mod Pandang Sahaja (Tetamu)</h3>
-                    <p id="bannerDesc" class="text-xs text-amber-700">Sistem dikunci bagi melindungi jadual. Sila log masuk menggunakan emel rasmi DELIMa.</p>
+                    <p id="bannerDesc" class="text-xs text-amber-700">Sistem dikunci bagi melindungi jadual. Sila log masuk menggunakan emel rasmi DELIMa untuk mula mengedit.</p>
                 </div>
             </div>
         </div>
@@ -331,8 +331,8 @@
                     <div class="flex items-center gap-2 mb-3">
                         <span class="text-xl">🤖</span>
                         <div>
-                            <h3 class="font-bold text-sm">Pembantu AI (Kuasakan oleh Gemini API)</h3>
-                            <p class="text-[10px] text-purple-200">Taip arahan di bawah dan tekan Enter. AI akan menganalisis arahan anda secara live.</p>
+                            <h3 class="font-bold text-sm">Pembantu AI (Dikemudi oleh Gemini 1.5 Pro)</h3>
+                            <p class="text-[10px] text-purple-200">Taip arahan di bawah dan tekan Enter. AI akan menganalisis masalah jadual secara pintar.</p>
                         </div>
                     </div>
                     <div class="flex gap-2 relative z-10">
@@ -343,10 +343,10 @@
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-wrap justify-between items-center gap-4 print-hidden">
                     <div>
-                        <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2"><span>⚡</span> Enjin Penjadualan 3D (Round-Robin)</h3>
-                        <p class="text-xs text-slate-500">Menganalisis matriks, kekangan waktu, dan keseimbangan rehat.</p>
+                        <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2"><span>⚡</span> Enjin Penjadualan 3D (Round-Robin & Keseimbangan)</h3>
+                        <p class="text-xs text-slate-500">Menganalisis matriks, kekangan waktu, dan keseimbangan rehat secara kitaran.</p>
                     </div>
-                    <button onclick="window.janaAI()" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-lg admin-only">🚀 Jana Jadual Pintar AI</button>
+                    <button onclick="window.janaAI()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-lg transition admin-only">🚀 Jana Jadual Pintar AI</button>
                 </div>
 
                 <!-- VIEWPORT -->
@@ -354,7 +354,7 @@
                     <div class="flex flex-wrap items-center gap-4 mb-4 print-hidden bg-slate-50 p-3 rounded-lg border shadow-inner">
                         <div class="flex items-center gap-2">
                             <select id="paparJenisMode" onchange="window.toggleModePapar()" class="text-xs border rounded-lg px-3 py-2 font-bold text-indigo-700 bg-white">
-                                <option value="kelas">🏫 Jadual Kelas</option><option value="guru">👨‍🏫 Jadual Guru</option><option value="induk">🗺️️ Jadual Matriks</option><option value="beban">📊 Analisis Beban</option>
+                                <option value="kelas">🏫 Jadual Kelas</option><option value="guru">👨‍🏫 Jadual Guru</option><option value="induk">🗺 Jadual Matriks</option><option value="beban">📊 Analisis Beban</option>
                             </select>
                         </div>
                         <div id="wrapperSesi" class="flex items-center gap-2">
@@ -369,7 +369,7 @@
                             <select id="paparGuruSelect" onchange="window.renderJadualGuru()" class="text-xs border rounded-lg px-3 py-2 font-bold bg-white max-w-[150px]"><option value="">-- Pilih Guru --</option></select>
                         </div>
                         <div class="ml-auto">
-                            <button onclick="window.print()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-2 rounded-lg border">🖨 Cetak</button>
+                            <button onclick="window.print()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-2 rounded-lg border transition">🖨 Cetak</button>
                         </div>
                     </div>
 
@@ -389,25 +389,25 @@
                         </div>
                     </div>
 
-                    <div class="bg-slate-50 p-4 rounded-xl border mb-6 admin-only">
+                    <div class="bg-slate-50 p-4 rounded-xl border mb-6 admin-only shadow-inner">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                            <div><label class="text-[10px] font-bold text-slate-700 block mb-1">Tarikh:</label><input type="date" id="pep_tarikh" class="w-full text-xs border rounded-lg px-3 py-2"></div>
-                            <div><label class="text-[10px] font-bold text-slate-700 block mb-1">Waktu Mula:</label><input type="time" id="pep_mula" class="w-full text-xs border rounded-lg px-3 py-2"></div>
-                            <div><label class="text-[10px] font-bold text-slate-700 block mb-1">Waktu Tamat:</label><input type="time" id="pep_tamat" class="w-full text-xs border rounded-lg px-3 py-2"></div>
-                            <div><label class="text-[10px] font-bold text-slate-700 block mb-1">Pilih Subjek:</label><select id="pep_subjek" class="w-full text-xs border rounded-lg px-3 py-2 font-bold"><option value="">-- Subjek --</option></select></div>
+                            <div><label class="text-[10px] font-bold text-slate-700 block mb-1">Tarikh:</label><input type="date" id="pep_tarikh" class="w-full text-xs border rounded-lg px-3 py-2 bg-white"></div>
+                            <div><label class="text-[10px] font-bold text-slate-700 block mb-1">Waktu Mula:</label><input type="time" id="pep_mula" class="w-full text-xs border rounded-lg px-3 py-2 bg-white"></div>
+                            <div><label class="text-[10px] font-bold text-slate-700 block mb-1">Waktu Tamat:</label><input type="time" id="pep_tamat" class="w-full text-xs border rounded-lg px-3 py-2 bg-white"></div>
+                            <div><label class="text-[10px] font-bold text-slate-700 block mb-1">Pilih Subjek:</label><select id="pep_subjek" class="w-full text-xs border rounded-lg px-3 py-2 font-bold bg-white"><option value="">-- Subjek --</option></select></div>
                         </div>
                         <div class="flex flex-col md:flex-row gap-4 items-end">
                             <div class="flex-1 w-full">
                                 <label class="text-[10px] font-bold text-slate-700 block mb-1">Kelas Terlibat:</label>
                                 <div id="pep_kelas_container" class="flex flex-wrap gap-2 max-h-24 overflow-y-auto p-2 bg-white border rounded-lg"></div>
                             </div>
-                            <button onclick="window.tambahPeperiksaan()" class="bg-indigo-600 text-white font-bold text-xs px-6 py-2.5 rounded-lg whitespace-nowrap admin-only">➕ Tambah Slot Periksa</button>
+                            <button onclick="window.tambahPeperiksaan()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg whitespace-nowrap admin-only transition">➕ Tambah Slot Periksa</button>
                         </div>
                     </div>
 
                     <div class="flex justify-between items-center mb-2">
                         <h4 class="text-xs font-bold text-slate-700">Senarai Jadual Peperiksaan Semasa:</h4>
-                        <button onclick="window.janaSemulaPengawasAI()" class="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded admin-only">🔄 Kemas Kini Pengawas (AI)</button>
+                        <button onclick="window.janaSemulaPengawasAI()" class="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 px-3 py-1.5 rounded admin-only transition">🔄 Kemas Kini Pengawas (AI)</button>
                     </div>
                     <div class="overflow-x-auto border rounded-xl shadow-sm bg-white print:border-none print:shadow-none">
                         <table class="w-full text-left text-xs">
@@ -428,7 +428,7 @@
             <div id="section-tetapan" class="tab-content hidden space-y-6">
                 <!-- PROFIL PENJENAMAAN -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h3 class="font-bold text-sm text-slate-800 mb-4 flex items-center gap-2"><span>🏫</span> Profil Sistem & Penjenamaan Profil Sekolah</h3>
+                    <h3 class="font-bold text-sm text-slate-800 mb-4 flex items-center gap-2"><span>🏫</span> Profil Sistem & Penjenamaan (Multi-Tenant)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-4">
                             <div>
@@ -450,23 +450,23 @@
                     </div>
                     <div class="mt-5 border-t pt-4 flex justify-between items-center">
                         <button onclick="window.padamProfilSistem()" class="text-red-500 hover:text-red-700 text-xs font-bold underline master-only">Padam Profil Ini</button>
-                        <button onclick="window.simpanProfilSekolah()" class="bg-indigo-600 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-sm admin-only">💾 Simpan Penjenamaan</button>
+                        <button onclick="window.simpanProfilSekolah()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-sm transition admin-only">💾 Simpan Penjenamaan</button>
                     </div>
                 </div>
 
                 <!-- ADMIN & KESELAMATAN -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 print-hidden">
-                    <h3 class="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2"><span>🛡️</span> Pengurusan Pentadbir (DELIMa)</h3>
+                    <h3 class="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2"><span>🛡️</span> Pengurusan Pentadbir (Akses Kuasa)</h3>
                     <p class="text-[10px] text-slate-500 mb-4">Berikan kuasa mengedit/menjana jadual kepada e-mel DELIMa guru lain untuk profil sekolah ini.</p>
                     
                     <div class="flex gap-2 mb-4">
-                        <input type="email" id="inputAdminBaru" placeholder="Cth: g-1234@moe-dl.edu.my" class="flex-1 text-xs border rounded-lg px-3 py-2 bg-slate-50 master-only">
-                        <button onclick="window.tambahAdmin()" class="bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded-lg master-only">➕ Tambah Akses</button>
+                        <input type="email" id="inputAdminBaru" placeholder="Cth: g-1234@moe-dl.edu.my" class="flex-1 text-xs border rounded-lg px-3 py-2 bg-slate-50 master-only focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button onclick="window.tambahAdmin()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm master-only">➕ Tambah Akses</button>
                     </div>
                     
-                    <div class="border rounded-lg overflow-hidden bg-white">
+                    <div class="border rounded-lg overflow-hidden bg-white shadow-sm">
                         <table class="w-full text-left text-xs">
-                            <thead class="bg-indigo-50 border-b"><tr><th class="p-2 pl-4 font-bold">E-mel Pentadbir Dibenarkan</th><th class="p-2 w-24 text-center">Tindakan</th></tr></thead>
+                            <thead class="bg-indigo-50 border-b"><tr><th class="p-2 pl-4 font-bold text-indigo-900">E-mel Pentadbir Dibenarkan</th><th class="p-2 w-24 text-center font-bold text-indigo-900">Tindakan</th></tr></thead>
                             <tbody id="tbodyAdmins"></tbody>
                         </table>
                     </div>
@@ -475,9 +475,10 @@
                 <!-- BACKUP / ZON BAHAYA -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 class="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2"><span>🗄️</span> Sandaran & Pulihkan (Backup JSON)</h3>
+                        <h3 class="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2"><span>🗄️️</span> Sandaran & Pulihkan (Offline JSON)</h3>
+                        <p class="text-[10px] text-slate-500 mb-4">Selain fungsi Cloud, cikgu boleh simpan fail JSON sebagai sandaran luaran.</p>
                         <div class="flex flex-col gap-3">
-                            <button onclick="window.muatTurunJSON()" class="w-full bg-emerald-50 text-emerald-700 font-bold text-xs py-2.5 rounded-lg border admin-only">📥 Muat Turun Fail Sandaran</button>
+                            <button onclick="window.muatTurunJSON()" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs py-2.5 rounded-lg border border-emerald-200 transition admin-only">📥 Muat Turun Fail Sandaran</button>
                             <div class="border-t pt-3 mt-1">
                                 <label class="text-[10px] font-bold text-slate-600 block mb-1">Pulihkan Data dari Fail (.json):</label>
                                 <input type="file" accept=".json" onchange="window.muatNaikJSON(this.files[0])" class="w-full text-xs border p-1.5 rounded bg-slate-50 admin-only">
@@ -487,7 +488,8 @@
 
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 border-l-4 border-l-red-500">
                         <h3 class="font-bold text-sm text-red-600 mb-1 flex items-center gap-2"><span>⚠</span> Kosongkan Memori (Reset)</h3>
-                        <button onclick="window.resetDataSemasa()" class="mt-4 bg-red-50 text-red-600 font-bold text-xs px-4 py-2.5 rounded-lg border border-red-200 master-only">🗑️ Factory Reset Sistem</button>
+                        <p class="text-[10px] text-slate-500 mb-4">Akan memadam keseluruhan data profil ini dari Database dan Local Storage.</p>
+                        <button onclick="window.resetDataSemasa()" class="w-full mt-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs px-4 py-2.5 rounded-lg border border-red-200 transition master-only">🗑️ Factory Reset Profil Semasa</button>
                     </div>
                 </div>
             </div>
@@ -501,8 +503,8 @@
             <h3 id="modalTitle" class="text-base font-bold text-slate-800 mb-2">Makluman</h3>
             <div id="modalMessage" class="text-xs text-slate-600 mb-6 max-h-[60vh] overflow-y-auto leading-relaxed"></div>
             <div class="flex justify-end gap-2">
-                <button id="modalBtnCancel" class="hidden px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Batal</button>
-                <button id="modalBtnOk" class="px-5 py-2 bg-indigo-600 text-white font-bold text-xs rounded-lg">OK</button>
+                <button id="modalBtnCancel" class="hidden px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Batal</button>
+                <button id="modalBtnOk" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition shadow-sm">OK</button>
             </div>
         </div>
     </div>
@@ -516,7 +518,6 @@
         window.tempAgihan = {};
         window.currentUser = null;
         
-        // Ganti Master Admin Emel ini dengan emel sebenar Cikgu
         const MASTER_EMAIL = 'sekolah-7608@moe-dl.edu.my';
 
         function createDefaultProfile(name) {
@@ -538,6 +539,7 @@
         }
 
         window.onload = function() {
+            // First load from local storage to prevent blank screen while fetching Firebase
             let savedProfiles = localStorage.getItem('skb_profiles_v4');
             let savedCurrent = localStorage.getItem('skb_current_v4');
 
@@ -548,21 +550,36 @@
             window.currentProfileId = (savedCurrent && window.allProfiles[savedCurrent]) ? savedCurrent : Object.keys(window.allProfiles)[0];
             window.appState = window.allProfiles[window.currentProfileId];
             
-            // Jaminan Data Kekangan
             if(!window.appState.kekangan) window.appState.kekangan = {};
             if(!window.appState.kekangan.sekatanMasa) window.appState.kekangan.sekatanMasa = [];
+            if(!window.appState.peperiksaan) window.appState.peperiksaan = [];
 
             window.renderProfileSwitcher();
             window.kemasKiniUI();
             window.kemasKiniAksesAdmin(); 
         };
 
-        window.simpanData = function(showMsg = true) {
-            window.allProfiles[window.currentProfileId] = window.appState;
+        window.simpanDataLokalSahaja = function() {
             localStorage.setItem('skb_profiles_v4', JSON.stringify(window.allProfiles));
             localStorage.setItem('skb_current_v4', window.currentProfileId);
+        };
+
+        window.simpanData = function(showMsg = true) {
+            window.allProfiles[window.currentProfileId] = window.appState;
+            window.simpanDataLokalSahaja();
             window.kemasKiniUI();
-            if(showMsg) window.showToast("Data disimpan!", "success");
+
+            // Firebase Cloud Sync
+            if (window.currentUser && window.firebaseDB && window.firebaseSet && window.firebaseRef) {
+                window.firebaseSet(window.firebaseRef(window.firebaseDB, 'jadual_data_v1'), window.allProfiles)
+                .then(() => { if(showMsg) window.showToast("Data diselamatkan ke Awan (Database)!", "success"); })
+                .catch((e) => { 
+                    console.error(e);
+                    if(showMsg) window.showToast("Berjaya simpan di komputer. Gagal simpan ke awan.", "error"); 
+                });
+            } else {
+                if(showMsg) window.showToast("Data disimpan di memori komputer (Offline).", "info");
+            }
         };
 
         // --- MULTI TENANT (TUKAR SEKOLAH) ---
@@ -623,12 +640,12 @@
                 uiUser.innerHTML = "👨‍🏫 Mod Guru"; uiEmail.innerText = email;
                 banner.classList.remove('hidden'); document.getElementById('bannerTitle').innerText = "Mod Guru Biasa (Data Sahaja)";
                 document.getElementById('bannerDesc').innerHTML = `Anda log masuk sebagai <b>${email}</b>. Anda dilarang memadam data atau mengubah jadual tanpa kebenaran Admin.`;
-                banner.className = "mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl shadow-sm flex items-center justify-between print-hidden";
+                banner.className = "mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl shadow-sm flex items-center justify-between print-hidden transition-all";
             } else {
                 uiUser.innerHTML = "Status Tetamu"; uiEmail.innerText = "Pandang Sahaja";
                 banner.classList.remove('hidden'); document.getElementById('bannerTitle').innerText = "Mod Pandang Sahaja (Tetamu)";
                 document.getElementById('bannerDesc').innerText = "Sistem dikunci bagi melindungi jadual. Sila log masuk DELIMa.";
-                banner.className = "mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm flex items-center justify-between print-hidden";
+                banner.className = "mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm flex items-center justify-between print-hidden transition-all";
             }
             
             if(role === 'master') { document.querySelectorAll('.master-only').forEach(el => el.classList.remove('opacity-40', 'pointer-events-none')); }
@@ -694,7 +711,7 @@
                 }
                 
                 if(window.appState.jadual) window.appState.jadual.status = null; 
-                window.simpanData(false); window.showToast("Data & Seluruh Rekod Dikemas kini!", "success"); window.paparSenarai(jenis);
+                window.simpanData(false); window.showToast("Data Dikemas kini Secara Automatik!", "success"); window.paparSenarai(jenis);
             }
         };
 
@@ -727,10 +744,10 @@
             let h = `<div class="max-h-60 overflow-y-auto pr-2"><ul class="space-y-1">`;
             dat.forEach((x,i) => {
                 let t = typeof x==='object' ? `<b>${x.nama}</b> (${x.kod})` : x;
-                h += `<li class="flex justify-between items-center bg-slate-50 border p-2 text-xs rounded shadow-sm"><span>${t}</span>
+                h += `<li class="flex justify-between items-center bg-slate-50 border p-2 text-xs rounded shadow-sm hover:bg-slate-100 transition"><span>${t}</span>
                       <div class="flex gap-1.5 admin-only">
-                        <button onclick="window.editDataGlobal('${jenis}',${i})" class="text-indigo-600 font-bold px-2 py-1 bg-indigo-50 border rounded">✏️</button>
-                        <button onclick="window.padamData('${jenis}',${i})" class="text-red-500 font-bold px-2 py-1 bg-red-50 border rounded">🗑️</button>
+                        <button onclick="window.editDataGlobal('${jenis}',${i})" class="text-indigo-600 font-bold px-2 py-1 bg-indigo-50 hover:bg-indigo-100 border rounded transition">✏️ Edit</button>
+                        <button onclick="window.padamData('${jenis}',${i})" class="text-red-500 font-bold px-2 py-1 bg-red-50 hover:bg-red-100 border rounded transition">🗑️</button>
                       </div></li>`;
             });
             window.customDialog(`Senarai ${jenis.toUpperCase()}`, h + `</ul></div>`);
@@ -754,12 +771,12 @@
             let d = window.appState.kekangan.subjek || {}; let h = '';
             for(let sub in d) {
                 let tags = [];
-                if(d[sub].akhir) tags.push('<span class="bg-red-50 text-red-700 border px-2 py-0.5 rounded text-[9px]">Masa Akhir</span>');
-                if(d[sub].double) tags.push('<span class="bg-blue-50 text-blue-700 border px-2 py-0.5 rounded text-[9px]">Double Period</span>');
-                if(d[sub].robin) tags.push('<span class="bg-emerald-50 text-emerald-700 border px-2 py-0.5 rounded text-[9px]">Round-Robin</span>');
-                h += `<div class="bg-white border p-3 rounded-xl shadow-sm flex justify-between items-center group">
-                    <div><div class="font-bold text-xs mb-1.5">${sub}</div><div class="flex gap-1.5">${tags.join('')}</div></div>
-                    <button onclick="window.padamKekanganSubjek('${sub}')" class="text-red-500 font-bold px-2 opacity-0 group-hover:opacity-100 admin-only">X</button>
+                if(d[sub].akhir) tags.push('<span class="bg-red-50 text-red-700 border px-2 py-0.5 rounded text-[9px] font-bold">Akhir</span>');
+                if(d[sub].double) tags.push('<span class="bg-blue-50 text-blue-700 border px-2 py-0.5 rounded text-[9px] font-bold">Double</span>');
+                if(d[sub].robin) tags.push('<span class="bg-emerald-50 text-emerald-700 border px-2 py-0.5 rounded text-[9px] font-bold">Robin</span>');
+                h += `<div class="bg-white border p-3 rounded-xl shadow-sm flex justify-between items-center group hover:bg-slate-50 transition">
+                    <div><div class="font-bold text-xs mb-1.5 text-slate-800">${sub}</div><div class="flex gap-1.5 flex-wrap">${tags.join('')}</div></div>
+                    <button onclick="window.padamKekanganSubjek('${sub}')" class="text-red-500 font-bold p-2 bg-red-50 rounded opacity-0 group-hover:opacity-100 admin-only transition">X</button>
                 </div>`;
             }
             document.getElementById('senaraiKekanganSubjek').innerHTML = h || '<p class="text-xs text-slate-400 italic">Tiada kekangan subjek.</p>';
@@ -780,8 +797,8 @@
             d.forEach((s, i) => {
                 let gName = (window.appState.guru.find(g => g.id === s.guruId) || {}).nama || "Tidak Diketahui";
                 h += `<div class="bg-red-50 border border-red-200 p-2 rounded-lg shadow-sm flex justify-between items-center group">
-                    <div><div class="font-bold text-xs text-red-900">${gName}</div><div class="text-[10px] text-red-700">Tidak boleh: ${s.hari} - Waktu ${s.waktu}</div></div>
-                    <button onclick="window.padamSekatanGuru(${i})" class="text-red-600 font-bold px-2 admin-only opacity-0 group-hover:opacity-100">X</button>
+                    <div><div class="font-bold text-xs text-red-900">${gName}</div><div class="text-[10px] text-red-700">Tidak boleh: ${s.hari} - Wkt ${s.waktu}</div></div>
+                    <button onclick="window.padamSekatanGuru(${i})" class="text-red-600 font-bold p-1 bg-red-100 rounded admin-only opacity-0 group-hover:opacity-100 transition">X</button>
                 </div>`;
             });
             document.getElementById('senaraiSekatanGuru').innerHTML = h || '<p class="text-xs text-slate-400 italic">Tiada sekatan waktu guru.</p>';
@@ -797,7 +814,7 @@
             window.simpanData(false); window.showToast("Kekangan AI Disimpan.","success");
         };
 
-        // --- ENJIN AI MATRIKS ---
+        // --- ENJIN AI MATRIKS (DITAMBAH BAIK: ROUND-ROBIN LOMPAT HARI) ---
         window.janaAI = function() {
             let c = document.getElementById('paparanJadualContainer');
             c.innerHTML = `<div class="text-center py-16 animate-modal"><div class="animate-spin text-5xl mb-4">⚙</div><p class="font-bold text-indigo-700 text-sm">Menyelesaikan Matriks Round-Robin...</p></div>`;
@@ -815,7 +832,7 @@
                 let sortedAgihan = [...(window.appState.agihan||[])].sort((a,b)=> (b.tugas||[]).length - (a.tugas||[]).length);
 
                 sortedAgihan.forEach(ag => {
-                    let gid=ag.guruId; let sGuru = ag.sesiGuru || 'pagi';
+                    let gid = ag.guruId; let sGuru = ag.sesiGuru || 'pagi';
                     let sekatanGuru = sekatanMasa.filter(s => s.guruId === gid);
 
                     (ag.tugas||[]).forEach(t => {
@@ -833,12 +850,13 @@
                             let placed = false;
 
                             for(let d = 0; d < hl.length; d++) {
+                                // CARA ROUND-ROBIN LOMPAT HARI
                                 let hIdx = (hariStartIdx + d) % hl.length;
                                 let h = hl[hIdx];
                                 let slots = m.hari[h].slot;
                                 let rehat = m.hari[h].rehat;
 
-                                // Soft Constraint: Rehat Balance
+                                // Keseimbangan Rehat Guru
                                 let bCount = 0; let aCount = 0;
                                 for(let x=0; x<slots; x++) { if(jG[gid][h][x]) { if(x<rehat) bCount++; else aCount++; } }
                                 let preferAfter = bCount > aCount;
@@ -849,7 +867,6 @@
                                 for(let i = startS; i !== endS; i += step) {
                                     if(i === rehat) continue;
                                     
-                                    // Keseimbangan Rehat Check (Relaxed overtime)
                                     let isMorning = i < rehat;
                                     if(enforceBalance && isMorning && preferAfter && currentLoop < 50) continue;
                                     if(enforceBalance && !isMorning && !preferAfter && currentLoop < 50) continue;
@@ -861,13 +878,12 @@
                                         if(sIdx < 0 || sIdx >= slots || sIdx === rehat) { canPlace = false; break; }
                                         if(jG[gid][h][sIdx] || jK[t.kelas][h][sIdx]) { canPlace = false; break; }
                                         
-                                        // Hard Constraint: Sekatan Masa
+                                        // Semak Kategori 4: Sekatan Waktu
                                         if(sekatanGuru.some(s => s.hari === h && s.waktu === (sIdx+1))) { canPlace = false; break; }
-                                        
                                         checkSlots.push(sIdx);
                                     }
 
-                                    // Hard Constraint: Round-Robin (Only 1 block per day)
+                                    // Semak Round-Robin (Pecahkan hari)
                                     if(canPlace && isRobin && currentLoop < 100) {
                                         for(let check_i = 0; check_i < slots; check_i++) {
                                             if(jK[t.kelas][h][check_i] && jK[t.kelas][h][check_i].subjek === t.subjek) { canPlace = false; break; }
@@ -880,15 +896,17 @@
                                             jK[t.kelas][h][sIdx] = {subjek:t.subjek, guru:ag.namaGuru, sesi:sGuru};
                                         });
                                         wRem -= blockSize; placed = true;
-                                        if(isRobin) hariStartIdx = hIdx + 1; // Jump to next day
+                                        // WAJIBKAN LOMPAT HARI JIKA ROUND ROBIN
+                                        if(isRobin) hariStartIdx = hIdx + 1; 
                                         break; 
                                     }
                                 }
+                                // BERHENTI PENCARIAN DALAM HARI INI JIKA SUDAH PLACED (ROUND ROBIN BEHAVIOUR)
                                 if(placed && isRobin) break; 
                                 if(placed && wRem <= 0) break;
                             }
 
-                            // Fallback / Relaxation if scheduler gets stuck
+                            // Fallback jika Mustahil (Relaxation)
                             if(!placed) {
                                 if (isRobin && currentLoop > 100) isRobin = false;
                                 else if (isDouble && currentLoop > 150) isDouble = false;
@@ -900,33 +918,31 @@
                 });
                 
                 window.appState.jadual = { status: 'siap', dataKelas: jK, dataGuru: jG };
-                window.simpanData(false); window.customDialog("Berjaya","✅ Penjadualan AI dengan fungsi Round-Robin, Keseimbangan Rehat, dan Sekatan Waktu Selesai!"); window.toggleModePapar();
+                window.simpanData(false); window.customDialog("Berjaya","✅ Penjadualan AI dengan fungsi Keseimbangan dan Round-Robin Lompat Hari Selesai!"); window.toggleModePapar();
             }, 500);
         };
 
-        // --- GEMINI API CALL (PROMPT AI) ---
+        // --- GEMINI API CALL (PROMPT AI PREMIUM) ---
         window.prosesPromptAI = async function() {
             let p = document.getElementById('aiPromptInput').value.trim();
             if(!p) return window.showToast("Sila taip arahan untuk AI.", "error");
-            if(!window.appState.jadual || !window.appState.jadual.status) return window.showToast("Sila Jana Jadual AI dahulu.", "error");
 
             let btn = document.getElementById('btnAiLaksana');
             let orgText = btn.innerHTML;
             btn.innerHTML = "⏳ Otak AI Sedang Berfikir..."; btn.disabled = true;
 
-            const apiKey = "AQ.Ab8RN6JZbYJaXxIQzfKvIrro4BXE6UxfYa9BAuY6s67uCTS7eQ"; // User Paid Key
+            const apiKey = "AQ.Ab8RN6JZbYJaXxIQzfKvIrro4BXE6UxfYa9BAuY6s67uCTS7eQ"; 
 
             try {
-                // MENGGUNAKAN MODEL GEMINI 1.5 PRO (Model Paling Pintar & Kompleks Google)
+                // MODEL GEMINI 1.5 PRO (Premium AI)
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
                 
-                // Memberi watak profesional dan kepakaran kepada otak AI (System Prompt)
-                const sysPrompt = "Anda adalah Pembantu AI Penjadualan Waktu Sekolah yang sangat pintar, logikal dan pakar. Tugas anda adalah membaca arahan pengguna, mengenal pasti implikasi konflik jadual (seperti pertindihan masa, beban guru, dll), dan membalas dengan jawapan yang profesional, ringkas, dan berstruktur dalam Bahasa Melayu. Jelaskan langkah teknikal dan logik yang anda akan laksanakan ke dalam matriks pangkalan data jadual berdasarkan arahan tersebut.";
+                const sysPrompt = "Anda adalah Pakar AI Penjadualan Waktu Sekolah yang profesional. Tugas anda membaca masalah penjadualan guru, menganalisis kesan domino (pertindihan, beban burnout), dan memberikan pelan penyelesaian yang sangat logikal, ringkas dan tepat dalam Bahasa Melayu.";
                 
                 const payload = {
-                    contents: [{ parts: [{ text: `Arahan Pengubahsuaian Jadual: "${p}"` }] }],
+                    contents: [{ parts: [{ text: `Isu Jadual Sekolah: "${p}"` }] }],
                     systemInstruction: { parts: [{ text: sysPrompt }] },
-                    generationConfig: { temperature: 0.3 } // Suhu rendah supaya jawapan AI lebih logikal, analitikal dan tepat
+                    generationConfig: { temperature: 0.3 } 
                 };
 
                 const response = await fetch(apiUrl, {
@@ -940,29 +956,24 @@
                 
                 const aiReply = data.candidates[0].content.parts[0].text;
 
-                // Membina UI Pop-Up yang lebih Premium untuk paparan jawapan Gemini Pro
                 let dialogHtml = `
                 <div class="mb-4">
-                    <div class="text-[10px] text-slate-500 mb-1">Arahan Diserahkan:</div>
+                    <div class="text-[10px] text-slate-500 mb-1">Arahan Anda:</div>
                     <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-800 shadow-inner">"${p}"</div>
                 </div>
                 <div>
                     <div class="text-[10px] text-purple-700 font-bold mb-1 flex items-center gap-1"><span>✨</span> Analisis Kepintaran Buatan (Gemini 1.5 Pro):</div>
                     <div class="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 p-4 rounded-xl text-xs text-purple-900 leading-relaxed shadow-inner whitespace-pre-wrap">${aiReply}</div>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-4 italic text-center">*Matriks jadual sedang dikemas kini oleh enjin pintar berdasarkan logik di atas.*</p>
+                <p class="text-[10px] text-slate-400 mt-4 italic text-center">*Sila sahkan pelan AI ini dan laksanakan perubahan secara manual atau tekan butang Jana semula.*</p>
                 `;
 
                 window.customDialog("Tindakan Pembantu AI (Pro Version)", dialogHtml, true, () => {
-                    window.showToast("Jadual telah diselaraskan secara pintar!", "success");
-                    document.getElementById('aiPromptInput').value = ""; window.toggleModePapar();
+                    document.getElementById('aiPromptInput').value = "";
                 });
             } catch (err) {
-                // Fallback sekiranya internet atau API bermasalah
                 console.error(err);
-                window.customDialog("Ralat Enjin AI", `Gagal memanggil pelayan Gemini.<br><span class="text-xs text-red-500">${err.message}</span><br><br>Jalankan arahan ini secara paksa di dalam enjin logik tempatan (Offline)?`, true, () => {
-                     window.showToast("Jadual diubah suai secara manual.", "success"); document.getElementById('aiPromptInput').value = ""; window.toggleModePapar();
-                });
+                window.customDialog("Ralat Enjin AI", `Gagal memanggil pelayan Gemini.<br><span class="text-xs text-red-500">${err.message}</span>`, false);
             } finally {
                 btn.innerHTML = orgText; btn.disabled = false;
             }
@@ -1001,11 +1012,9 @@
             }
 
             window.renderKekanganSubjek(); window.renderSekatanGuru();
-            // --- JADUAL PEPERIKSAAN (Skip long logic here for length, it is retained from previous block) ---
             
-            // Backup, Agihan, Masa logic are retained exactly as previously defined to avoid bloat, since they work fine.
             let tbodyAdmins = document.getElementById('tbodyAdmins');
-            if(tbodyAdmins) tbodyAdmins.innerHTML = (window.appState.admins||[MASTER_EMAIL]).map(email => `<tr><td class="p-2 border-b">${email}</td><td class="p-2 border-b text-center"><button onclick="window.buangAdmin('${email}')" class="text-red-500 font-bold px-2 py-1 bg-red-50 border rounded master-only">Buang</button></td></tr>`).join('');
+            if(tbodyAdmins) tbodyAdmins.innerHTML = (window.appState.admins||[MASTER_EMAIL]).map(email => `<tr><td class="p-2 border-b font-medium text-slate-800">${email}</td><td class="p-2 border-b text-center"><button onclick="window.buangAdmin('${email}')" class="text-red-500 font-bold px-2 py-1 bg-red-50 hover:bg-red-100 border rounded master-only transition">Buang</button></td></tr>`).join('');
         };
 
         window.tambahAdmin = function() {
@@ -1018,10 +1027,11 @@
 
     </script>
 
-    <!-- FIREBASE (PRODUCTION READY) -->
+    <!-- FIREBASE (PRODUCTION READY - REALTIME DB & AUTH) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         
         // Konfigurasi Live Firebase Cikgu
         const firebaseConfig = {
@@ -1038,11 +1048,44 @@
         try {
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
+            const db = getDatabase(app);
+
+            // Mendedahkan DB ke Global Scope untuk window.simpanData
+            window.firebaseDB = db;
+            window.firebaseSet = set;
+            window.firebaseRef = ref;
             
-            onAuthStateChanged(auth, (user) => {
+            onAuthStateChanged(auth, async (user) => {
                 window.currentUser = user;
-                if(user) document.getElementById('authBtnText').innerText = "Log Keluar";
-                else document.getElementById('authBtnText').innerText = "Log Masuk DELIMa";
+                if(user) {
+                    document.getElementById('authBtnText').innerText = "Log Keluar";
+                    
+                    // MUAT TURUN DATA DARI AWAN APABILA LOG MASUK
+                    try {
+                        const dbRef = ref(db);
+                        const snapshot = await get(child(dbRef, `jadual_data_v1`));
+                        if (snapshot.exists()) {
+                            window.allProfiles = snapshot.val();
+                            window.currentProfileId = localStorage.getItem('skb_current_v4') || Object.keys(window.allProfiles)[0];
+                            if(!window.allProfiles[window.currentProfileId]) window.currentProfileId = Object.keys(window.allProfiles)[0];
+                            
+                            window.appState = window.allProfiles[window.currentProfileId];
+                            window.simpanDataLokalSahaja(); // Sinkronkan ke lokal
+                            window.renderProfileSwitcher();
+                            window.kemasKiniUI();
+                            window.showToast("Data Awan (Database) Berjaya Disegerakkan! ☁️", "success");
+                        } else {
+                            window.showToast("Database Awan kosong. Data dari komputer akan dimuat naik.", "info");
+                            window.simpanData(false); // Tolak data komputer ke awan
+                        }
+                    } catch(e) {
+                        console.error(e);
+                        window.showToast("Ralat membaca Database Awan. Mod Offline diaktifkan.", "error");
+                    }
+                }
+                else {
+                    document.getElementById('authBtnText').innerText = "Log Masuk DELIMa";
+                }
                 window.kemasKiniAksesAdmin();
             });
 
@@ -1051,7 +1094,7 @@
                 else {
                     const provider = new GoogleAuthProvider();
                     provider.setCustomParameters({ hd: 'moe-dl.edu.my' }); // Sekat Gmail Biasa
-                    try { await signInWithPopup(auth, provider); window.showToast("Berjaya Log Masuk!"); } 
+                    try { await signInWithPopup(auth, provider); } 
                     catch (e) { window.customDialog("Ralat Firebase", e.message); }
                 }
             };
