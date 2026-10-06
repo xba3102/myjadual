@@ -20,7 +20,7 @@
             .print-hidden, header, .tab-btn, .ai-prompt-box { display: none !important; }
         }
         
-        /* SISTEM AKSES KAWALAN PERANAN (RBAC) - KELABUKAN JIKA BUKAN ADMIN */
+        /* SISTEM AKSES KAWALAN PERANAN (RBAC) */
         body.role-guest .admin-only,
         body.role-user .admin-only {
             opacity: 0.4 !important;
@@ -73,8 +73,8 @@
             <!-- TABS -->
             <div class="flex border-b border-slate-200 mb-6 bg-white rounded-xl shadow-sm overflow-x-auto print-hidden">
                 <button onclick="window.switchTab('data')" id="tab-data" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap">📁 1. Data Induk</button>
-                <button onclick="window.switchTab('agihan')" id="tab-agihan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">📊 2. Agihan Tugas</button>
-                <button onclick="window.switchTab('kekangan')" id="tab-kekangan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-2">🧠 3. Kekangan Ekstrem <span class="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded">NEW</span></button>
+                <button onclick="window.switchTab('agihan')" id="tab-agihan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">📊 2. Lesson Grid (Agihan)</button>
+                <button onclick="window.switchTab('kekangan')" id="tab-kekangan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">🧠 3. Kekangan Ekstrem</button>
                 <button onclick="window.switchTab('jadual')" id="tab-jadual" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">⚡ 4. Jadual AI</button>
                 <button onclick="window.switchTab('tetapan')" id="tab-tetapan" class="tab-btn px-5 py-3 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">⚙️ 5. Tetapan</button>
             </div>
@@ -82,6 +82,7 @@
             <!-- TAB 1: DATA INDUK -->
             <div id="section-data" class="tab-content space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- GURU -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between items-center mb-3">
@@ -100,6 +101,7 @@
                         <button onclick="window.paparSenarai('guru')" class="w-full mt-2 bg-slate-50 hover:bg-slate-100 text-indigo-600 font-bold text-xs py-2 rounded-lg border border-slate-200 transition">👁️ Papar Senarai Guru</button>
                     </div>
 
+                    <!-- KELAS -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between items-center mb-3">
@@ -118,6 +120,7 @@
                         </div>
                     </div>
 
+                    <!-- SUBJEK -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between items-center mb-3">
@@ -137,47 +140,38 @@
                 </div>
             </div>
 
-            <!-- TAB 2: AGIHAN -->
+            <!-- TAB 2: LESSON GRID (AGIHAN) -->
             <div id="section-agihan" class="tab-content hidden space-y-6">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h3 class="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2"><span>📋</span> Agihan Beban Guru</h3>
+                    <div class="flex justify-between items-center border-b pb-3 mb-4">
+                        <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2"><span>📋</span> Matriks Lesson Grid (Pengisian Berpusat)</h3>
+                        <div class="text-[10px] text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border">Masukkan tugas guru mengikut paparan kelas.</div>
+                    </div>
                     
-                    <div class="bg-slate-50 p-4 rounded-xl border mb-4 shadow-inner">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="text-[10px] font-bold text-indigo-700 block mb-1">1. Pilih Guru Utama</label>
-                                <select id="agihanGuru" onchange="window.renderAgihanSubjek()" class="w-full text-xs border rounded-lg px-3 py-2 font-bold admin-only bg-white"><option value="">-- Pilih Guru --</option></select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-indigo-700 block mb-1">2. Sesi Mengajar (Optional)</label>
-                                <select id="agihanSesiGuru" class="w-full text-xs border rounded-lg px-3 py-2 font-bold text-blue-700 admin-only bg-white">
-                                    <option value="pagi">☀️️ Pagi Sahaja</option><option value="petang">🌤️ Petang Sahaja</option>
-                                </select>
-                            </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border mb-6 shadow-inner">
+                        <div class="flex items-center gap-3 mb-4">
+                            <label class="text-xs font-bold text-indigo-700">Pilih Kelas Untuk Diuruskan:</label>
+                            <select id="gridKelasSelect" onchange="window.renderLessonGrid()" class="text-xs border rounded-lg px-3 py-2 font-bold bg-white shadow-sm min-w-[200px] admin-only"><option value="">-- Pilih Kelas --</option></select>
                         </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-indigo-700 block mb-2">3. Tandakan Subjek & Tambah Kelas</label>
-                            <div id="agihanSubjekContainer" class="space-y-2 max-h-[400px] overflow-y-auto custom-scroll p-1 admin-only"><span class="text-slate-400 italic text-xs">Pilih guru di atas dahulu.</span></div>
-                        </div>
-                        <div class="mt-4 pt-4 border-t flex justify-end">
-                            <button onclick="window.tambahAgihanPukal()" class="bg-indigo-600 hover:bg-indigo-700 transition text-white font-bold text-xs px-6 py-2.5 rounded-lg admin-only shadow-sm">💾 Simpan & Kemas Kini Agihan</button>
+                        
+                        <div id="lessonGridContainer" class="bg-white rounded-lg border shadow-sm overflow-x-auto min-h-[150px] relative admin-only">
+                            <div class="p-8 text-center text-slate-400 text-xs font-medium">Sila pilih kelas di atas untuk memaparkan Grid Subjek.</div>
                         </div>
                     </div>
 
                     <div>
-                        <h4 class="text-xs font-bold text-slate-700 mb-2">Rumusan Rekod Semasa:</h4>
-                        <div id="senaraiAgihan" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                        <h4 class="text-xs font-bold text-slate-700 mb-3 border-b pb-2">📊 Rumusan Beban Guru Semasa:</h4>
+                        <div id="senaraiAgihan" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto custom-scroll pr-2"></div>
                     </div>
                 </div>
             </div>
 
             <!-- TAB 3: KEKANGAN 9-DIMENSI -->
             <div id="section-kekangan" class="tab-content hidden space-y-6">
-                
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
                     <!-- KIRI: KEKANGAN UMUM & GURU -->
                     <div class="space-y-6">
-                        
                         <!-- 1. TETAPAN GLOBAL GURU -->
                         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
                             <h3 class="font-bold text-sm text-indigo-800 flex items-center gap-2 mb-4 border-b pb-2"><span>👨‍🏫</span> 1. Parameter Kesejahteraan Guru</h3>
@@ -197,12 +191,12 @@
 
                         <!-- 2. WAKTU TETAP KELAS -->
                         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-                            <h3 class="font-bold text-sm text-teal-800 flex items-center gap-2 mb-4 border-b pb-2"><span>🏫</span> 2. Waktu Tetap Sekolah (Perhimpunan)</h3>
+                            <h3 class="font-bold text-sm text-teal-800 flex items-center gap-2 mb-4 border-b pb-2"><span>🏫</span> 2. Waktu Tetap Sekolah (Acara/Perhimpunan)</h3>
                             <div class="bg-teal-50 p-3 rounded-lg border border-teal-100 shadow-inner mb-3">
                                 <div class="flex flex-wrap items-end gap-2">
                                     <div class="flex-1"><label class="text-[9px] font-bold text-teal-800 block mb-1">Acara/Jenis</label><input type="text" id="k_tetap_nama" placeholder="Cth: Perhimpunan" class="w-full text-xs border rounded px-2 py-1.5 admin-only bg-white"></div>
-                                    <div><label class="text-[9px] font-bold text-teal-800 block mb-1">Hari</label><select id="k_tetap_hari" class="w-24 text-xs border rounded px-2 py-1.5 admin-only bg-white"><option value="Isnin">Isnin</option><option value="Jumaat">Jumaat</option></select></div>
-                                    <div><label class="text-[9px] font-bold text-teal-800 block mb-1">Waktu (1-10)</label><input type="number" id="k_tetap_waktu" min="1" max="10" class="w-16 text-xs border rounded px-2 py-1.5 admin-only bg-white text-center"></div>
+                                    <div><label class="text-[9px] font-bold text-teal-800 block mb-1">Hari</label><select id="k_tetap_hari" class="w-20 text-xs border rounded px-2 py-1.5 admin-only bg-white"><option value="Isnin">Isnin</option><option value="Jumaat">Jumaat</option></select></div>
+                                    <div><label class="text-[9px] font-bold text-teal-800 block mb-1">Waktu</label><input type="number" id="k_tetap_waktu" min="1" max="10" class="w-14 text-xs border rounded px-2 py-1.5 admin-only bg-white text-center"></div>
                                     <button onclick="window.tambahWaktuTetap()" class="bg-teal-600 text-white font-bold text-xs px-3 py-1.5 rounded admin-only hover:bg-teal-700 transition h-[30px]">Kunci</button>
                                 </div>
                             </div>
@@ -216,23 +210,22 @@
                                 <div class="flex flex-wrap items-end gap-2">
                                     <div class="flex-1"><label class="text-[9px] font-bold text-red-800 block mb-1">Guru</label><select id="k_sekatan_guru" class="w-full text-xs border rounded px-2 py-1.5 admin-only bg-white"></select></div>
                                     <div><label class="text-[9px] font-bold text-red-800 block mb-1">Hari</label><select id="k_sekatan_hari" class="w-24 text-xs border rounded px-2 py-1.5 admin-only bg-white"><option value="Isnin">Isnin</option><option value="Selasa">Selasa</option><option value="Rabu">Rabu</option><option value="Khamis">Khamis</option><option value="Jumaat">Jumaat</option></select></div>
-                                    <div><label class="text-[9px] font-bold text-red-800 block mb-1">Waktu</label><input type="number" id="k_sekatan_waktu" min="1" max="10" placeholder="Semua" class="w-16 text-xs border rounded px-2 py-1.5 admin-only bg-white text-center"></div>
+                                    <div><label class="text-[9px] font-bold text-red-800 block mb-1">Wkt</label><input type="number" id="k_sekatan_waktu" min="1" max="10" placeholder="Semua" class="w-14 text-xs border rounded px-2 py-1.5 admin-only bg-white text-center"></div>
                                     <button onclick="window.tambahSekatanGuru()" class="bg-red-600 text-white font-bold text-xs px-3 py-1.5 rounded admin-only hover:bg-red-700 transition h-[30px]">Sekat</button>
                                 </div>
-                                <p class="text-[8px] text-red-600 mt-1 italic">*Biarkan waktu kosong untuk sekat guru cuti sehari suntuk.</p>
+                                <p class="text-[8px] text-red-600 mt-1 italic">*Biarkan petak waktu kosong untuk sekat guru sehari suntuk.</p>
                             </div>
                             <div id="senaraiSekatanGuru" class="space-y-1 max-h-32 overflow-y-auto custom-scroll"></div>
                         </div>
                     </div>
 
-                    <!-- KANAN: KEKANGAN SUBJEK KOMPLEKS -->
+                    <!-- KANAN: KEKANGAN SUBJEK -->
                     <div class="space-y-6">
-                        
                         <!-- 4. SUBJEK SERENTAK -->
                         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-                            <h3 class="font-bold text-sm text-purple-800 flex items-center gap-2 mb-4 border-b pb-2"><span>🔗</span> 4. Kumpulan Subjek Serentak (Concurrent)</h3>
+                            <h3 class="font-bold text-sm text-purple-800 flex items-center gap-2 mb-4 border-b pb-2"><span>🔗</span> 4. Subjek Serentak (Concurrent Blocking)</h3>
                             <div class="bg-purple-50 p-3 rounded-lg border border-purple-100 shadow-inner mb-3">
-                                <p class="text-[9px] text-purple-800 mb-2">Memaksa AI meletakkan subjek ini pada hari dan waktu yang sama. Sesuai untuk PAI & Moral.</p>
+                                <p class="text-[9px] text-purple-800 mb-2">Memaksa AI menyusun dua subjek ini pada hari dan waktu yang sama persis (Sesuai untuk PAI & Moral).</p>
                                 <div class="flex items-center gap-2">
                                     <select id="k_serentak_1" class="flex-1 text-xs border rounded px-2 py-1.5 admin-only bg-white"></select>
                                     <span class="text-xs font-bold text-purple-700">Wajib dgn</span>
@@ -263,34 +256,33 @@
                             </div>
                             <div id="senaraiKekanganSubjek" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scroll pr-1"></div>
                         </div>
-
                     </div>
                 </div>
             </div>
 
             <!-- TAB 4: JADUAL & AI -->
             <div id="section-jadual" class="tab-content hidden space-y-6">
-                <!-- AI PROMPT (GEMINI API) -->
-                <div class="bg-gradient-to-r from-purple-700 to-indigo-700 rounded-2xl shadow-md p-5 text-white ai-prompt-box relative overflow-hidden admin-only">
+                <!-- AI PROMPT -->
+                <div class="bg-gradient-to-r from-purple-800 to-indigo-800 rounded-2xl shadow-md p-5 text-white ai-prompt-box relative overflow-hidden admin-only">
                     <div class="absolute -right-4 -top-4 text-7xl opacity-10">🤖</div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="text-xl">🤖</span>
-                        <div><h3 class="font-bold text-sm">Pakar Penjadualan AI (Gemini 1.5 Pro)</h3><p class="text-[10px] text-purple-200">Ketik arahan dan tekan 'Enter' untuk bersembang dengan AI.</p></div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-3xl">✨</span>
+                        <div><h3 class="font-bold text-sm tracking-wide">Pakar Strategi AI (Gemini 1.5 Pro)</h3><p class="text-[10px] text-purple-200">Ketik isu penjadualan anda dan tekan 'Enter' untuk analisis profesional.</p></div>
                     </div>
-                    <div class="flex gap-2 relative z-10">
-                        <input type="text" id="aiPromptInput" onkeypress="if(event.key === 'Enter') window.prosesPromptAI()" placeholder="Cth: Cikgu Ali tiada hari Jumaat. Bolehkah AI susun semula supaya subjeknya pindah ke Khamis?" class="flex-1 text-xs px-4 py-2.5 rounded-xl text-slate-800 font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-inner">
-                        <button id="btnAiLaksana" onclick="window.prosesPromptAI()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-xs px-6 py-2.5 rounded-xl shadow whitespace-nowrap transition">✨ Hantar ke AI</button>
+                    <div class="flex gap-2 relative z-10 mt-4">
+                        <input type="text" id="aiPromptInput" onkeypress="if(event.key === 'Enter') window.prosesPromptAI()" placeholder="Tanya AI: Cth - Cikgu Ahmad cuti sakit hari Rabu, tolong analisis kesan pada jadual dan berikan langkah kontingensi." class="flex-1 text-xs px-4 py-3 rounded-xl text-slate-800 font-medium bg-white focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-inner">
+                        <button id="btnAiLaksana" onclick="window.prosesPromptAI()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-xs px-6 py-3 rounded-xl shadow whitespace-nowrap transition">Analisis Isu</button>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-wrap justify-between items-center gap-4 print-hidden relative overflow-hidden">
                     <div class="absolute inset-0 bg-gradient-to-r from-slate-50 to-white z-0"></div>
                     <div class="relative z-10">
-                        <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2"><span>⚡</span> Enjin CSE 9-Dimensi (Generasi 4)</h3>
-                        <p class="text-[10px] text-slate-500 mt-1 max-w-md">Algoritma secara pintar memproses Had Masa, Round-Robin, Blok Serentak, dan Kesejahteraan Guru dalam dua fasa semakan (*Strict & Fallback*).</p>
+                        <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2"><span>⚡</span> Enjin Matriks Pintar 9-Kekangan</h3>
+                        <p class="text-[10px] text-slate-500 mt-1 max-w-md">Menyemak beribu-ribu kombinasi dalam pecahan saat untuk memenuhi syarat guru, subjek, dan kelas.</p>
                     </div>
                     <button onclick="window.janaAI()" class="relative z-10 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs px-8 py-3 rounded-xl shadow-lg transition transform hover:scale-105 border border-emerald-500 flex items-center gap-2">
-                        <span class="text-base">🚀</span> JANA MATRIKS JADUAL SEKARANG
+                        <span class="text-base">🚀</span> JANA MATRIKS JADUAL
                     </button>
                 </div>
 
@@ -310,7 +302,7 @@
                         </div>
                         <div class="ml-auto flex gap-2">
                             <div id="statusJadualFlag" class="text-[10px] font-bold px-3 py-2 rounded border bg-white text-slate-500 flex items-center shadow-sm">Status: Belum Dijana</div>
-                            <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2 rounded-lg shadow transition flex items-center gap-2"><span>🖨️</span> Cetak PDF</button>
+                            <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2 rounded-lg shadow transition flex items-center gap-2"><span>🖨️</span> Cetak</button>
                         </div>
                     </div>
 
@@ -325,27 +317,27 @@
 
             <!-- TAB 5: TETAPAN -->
             <div id="section-tetapan" class="tab-content hidden space-y-6">
-                <!-- PROFIL PENJENAMAAN -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h3 class="font-bold text-sm text-slate-800 mb-4 flex items-center gap-2 border-b pb-2"><span>🏢</span> Pengurusan Cawangan & Penjenamaan (Multi-Tenant)</h3>
+                    <h3 class="font-bold text-sm text-slate-800 mb-4 flex items-center gap-2 border-b pb-2"><span>🏢</span> Pengurusan Cawangan & Penjenamaan</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-4">
                             <div class="bg-slate-50 p-4 rounded-lg border">
-                                <label class="text-xs font-bold text-slate-700 block mb-2">Cipta Cawangan / Sekolah Baharu:</label>
+                                <label class="text-xs font-bold text-slate-700 block mb-2">Cipta Sekolah Baharu:</label>
                                 <div class="flex gap-2">
-                                    <input type="text" id="inputProfilBaru" placeholder="Nama Sekolah (Cth: SK Binuang)" class="flex-1 text-xs border rounded-lg px-3 py-2 bg-white admin-only shadow-inner focus:ring-2 focus:ring-indigo-300">
+                                    <input type="text" id="inputProfilBaru" placeholder="Nama Sekolah" class="flex-1 text-xs border rounded-lg px-3 py-2 bg-white admin-only shadow-inner focus:ring-2 focus:ring-indigo-300">
                                     <button onclick="window.tambahProfilBaru()" class="bg-indigo-600 hover:bg-indigo-700 transition text-white font-bold text-xs px-4 py-2 rounded-lg admin-only shadow">Bina Profil</button>
                                 </div>
-                                <p class="text-[9px] text-slate-500 mt-2">Profil baharu akan mewujudkan pangkalan data kosong yang bersih khusus untuk sekolah tersebut.</p>
                             </div>
                             <div class="border-t pt-4">
                                 <label class="text-xs font-bold text-slate-700 block mb-1">Nama Sistem Semasa:</label>
                                 <input type="text" id="tetapan_nama_sekolah" class="w-full text-xs border rounded-lg px-3 py-2 bg-slate-50 admin-only">
                             </div>
                         </div>
-                        <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                            <h4 class="font-bold text-xs text-amber-800 mb-2">⚠️ Zon Data Kritikal</h4>
-                            <p class="text-[10px] text-amber-700 mb-4 leading-relaxed">Pastikan anda memilih sekolah yang betul dari menu atas sebelum membuat operasi pemadaman. Tindakan memadam atau mengubah nama tidak boleh diundur (undo).</p>
+                        <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-xs text-amber-800 mb-2">⚠️ Peringatan Data</h4>
+                                <p class="text-[10px] text-amber-700 mb-4 leading-relaxed">Tindakan memadam atau mengubah nama sekolah memberi kesan terus kepada Pangkalan Data Awan.</p>
+                            </div>
                             <button onclick="window.simpanProfilSekolah()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg admin-only shadow transition">💾 Simpan Perubahan Nama</button>
                         </div>
                     </div>
@@ -362,19 +354,14 @@
             <div id="modalMessage" class="text-xs text-slate-600 mb-6 max-h-[60vh] overflow-y-auto leading-relaxed"></div>
             <div class="flex justify-end gap-2">
                 <button id="modalBtnCancel" class="hidden px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Batal</button>
-                <button id="modalBtnOk" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition shadow-sm">Faham & Teruskan</button>
+                <button id="modalBtnOk" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition shadow-sm">OK</button>
             </div>
         </div>
     </div>
 
-    <!-- MAIN JAVASCRIPT LOGIC -->
+    <!-- MAIN JAVASCRIPT -->
     <script>
-        window.allProfiles = {};
-        window.currentProfileId = 'default';
-        window.appState = {}; 
-        window.tempAgihan = {};
-        window.currentUser = null;
-        
+        window.allProfiles = {}; window.currentProfileId = 'default'; window.appState = {}; window.currentUser = null;
         const MASTER_EMAIL = 'sekolah-7608@moe-dl.edu.my';
 
         function createDefaultProfile(name) {
@@ -383,25 +370,18 @@
                 admins: [MASTER_EMAIL],
                 guru: [], kelas: [], subjek: [], agihan: [], jadual: { status: null, dataKelas: null, dataGuru: null },
                 kekangan: { subjek: {}, sekatanMasa: [], serentak: [], waktuTetap: [], global: { maxHarian: 7, maxTurut: 4 } },
-                masaSekolah: { 
-                    mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20,
-                    hari: { Isnin:{slot:10, rehat:5}, Selasa:{slot:10, rehat:5}, Rabu:{slot:10, rehat:5}, Khamis:{slot:10, rehat:5}, Jumaat:{slot:6, rehat:3} }
-                }
+                masaSekolah: { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20, hari: { Isnin:{slot:10, rehat:5}, Selasa:{slot:10, rehat:5}, Rabu:{slot:10, rehat:5}, Khamis:{slot:10, rehat:5}, Jumaat:{slot:6, rehat:3} } }
             };
         }
 
         window.onload = function() {
-            let savedProfiles = localStorage.getItem('skb_profiles_v5');
-            let savedCurrent = localStorage.getItem('skb_current_v5');
-
-            if (savedProfiles) {
-                try { window.allProfiles = JSON.parse(savedProfiles); } catch(e) { window.allProfiles = { 'p1': createDefaultProfile('SK Bikang') }; }
-            } else { window.allProfiles = { 'p1': createDefaultProfile('SK Bikang') }; }
+            let savedProfiles = localStorage.getItem('skb_profiles_v6'); let savedCurrent = localStorage.getItem('skb_current_v6');
+            if (savedProfiles) { try { window.allProfiles = JSON.parse(savedProfiles); } catch(e) { window.allProfiles = { 'p1': createDefaultProfile('SK Bikang') }; } } 
+            else { window.allProfiles = { 'p1': createDefaultProfile('SK Bikang') }; }
 
             window.currentProfileId = (savedCurrent && window.allProfiles[savedCurrent]) ? savedCurrent : Object.keys(window.allProfiles)[0];
             window.appState = window.allProfiles[window.currentProfileId];
             
-            // Auto-heal missing objects for backward compatibility
             if(!window.appState.kekangan) window.appState.kekangan = {};
             if(!window.appState.kekangan.subjek) window.appState.kekangan.subjek = {};
             if(!window.appState.kekangan.sekatanMasa) window.appState.kekangan.sekatanMasa = [];
@@ -413,32 +393,24 @@
         };
 
         window.simpanDataLokalSahaja = function() {
-            localStorage.setItem('skb_profiles_v5', JSON.stringify(window.allProfiles));
-            localStorage.setItem('skb_current_v5', window.currentProfileId);
+            localStorage.setItem('skb_profiles_v6', JSON.stringify(window.allProfiles)); localStorage.setItem('skb_current_v6', window.currentProfileId);
         };
 
         window.simpanData = function(showMsg = true) {
-            window.allProfiles[window.currentProfileId] = window.appState;
-            window.simpanDataLokalSahaja();
-            window.kemasKiniUI();
-
+            window.allProfiles[window.currentProfileId] = window.appState; window.simpanDataLokalSahaja(); window.kemasKiniUI();
             if (window.currentUser && window.firebaseDB && window.firebaseSet && window.firebaseRef) {
                 window.firebaseSet(window.firebaseRef(window.firebaseDB, 'jadual_data_v1'), window.allProfiles)
-                .then(() => { if(showMsg) window.showToast("Data diselamatkan ke Awan (Cloud)", "success"); })
+                .then(() => { if(showMsg) window.showToast("Data diselamatkan ke Awan!", "success"); })
                 .catch((e) => { console.error(e); window.customDialog("Ralat Menyimpan Firebase", e.message, false); });
-            } else {
-                if(showMsg) window.showToast("Disimpan (Mod Luar Talian)", "info");
-            }
+            } else { if(showMsg) window.showToast("Disimpan Lokal Sahaja", "info"); }
         };
 
         window.showToast = function(msg, type='success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
+            const container = document.getElementById('toastContainer'); const toast = document.createElement('div');
             const bg = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
             toast.className = `${bg} text-white px-5 py-3 rounded-xl shadow-2xl border border-white/20 flex items-center gap-3 text-xs font-bold transform transition-all duration-300 translate-y-10 opacity-0 z-[9999]`;
             toast.innerHTML = `<span class="text-base">${type === 'success' ? '✅' : 'ℹ️'}</span> <span>${msg}</span>`;
-            container.appendChild(toast); 
-            setTimeout(() => { toast.classList.remove('translate-y-10', 'opacity-0'); }, 10);
+            container.appendChild(toast); setTimeout(() => toast.classList.remove('translate-y-10', 'opacity-0'), 10);
             setTimeout(() => { toast.classList.add('translate-y-10', 'opacity-0'); setTimeout(()=>toast.remove(), 300); }, 3000);
         };
 
@@ -461,557 +433,275 @@
             if(btn) { btn.classList.add('border-indigo-600', 'text-indigo-600'); btn.classList.remove('border-transparent', 'text-slate-500'); }
         };
 
+        // --- PROFIL ---
         window.renderProfileSwitcher = function() {
             let sel = document.getElementById('headerProfileSelect'); if(!sel) return;
-            let html = '';
-            for(let key in window.allProfiles) {
-                let nama = window.allProfiles[key].sekolah ? window.allProfiles[key].sekolah.nama : 'Sekolah';
-                html += `<option value="${key}">${nama}</option>`;
-            }
-            sel.innerHTML = html; sel.value = window.currentProfileId;
-            if(window.appState.sekolah) {
-                document.getElementById('headerSchoolName').innerText = window.appState.sekolah.nama || "Sistem Jadual Pintar AI";
-                if(document.getElementById('tetapan_nama_sekolah')) document.getElementById('tetapan_nama_sekolah').value = window.appState.sekolah.nama || "";
-            }
+            sel.innerHTML = Object.keys(window.allProfiles).map(key => `<option value="${key}">${window.allProfiles[key].sekolah?.nama || 'Sekolah'}</option>`).join('');
+            sel.value = window.currentProfileId;
+            if(window.appState.sekolah) { document.getElementById('headerSchoolName').innerText = window.appState.sekolah.nama || "Sistem Jadual"; if(document.getElementById('tetapan_nama_sekolah')) document.getElementById('tetapan_nama_sekolah').value = window.appState.sekolah.nama || ""; }
         };
+        window.tukarProfil = function(profilId) { if(window.allProfiles[profilId]) { window.currentProfileId = profilId; window.appState = window.allProfiles[profilId]; window.simpanDataLokalSahaja(); window.renderProfileSwitcher(); window.kemasKiniUI(); window.renderJadualKelas(); } };
+        window.tambahProfilBaru = function() { let nama = document.getElementById('inputProfilBaru').value.trim(); if(!nama) return; let newId = 'p_' + Date.now(); window.allProfiles[newId] = createDefaultProfile(nama); window.currentProfileId = newId; window.appState = window.allProfiles[newId]; document.getElementById('inputProfilBaru').value = ""; window.simpanData(true); window.renderProfileSwitcher(); };
+        window.simpanProfilSekolah = function() { let nama = document.getElementById('tetapan_nama_sekolah').value.trim(); if(!nama) return; if(!window.appState.sekolah) window.appState.sekolah = {}; window.appState.sekolah.nama = nama; window.simpanData(true); window.renderProfileSwitcher(); };
 
-        window.tukarProfil = function(profilId) {
-            if(window.allProfiles[profilId]) {
-                window.currentProfileId = profilId; window.appState = window.allProfiles[profilId];
-                window.simpanDataLokalSahaja(); window.renderProfileSwitcher(); window.kemasKiniUI();
-                window.showToast("Profil ditukar kepada " + window.appState.sekolah.nama, "info");
-                window.renderJadualKelas(); // reset view
-            }
-        };
-
-        window.tambahProfilBaru = function() {
-            let nama = document.getElementById('inputProfilBaru').value.trim();
-            if(!nama) return window.showToast("Sila masukkan nama sekolah", "error");
-            let newId = 'p_' + Date.now();
-            window.allProfiles[newId] = createDefaultProfile(nama);
-            window.currentProfileId = newId; window.appState = window.allProfiles[newId];
-            document.getElementById('inputProfilBaru').value = "";
-            window.simpanData(true); window.renderProfileSwitcher(); window.showToast("Profil Cawangan baru dicipta!", "success");
-        };
-
-        window.simpanProfilSekolah = function() {
-            let nama = document.getElementById('tetapan_nama_sekolah').value.trim();
-            if(!nama) return window.showToast("Nama sekolah tidak boleh kosong", "error");
-            if(!window.appState.sekolah) window.appState.sekolah = {};
-            window.appState.sekolah.nama = nama;
-            window.simpanData(true); window.renderProfileSwitcher(); window.showToast("Penjenamaan sekolah berjaya disimpan!", "success");
-        };
-
-        // --- DATA INDUK LOGIC ---
+        // --- DATA INDUK ---
         window.tambahData = function(jenis) {
-            if(jenis === 'guru') {
-                let n = document.getElementById('inputGuru').value.trim(); let k = document.getElementById('inputKodGuru').value.trim().toUpperCase();
-                if(!n || !k) return window.showToast("Isi nama dan kod.", "error");
-                if(!window.appState.guru) window.appState.guru=[]; window.appState.guru.push({id: 'g_'+Date.now(), nama: n, kod: k});
-                document.getElementById('inputGuru').value = ""; document.getElementById('inputKodGuru').value = ""; window.simpanData(true);
-            }
-            else if(jenis === 'kelas') {
-                let text = document.getElementById('inputKelas').value.trim(); if(!text) return;
-                if(!window.appState.kelas) window.appState.kelas=[]; if(!window.appState.kelas.includes(text)) window.appState.kelas.push(text);
-                document.getElementById('inputKelas').value = ""; window.simpanData(true);
-            }
-            else if(jenis === 'subjek') {
-                let s = document.getElementById('inputSubjek').value.trim(); if(!s) return;
-                if(!window.appState.subjek) window.appState.subjek=[]; if(!window.appState.subjek.includes(s)) window.appState.subjek.push(s);
-                document.getElementById('inputSubjek').value = ""; window.simpanData(true);
-            }
+            if(jenis === 'guru') { let n = document.getElementById('inputGuru').value.trim(); let k = document.getElementById('inputKodGuru').value.trim().toUpperCase(); if(!n || !k) return; if(!window.appState.guru) window.appState.guru=[]; window.appState.guru.push({id: 'g_'+Date.now(), nama: n, kod: k}); document.getElementById('inputGuru').value = ""; document.getElementById('inputKodGuru').value = ""; window.simpanData(true); }
+            else if(jenis === 'kelas') { let text = document.getElementById('inputKelas').value.trim(); if(!text) return; if(!window.appState.kelas) window.appState.kelas=[]; if(!window.appState.kelas.includes(text)) window.appState.kelas.push(text); document.getElementById('inputKelas').value = ""; window.simpanData(true); }
+            else if(jenis === 'subjek') { let s = document.getElementById('inputSubjek').value.trim(); if(!s) return; if(!window.appState.subjek) window.appState.subjek=[]; if(!window.appState.subjek.includes(s)) window.appState.subjek.push(s); document.getElementById('inputSubjek').value = ""; window.simpanData(true); }
         };
-
-        window.janaSubjekSK = function() {
-            const subs = ["Bahasa Melayu", "Bahasa Inggeris", "Matematik", "Sains", "Pendidikan Islam", "Pendidikan Moral", "Sejarah", "Pendidikan Jasmani", "Pendidikan Kesihatan", "Reka Bentuk dan Teknologi", "Pendidikan Seni Visual", "Pendidikan Muzik"];
-            let added = 0; if(!window.appState.subjek) window.appState.subjek = [];
-            let ex = window.appState.subjek.map(s => s.toLowerCase().trim());
-            subs.forEach(s => { if(!ex.includes(s.toLowerCase())) { window.appState.subjek.push(s); added++; } });
-            if(added > 0) { window.simpanData(true); window.showToast(`${added} subjek dimuatkan!`, "success"); }
-            else { window.showToast("Subjek teras sudah wujud.", "info"); }
-        };
-
-        window.bukaModalPukalGuru = function() {
-            let html = `<div class="space-y-4"><div class="bg-indigo-50 p-3 rounded-lg text-xs border text-indigo-800">Muat naik fail <b>Excel (.xlsx) atau .CSV</b>. <br><br><b>Format Wajib:</b><br>Lajur A: Nama Penuh Guru<br>Lajur B: Kod Ringkas (Max 5 Huruf)</div>
-                <input type="file" accept=".xlsx, .csv" onchange="if(this.files.length > 0) window.prosesFailPukalGuru(this.files[0])" class="w-full text-xs p-3 bg-slate-50 border rounded-lg cursor-pointer"></div>`;
-            window.customDialog("Muat Naik Pukal Excel", html, false);
-        };
-
-        window.prosesFailPukalGuru = function(file) {
-            window.showToast("Membaca fail Excel...", "info");
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result); const wb = XLSX.read(data, {type: 'array'});
-                    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1});
-                    let count = 0; if(!window.appState.guru) window.appState.guru = [];
-                    // Start loop at 1 to skip header row assuming A1="Nama", B1="Kod"
-                    let startIdx = (rows[0] && rows[0][0] && rows[0][0].toString().toLowerCase().includes('nama')) ? 1 : 0;
-                    
-                    for(let i = startIdx; i < rows.length; i++) {
-                        let n = rows[i][0]; let k = rows[i][1];
-                        if(n && k) { window.appState.guru.push({ id: 'g_' + Date.now() + '_' + i, nama: String(n).trim(), kod: String(k).trim().substring(0,5).toUpperCase() }); count++; }
-                    }
-                    if(count > 0) { window.simpanData(true); window.showToast(`${count} rekod guru berjaya ditambah!`, "success"); document.getElementById('customModal').classList.add('hidden'); } 
-                    else { window.customDialog("Ralat Format", "Tiada data ditemui. Pastikan Lajur A mengandungi Nama dan Lajur B mengandungi Kod.", false); }
-                } catch (err) { window.customDialog("Ralat Fail", "Gagal memproses fail Excel. Sila pastikan format betul. Detail: " + err.message, false); }
-            };
-            reader.readAsArrayBuffer(file);
-        };
-
-        window.paparSenarai = function(jenis) {
-            let dat = window.appState[jenis]||[]; if(dat.length===0) return window.customDialog("Makluman","Tiada data direkodkan setakat ini.");
-            let title = jenis === 'guru' ? '👨‍🏫 Guru' : (jenis === 'kelas' ? '🏫 Kelas' : '📚 Subjek');
-            let h = `<div class="max-h-60 overflow-y-auto pr-2 custom-scroll"><ul class="space-y-1.5">`;
-            dat.forEach((x,i) => {
-                let t = typeof x==='object' ? `<b>${x.nama}</b> <span class="text-[9px] bg-slate-200 px-1.5 rounded text-slate-600">${x.kod}</span>` : x;
-                h += `<li class="flex justify-between items-center bg-white border p-2 text-xs rounded-lg shadow-sm hover:border-indigo-200 transition"><span>${t}</span>
-                      <button onclick="window.padamData('${jenis}',${i})" class="text-red-500 font-bold px-2 py-1 bg-red-50 hover:bg-red-500 hover:text-white border border-red-100 rounded transition admin-only">Padam</button></li>`;
-            });
-            window.customDialog(`Senarai ${title}`, h + `</ul></div>`);
-        };
-        
+        window.janaSubjekSK = function() { const subs = ["Bahasa Melayu", "Bahasa Inggeris", "Matematik", "Sains", "Pendidikan Islam", "Pendidikan Moral", "Sejarah", "Pendidikan Jasmani", "Pendidikan Kesihatan", "Reka Bentuk dan Teknologi", "Pendidikan Seni Visual", "Pendidikan Muzik"]; let added = 0; if(!window.appState.subjek) window.appState.subjek = []; let ex = window.appState.subjek.map(s => s.toLowerCase().trim()); subs.forEach(s => { if(!ex.includes(s.toLowerCase())) { window.appState.subjek.push(s); added++; } }); if(added > 0) window.simpanData(true); window.showToast(`${added} subjek SK dimuatkan!`); };
+        window.bukaModalPukalGuru = function() { window.customDialog("Muat Naik Pukal Excel", `<div class="space-y-4"><div class="bg-indigo-50 p-3 rounded-lg text-xs border">Lajur A: Nama, Lajur B: Kod</div><input type="file" accept=".xlsx, .csv" onchange="if(this.files.length > 0) window.prosesFailPukalGuru(this.files[0])" class="w-full text-xs p-3 bg-slate-50 border rounded-lg cursor-pointer"></div>`, false); };
+        window.prosesFailPukalGuru = function(file) { const reader = new FileReader(); reader.onload = function(e) { try { const data = new Uint8Array(e.target.result); const wb = XLSX.read(data, {type: 'array'}); const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); let count = 0; if(!window.appState.guru) window.appState.guru = []; let startIdx = (rows[0] && rows[0][0] && rows[0][0].toString().toLowerCase().includes('nama')) ? 1 : 0; for(let i = startIdx; i < rows.length; i++) { let n = rows[i][0]; let k = rows[i][1]; if(n && k) { window.appState.guru.push({ id: 'g_' + Date.now() + '_' + i, nama: String(n).trim(), kod: String(k).trim().substring(0,5).toUpperCase() }); count++; } } if(count > 0) { window.simpanData(true); document.getElementById('customModal').classList.add('hidden'); } } catch (err) {} }; reader.readAsArrayBuffer(file); };
+        window.paparSenarai = function(jenis) { let dat = window.appState[jenis]||[]; if(dat.length===0) return window.customDialog("Makluman","Tiada data."); let h = `<div class="max-h-60 overflow-y-auto pr-2 custom-scroll"><ul class="space-y-1.5">`; dat.forEach((x,i) => { let t = typeof x==='object' ? `<b>${x.nama}</b> <span class="text-[9px] bg-slate-200 px-1.5 rounded">${x.kod}</span>` : x; h += `<li class="flex justify-between items-center bg-white border p-2 text-xs rounded-lg shadow-sm"><span>${t}</span><button onclick="window.padamData('${jenis}',${i})" class="text-red-500 font-bold px-2 py-1 bg-red-50 hover:bg-red-500 hover:text-white border border-red-100 rounded transition admin-only">Padam</button></li>`; }); window.customDialog(`Senarai`, h + `</ul></div>`); };
         window.padamData = function(j, i) { window.appState[j].splice(i,1); window.simpanData(true); window.paparSenarai(j); };
+        window.susunKelas = function(arah) { if(!window.appState.kelas || window.appState.kelas.length === 0) return; window.appState.kelas.sort((a,b) => { return arah === 'asc' ? a.localeCompare(b, 'ms', {numeric: true}) : b.localeCompare(a, 'ms', {numeric: true}); }); window.simpanData(true); };
 
-        window.susunKelas = function(arah) {
-            if(!window.appState.kelas || window.appState.kelas.length === 0) return window.showToast("Tiada rekod untuk disusun.", "error");
-            window.appState.kelas.sort((a,b) => { return arah === 'asc' ? a.localeCompare(b, 'ms', {numeric: true}) : b.localeCompare(a, 'ms', {numeric: true}); });
-            window.simpanData(true); window.showToast(`Berjaya disusun ${arah === 'asc' ? 'A-Z' : 'Z-A'}.`, "success");
-        };
+        // --- NEW LESSON GRID (AGIHAN KELAS) ---
+        window.renderLessonGrid = function() {
+            let kls = document.getElementById('gridKelasSelect').value;
+            let container = document.getElementById('lessonGridContainer');
+            if(!kls) { container.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs font-medium">Sila pilih kelas di atas untuk memaparkan Grid Subjek.</div>'; return; }
+            if(!window.appState.subjek || window.appState.subjek.length === 0) { container.innerHTML = `<p class="p-8 text-center text-red-500 text-xs font-bold">⚠️️ Sila tambah Mata Pelajaran di Tab 1 (Data Induk) terlebih dahulu.</p>`; return; }
 
-        // --- AGIHAN BEBAN LOGIC ---
-        window.renderAgihanSubjek = function() {
-            const gId = document.getElementById('agihanGuru').value;
-            const container = document.getElementById('agihanSubjekContainer');
-            if(!gId) { container.innerHTML = '<span class="text-slate-400 italic text-xs">Pilih guru di atas dahulu.</span>'; return; }
-            
-            let exAgihan = (window.appState.agihan || []).find(a => a.guruId === gId);
-            window.tempAgihan = {};
-            if (exAgihan && exAgihan.tugas) {
-                exAgihan.tugas.forEach(t => {
-                    if(!window.tempAgihan[t.subjek]) window.tempAgihan[t.subjek] = [];
-                    window.tempAgihan[t.subjek].push({ kelas: t.kelas, waktu: t.waktu });
+            // Extract existing assignment specifically for this class
+            let existingData = {}; let totalWaktuKls = 0;
+            (window.appState.agihan||[]).forEach(ag => {
+                (ag.tugas||[]).forEach(t => {
+                    if(t.kelas === kls) { existingData[t.subjek] = { guruId: ag.guruId, waktu: t.waktu }; totalWaktuKls += parseInt(t.waktu); }
                 });
-            }
-            if(!window.appState.subjek || window.appState.subjek.length === 0) { container.innerHTML = `<p class="text-xs text-red-500 font-bold">⚠️ Sila tambah subjek di Tab 1 (Data Induk) terlebih dahulu.</p>`; return; }
-            
-            let optsKelas = '<option value="">-- Pilih --</option>' + (window.appState.kelas || []).map(k => `<option value="${k}">${k}</option>`).join('');
-            let html = '';
-            window.appState.subjek.forEach((sub, idx) => {
-                let sID = "sub_" + idx; let isActive = window.tempAgihan[sub] && window.tempAgihan[sub].length > 0;
-                let chk = isActive ? 'checked' : ''; let hClass = isActive ? '' : 'hidden'; let bgClass = isActive ? 'bg-indigo-50 border-indigo-300' : 'bg-white border-slate-200';
-                html += `
-                <div id="card_${sID}" class="border rounded-lg mb-2 overflow-hidden shadow-sm transition-all ${bgClass}">
-                    <div class="flex items-center gap-2 p-3 cursor-pointer hover:bg-slate-50 border-b border-transparent">
-                        <input type="checkbox" id="chk_${sID}" value="${sub}" ${chk} onchange="window.toggleSubjekPane('${sub}', '${sID}')" class="subjek-checkbox-item rounded text-indigo-600 w-4 h-4 cursor-pointer admin-only">
-                        <label for="chk_${sID}" class="flex-1 text-[11px] font-bold text-slate-800 cursor-pointer select-none">${sub}</label>
-                    </div>
-                    <div id="pane_${sID}" class="${hClass} p-3 bg-slate-50 border-t border-indigo-100">
-                        <div class="flex gap-2 items-end mb-2">
-                            <div class="flex-1"><label class="text-[9px] font-bold text-slate-500 block mb-1">Pilih Kelas</label><select id="sel_kls_${sID}" class="w-full text-[10px] border rounded px-2 py-1.5 bg-white admin-only shadow-sm">${optsKelas}</select></div>
-                            <div class="w-16"><label class="text-[9px] font-bold text-slate-500 block mb-1">Waktu</label><input type="number" id="inp_wkt_${sID}" value="1" min="1" class="w-full text-[10px] border rounded px-2 py-1.5 bg-white admin-only text-center shadow-sm"></div>
-                            <button onclick="window.tambahTugasTemp('${sub}', '${sID}')" class="bg-indigo-600 text-white font-bold text-[10px] px-3 py-1.5 rounded hover:bg-indigo-700 transition admin-only h-[28px] shadow-sm">Tambah</button>
-                        </div>
-                        <ul id="list_${sID}" class="space-y-1"></ul>
-                    </div>
-                </div>`;
             });
+
+            let gOptsBase = '<option value="">-- Tiada Guru --</option>';
+
+            let trHtml = '';
+            window.appState.subjek.forEach((sub, idx) => {
+                let current = existingData[sub] || {guruId: '', waktu: 0};
+                let rowBg = current.waktu > 0 ? 'bg-indigo-50/50' : 'bg-white hover:bg-slate-50';
+                
+                // Build specific dropdown selecting the correct guru
+                let gOpts = gOptsBase + (window.appState.guru||[]).map(g => `<option value="${g.id}" ${g.id === current.guruId ? 'selected' : ''}>${g.nama}</option>`).join('');
+
+                trHtml += `
+                <tr class="border-b transition ${rowBg}">
+                    <td class="p-2.5 text-[11px] font-bold text-slate-700">${sub}</td>
+                    <td class="p-2"><select id="lg_guru_${idx}" class="w-full border rounded px-2 py-1.5 text-[10px] bg-white shadow-sm focus:ring-1 focus:ring-indigo-300 admin-only" data-subjek="${sub}">${gOpts}</select></td>
+                    <td class="p-2"><input type="number" id="lg_wkt_${idx}" value="${current.waktu}" min="0" max="20" class="w-16 text-center border rounded px-2 py-1.5 text-[11px] font-bold text-indigo-700 bg-white shadow-sm focus:ring-1 focus:ring-indigo-300 admin-only lg-wkt-input"></td>
+                </tr>`;
+            });
+
+            let html = `
+            <table class="w-full text-left bg-white min-w-[500px]">
+                <thead class="bg-indigo-600 text-white">
+                    <tr>
+                        <th class="p-3 text-[10px] uppercase font-bold tracking-wider w-1/3">Mata Pelajaran</th>
+                        <th class="p-3 text-[10px] uppercase font-bold tracking-wider w-1/2">Pilih Guru Pembimbing</th>
+                        <th class="p-3 text-[10px] uppercase font-bold tracking-wider text-center">Waktu Seminggu</th>
+                    </tr>
+                </thead>
+                <tbody>${trHtml}</tbody>
+            </table>
+            <div class="bg-slate-100 p-4 border-t flex justify-between items-center">
+                <div class="text-xs font-bold text-slate-700">Jumlah Waktu Kelas Ini: <span class="bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded shadow-inner" id="lg_total_waktu">${totalWaktuKls}</span></div>
+                <button onclick="window.simpanLessonGrid()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg admin-only shadow transition flex items-center gap-2">💾 Simpan Jadual ${kls}</button>
+            </div>`;
+            
             container.innerHTML = html;
-            window.appState.subjek.forEach((sub, idx) => { if(window.tempAgihan[sub]) window.renderTugasList(sub, "sub_" + idx); });
-        };
-
-        window.toggleSubjekPane = function(sub, sID) {
-            let isChk = document.getElementById(`chk_${sID}`).checked;
-            let pane = document.getElementById(`pane_${sID}`); let card = document.getElementById(`card_${sID}`);
-            if (isChk) { pane.classList.remove('hidden'); card.classList.add('bg-indigo-50', 'border-indigo-300'); card.classList.remove('bg-white', 'border-slate-200'); if(!window.tempAgihan[sub]) window.tempAgihan[sub] = []; window.renderTugasList(sub, sID); } 
-            else { pane.classList.add('hidden'); card.classList.remove('bg-indigo-50', 'border-indigo-300'); card.classList.add('bg-white', 'border-slate-200'); }
-        };
-
-        window.tambahTugasTemp = function(sub, sID) {
-            let kls = document.getElementById(`sel_kls_${sID}`).value; let wkt = parseInt(document.getElementById(`inp_wkt_${sID}`).value);
-            if(!kls || !wkt) return window.showToast("Pilih kelas dan jumlah waktu", "error");
-            if(!window.tempAgihan[sub]) window.tempAgihan[sub] = [];
-            let wujud = window.tempAgihan[sub].find(x => x.kelas === kls);
-            if(wujud) wujud.waktu = wkt; else window.tempAgihan[sub].push({kelas: kls, waktu: wkt});
-            window.renderTugasList(sub, sID);
-        };
-        
-        window.padamTugasTemp = function(sub, sID, idx) { window.tempAgihan[sub].splice(idx, 1); window.renderTugasList(sub, sID); };
-        window.kemaskiniTugasTemp = function(sub, sID, idx, newWkt) { window.tempAgihan[sub][idx].waktu = parseInt(newWkt); };
-
-        window.renderTugasList = function(sub, sID) {
-            let el = document.getElementById(`list_${sID}`); let data = window.tempAgihan[sub] || [];
-            if(data.length === 0) { el.innerHTML = `<li class="text-[9px] text-slate-400 italic py-1">Tiada kelas diset.</li>`; } 
-            else {
-                el.innerHTML = data.map((item, idx) => `
-                    <li class="flex justify-between items-center bg-white border p-1.5 rounded text-[10px] shadow-sm">
-                        <span class="flex items-center gap-2 text-slate-700"><span>Kelas <b>${item.kelas}</b> :</span> <input type="number" value="${item.waktu}" min="1" onchange="window.kemaskiniTugasTemp('${sub}', '${sID}', ${idx}, this.value)" class="w-12 text-center border rounded font-bold text-indigo-700 bg-indigo-50 admin-only shadow-inner"> wkt</span>
-                        <button onclick="window.padamTugasTemp('${sub}', '${sID}', ${idx})" class="text-red-500 hover:bg-red-100 font-bold px-2 py-0.5 rounded transition admin-only">X</button>
-                    </li>`).join('');
-            }
-        };
-
-        window.tambahAgihanPukal = function() {
-            let gId = document.getElementById('agihanGuru').value;
-            if(!gId) return window.showToast("Pilih guru di dropdown pertama.", "error");
-            let tugasAkhir = [];
-            document.querySelectorAll('.subjek-checkbox-item:checked').forEach(chk => { let sub = chk.value; (window.tempAgihan[sub]||[]).forEach(k => tugasAkhir.push({subjek: sub, kelas: k.kelas, waktu: k.waktu})); });
             
-            let guru = window.appState.guru.find(g => g.id === gId);
-            if(!window.appState.agihan) window.appState.agihan = [];
-            let exIdx = window.appState.agihan.findIndex(a => a.guruId === gId);
-            
-            if(tugasAkhir.length === 0) {
-                // If saved with no tasks, we delete the assignment
-                if(exIdx >= 0) window.appState.agihan.splice(exIdx, 1);
-                window.simpanData(true); window.showToast("Agihan dikosongkan.", "info");
-            } else {
-                if(exIdx >= 0) window.appState.agihan[exIdx] = { guruId: gId, namaGuru: guru.nama, tugas: tugasAkhir };
-                else window.appState.agihan.push({ guruId: gId, namaGuru: guru.nama, tugas: tugasAkhir });
-                window.simpanData(true); window.showToast("Agihan Guru Berjaya Direkod!", "success"); 
-            }
-            window.paparSenaraiAgihan();
+            // Add listeners to auto-calculate total
+            document.querySelectorAll('.lg-wkt-input').forEach(inp => {
+                inp.addEventListener('input', () => {
+                    let sum = 0; document.querySelectorAll('.lg-wkt-input').forEach(i => sum += (parseInt(i.value)||0));
+                    document.getElementById('lg_total_waktu').innerText = sum;
+                });
+            });
+        };
+
+        window.simpanLessonGrid = function() {
+            let kls = document.getElementById('gridKelasSelect').value; if(!kls) return;
+
+            // 1. Clear existing tasks for this class from ALL teachers
+            if(window.appState.agihan) {
+                window.appState.agihan.forEach(ag => { ag.tugas = ag.tugas.filter(t => t.kelas !== kls); });
+                // Clean up any teachers with 0 tasks
+                window.appState.agihan = window.appState.agihan.filter(ag => ag.tugas.length > 0);
+            } else { window.appState.agihan = []; }
+
+            // 2. Read grid and assign to teachers
+            let totalAdded = 0;
+            window.appState.subjek.forEach((sub, idx) => {
+                let gid = document.getElementById(`lg_guru_${idx}`).value;
+                let wkt = parseInt(document.getElementById(`lg_wkt_${idx}`).value) || 0;
+                
+                if(gid && wkt > 0) {
+                    let gObj = window.appState.guru.find(g => g.id === gid);
+                    if(gObj) {
+                        let ag = window.appState.agihan.find(a => a.guruId === gid);
+                        if(!ag) { ag = { guruId: gid, namaGuru: gObj.nama, tugas: [] }; window.appState.agihan.push(ag); }
+                        ag.tugas.push({ subjek: sub, kelas: kls, waktu: wkt });
+                        totalAdded++;
+                    }
+                }
+            });
+
+            window.simpanData(true); window.showToast(`Berjaya! ${totalAdded} subjek direkod untuk kelas ${kls}.`, "success"); window.kemasKiniUI();
         };
 
         window.paparSenaraiAgihan = function() {
             let el = document.getElementById('senaraiAgihan'); if(!el) return;
-            if(!window.appState.agihan || window.appState.agihan.length === 0) { el.innerHTML = `<div class="col-span-full text-center py-6 border-2 border-dashed border-slate-200 rounded-xl"><p class="text-xs text-slate-400 font-bold">Belum ada guru yang diagihkan tugas.</p></div>`; return; }
+            if(!window.appState.agihan || window.appState.agihan.length === 0) { el.innerHTML = `<div class="col-span-full text-center py-6 border-2 border-dashed border-slate-200 rounded-xl"><p class="text-xs text-slate-400 font-bold">Belum ada guru yang diberikan tugas.</p></div>`; return; }
             let html = '';
-            window.appState.agihan.forEach(a => {
+            
+            // Sort teachers alphabetically
+            let sortedAgihan = [...window.appState.agihan].sort((a,b) => a.namaGuru.localeCompare(b.namaGuru));
+
+            sortedAgihan.forEach(a => {
                 let sObj = {}; (a.tugas||[]).forEach(t => { if(!sObj[t.subjek]) sObj[t.subjek]=[]; sObj[t.subjek].push(`<b>${t.kelas}</b> <span class="text-indigo-600">(${t.waktu}w)</span>`); });
                 let bHtml = ''; for(let s in sObj) bHtml += `<div class="bg-indigo-50 border border-indigo-100 rounded-lg p-2 mb-1.5"><div class="font-bold text-[10px] text-indigo-900 border-b border-indigo-200 pb-1 mb-1">${s}</div><div class="flex flex-wrap gap-1 text-[9px] text-slate-700">${sObj[s].map(x=>`<span class="bg-white px-1.5 py-0.5 rounded border shadow-sm">${x}</span>`).join('')}</div></div>`;
                 let totalWaktu = (a.tugas||[]).reduce((sum, current) => sum + current.waktu, 0);
                 
-                html += `<div class="bg-white p-4 rounded-xl border relative group shadow-sm hover:shadow transition"><div class="absolute top-2 right-2 flex gap-1"><span class="bg-slate-100 text-slate-600 text-[9px] font-bold px-2 py-1 rounded border">${totalWaktu} Waktu</span><button onclick="window.padamAgihan('${a.guruId}')" class="text-white font-bold text-[9px] px-2 py-1 bg-red-500 hover:bg-red-600 rounded transition hidden group-hover:block admin-only shadow">Padam</button></div><div class="font-bold text-xs text-slate-800 mb-3 border-b pb-2 w-3/4 truncate">👨‍🏫 ${a.namaGuru}</div>${bHtml}</div>`;
+                html += `<div class="bg-white p-4 rounded-xl border relative group shadow-sm hover:shadow transition">
+                    <div class="absolute top-2 right-2 flex gap-1">
+                        <span class="bg-slate-100 text-slate-600 text-[9px] font-bold px-2 py-1 rounded border shadow-inner">${totalWaktu} Waktu</span>
+                    </div>
+                    <div class="font-bold text-xs text-slate-800 mb-3 border-b pb-2 w-3/4 truncate">👨‍🏫 ${a.namaGuru}</div>${bHtml}
+                </div>`;
             });
             el.innerHTML = html;
         };
-        
-        window.padamAgihan = function(gId) {
-            window.customDialog("Padam Agihan", "Anda pasti mahu memadam semua rekod tugas mengajar guru ini?", true, () => {
-                let idx = window.appState.agihan.findIndex(a => a.guruId === gId);
-                if(idx >= 0) { window.appState.agihan.splice(idx, 1); window.simpanData(true); window.paparSenaraiAgihan(); window.showToast("Agihan dipadam.", "success"); }
-            });
-        };
 
+        // --- KEKANGAN ---
+        window.simpanConfigGlobal = function() { let mt = parseInt(document.getElementById('cfg_max_turut').value)||4; let mh = parseInt(document.getElementById('cfg_max_harian').value)||7; if(!window.appState.kekangan) window.appState.kekangan = {}; window.appState.kekangan.global = { maxTurut: mt, maxHarian: mh }; window.simpanData(true); };
+        window.tambahWaktuTetap = function() { let nama = document.getElementById('k_tetap_nama').value.trim(); let hari = document.getElementById('k_tetap_hari').value; let wkt = parseInt(document.getElementById('k_tetap_waktu').value); if(!nama||!hari||!wkt) return; if(!window.appState.kekangan.waktuTetap) window.appState.kekangan.waktuTetap=[]; window.appState.kekangan.waktuTetap.push({nama, hari, waktu:wkt}); document.getElementById('k_tetap_nama').value=""; window.simpanData(true); window.kemasKiniUI(); };
+        window.padamWaktuTetap = function(idx) { window.appState.kekangan.waktuTetap.splice(idx,1); window.simpanData(true); window.kemasKiniUI(); };
+        window.tambahSekatanGuru = function() { let gid = document.getElementById('k_sekatan_guru').value; let h = document.getElementById('k_sekatan_hari').value; let w = document.getElementById('k_sekatan_waktu').value; if(!gid||!h) return; if(!window.appState.kekangan.sekatanMasa) window.appState.kekangan.sekatanMasa=[]; window.appState.kekangan.sekatanMasa.push({guruId:gid, hari:h, waktu: w?parseInt(w):'SEMUA'}); window.simpanData(true); window.kemasKiniUI(); };
+        window.padamSekatanGuru = function(idx) { window.appState.kekangan.sekatanMasa.splice(idx,1); window.simpanData(true); window.kemasKiniUI(); };
+        window.tambahSubjekSerentak = function() { let s1 = document.getElementById('k_serentak_1').value; let s2 = document.getElementById('k_serentak_2').value; if(!s1||!s2||s1===s2) return; if(!window.appState.kekangan.serentak) window.appState.kekangan.serentak=[]; window.appState.kekangan.serentak.push({s1, s2}); window.simpanData(true); window.kemasKiniUI(); };
+        window.padamSubjekSerentak = function(idx) { window.appState.kekangan.serentak.splice(idx,1); window.simpanData(true); window.kemasKiniUI(); };
+        window.tambahKekanganSubjek = function() { let subjek = document.getElementById('k_s_subjek').value; if(!subjek) return; let akhir = document.getElementById('k_s_akhir').checked; let double = document.getElementById('k_s_double').checked; let robin = document.getElementById('k_s_robin').checked; let berat = document.getElementById('k_s_berat').checked; if(!window.appState.kekangan.subjek) window.appState.kekangan.subjek={}; window.appState.kekangan.subjek[subjek] = {akhir, double, robin, berat}; window.simpanData(true); window.kemasKiniUI(); };
+        window.padamKekanganSubjek = function(sub) { if(window.appState.kekangan.subjek[sub]) { delete window.appState.kekangan.subjek[sub]; window.simpanData(true); window.kemasKiniUI(); } };
 
-        // --- KEKANGAN LOGIC (THE 9 CONSTRAINTS) ---
-        
-        window.simpanConfigGlobal = function() {
-            let mt = parseInt(document.getElementById('cfg_max_turut').value) || 4;
-            let mh = parseInt(document.getElementById('cfg_max_harian').value) || 7;
-            if(!window.appState.kekangan) window.appState.kekangan = {};
-            window.appState.kekangan.global = { maxTurut: mt, maxHarian: mh };
-            window.simpanData(true); window.showToast("Parameter Kesejahteraan disimpan.", "success");
-        };
-
-        window.tambahWaktuTetap = function() {
-            let nama = document.getElementById('k_tetap_nama').value.trim();
-            let hari = document.getElementById('k_tetap_hari').value;
-            let wkt = parseInt(document.getElementById('k_tetap_waktu').value);
-            if(!nama || !hari || !wkt) return window.showToast("Lengkapkan borang waktu tetap.", "error");
-            if(!window.appState.kekangan.waktuTetap) window.appState.kekangan.waktuTetap = [];
-            window.appState.kekangan.waktuTetap.push({ nama, hari, waktu: wkt });
-            document.getElementById('k_tetap_nama').value = ""; window.simpanData(true);
-        };
-        window.padamWaktuTetap = function(idx) { window.appState.kekangan.waktuTetap.splice(idx, 1); window.simpanData(true); };
-
-        window.tambahSekatanGuru = function() {
-            let gid = document.getElementById('k_sekatan_guru').value; let h = document.getElementById('k_sekatan_hari').value; let w = document.getElementById('k_sekatan_waktu').value;
-            if(!gid || !h) return window.showToast("Lengkapkan borang sekatan.", "error");
-            if(!window.appState.kekangan.sekatanMasa) window.appState.kekangan.sekatanMasa = [];
-            window.appState.kekangan.sekatanMasa.push({ guruId: gid, hari: h, waktu: w ? parseInt(w) : "SEMUA" }); 
-            window.simpanData(true);
-        };
-        window.padamSekatanGuru = function(idx) { window.appState.kekangan.sekatanMasa.splice(idx, 1); window.simpanData(true); };
-
-        window.tambahSubjekSerentak = function() {
-            let s1 = document.getElementById('k_serentak_1').value; let s2 = document.getElementById('k_serentak_2').value;
-            if(!s1 || !s2 || s1===s2) return window.showToast("Pilih 2 subjek berbeza.", "error");
-            if(!window.appState.kekangan.serentak) window.appState.kekangan.serentak = [];
-            window.appState.kekangan.serentak.push({ s1, s2 }); window.simpanData(true);
-        };
-        window.padamSubjekSerentak = function(idx) { window.appState.kekangan.serentak.splice(idx, 1); window.simpanData(true); };
-
-        window.tambahKekanganSubjek = function() {
-            let subjek = document.getElementById('k_s_subjek').value; 
-            if(!subjek) return window.showToast("Pilih subjek.", "error");
-            let akhir = document.getElementById('k_s_akhir').checked;
-            let double = document.getElementById('k_s_double').checked; 
-            let robin = document.getElementById('k_s_robin').checked;
-            let berat = document.getElementById('k_s_berat').checked;
-            
-            if(!window.appState.kekangan.subjek) window.appState.kekangan.subjek = {};
-            window.appState.kekangan.subjek[subjek] = { akhir, double, robin, berat };
-            window.simpanData(true); 
-        };
-        window.padamKekanganSubjek = function(sub) { if(window.appState.kekangan.subjek[sub]) { delete window.appState.kekangan.subjek[sub]; window.simpanData(true); } };
-
-
-        // --- UPDATE UI BINDINGS ---
-        window.kemasKiniUI = function() {
-            // Counters
-            if(document.getElementById('countGuru')) document.getElementById('countGuru').innerText = (window.appState.guru||[]).length;
-            if(document.getElementById('countKelas')) document.getElementById('countKelas').innerText = (window.appState.kelas||[]).length;
-            if(document.getElementById('countSubjek')) document.getElementById('countSubjek').innerText = (window.appState.subjek||[]).length;
-            
-            // Dropdowns
-            let gOpts = '<option value="">-- Pilih Guru --</option>' + (window.appState.guru||[]).map(g=>`<option value="${g.id}">${g.nama} (${g.kod})</option>`).join('');
-            ['agihanGuru', 'paparGuruSelect', 'k_sekatan_guru'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerHTML = gOpts; });
-
-            let kOpts = '<option value="">-- Pilih Kelas --</option>' + (window.appState.kelas||[]).map(k=>`<option value="${k}">${k}</option>`).join('');
-            if(document.getElementById('paparKelasSelect')) document.getElementById('paparKelasSelect').innerHTML = kOpts;
-            
-            let sOpts = '<option value="">-- Pilih Subjek --</option>' + (window.appState.subjek||[]).map(s=>`<option value="${s}">${s}</option>`).join('');
-            ['k_s_subjek', 'k_serentak_1', 'k_serentak_2'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerHTML = sOpts; });
-            
-            // Render Kekangan UI - Global
-            if(window.appState.kekangan && window.appState.kekangan.global) {
-                if(document.getElementById('cfg_max_turut')) document.getElementById('cfg_max_turut').value = window.appState.kekangan.global.maxTurut || 4;
-                if(document.getElementById('cfg_max_harian')) document.getElementById('cfg_max_harian').value = window.appState.kekangan.global.maxHarian || 7;
-            }
-
-            // Render Waktu Tetap
-            let hTetap = '';
-            (window.appState.kekangan?.waktuTetap || []).forEach((w, idx) => {
-                hTetap += `<div class="bg-white border p-2 rounded flex justify-between items-center shadow-sm"><span class="text-[10px] font-bold text-teal-900">${w.nama} <span class="bg-teal-50 px-1 border text-teal-600 rounded">${w.hari} (Wkt ${w.waktu})</span></span><button onclick="window.padamWaktuTetap(${idx})" class="text-red-500 font-bold px-2 hover:bg-red-50 rounded admin-only">X</button></div>`;
-            });
-            if(document.getElementById('senaraiWaktuTetap')) document.getElementById('senaraiWaktuTetap').innerHTML = hTetap || '<p class="text-[10px] text-slate-400 italic">Tiada acara rasmi sekolah direkod.</p>';
-
-            // Render Sekatan Guru
-            let hSek = '';
-            (window.appState.kekangan?.sekatanMasa || []).forEach((s, idx) => {
-                let guru = (window.appState.guru||[]).find(g => g.id === s.guruId);
-                hSek += `<div class="bg-white border p-2 rounded flex justify-between items-center shadow-sm"><span class="text-[10px] font-bold text-red-900 w-3/4 truncate">${guru?guru.nama:'N/A'} <span class="bg-red-50 px-1 border text-red-600 rounded">${s.hari} ${s.waktu==='SEMUA'?'(Semua)':'(Wkt '+s.waktu+')'}</span></span><button onclick="window.padamSekatanGuru(${idx})" class="text-red-500 font-bold px-2 hover:bg-red-50 rounded admin-only">X</button></div>`;
-            });
-            if(document.getElementById('senaraiSekatanGuru')) document.getElementById('senaraiSekatanGuru').innerHTML = hSek || '<p class="text-[10px] text-slate-400 italic">Tiada sekatan cuti khusus guru.</p>';
-
-            // Render Subjek Serentak
-            let hRen = '';
-            (window.appState.kekangan?.serentak || []).forEach((s, idx) => {
-                hRen += `<div class="bg-white border p-2 rounded flex justify-between items-center shadow-sm"><span class="text-[10px] font-bold text-purple-900">${s.s1} <span class="text-slate-400 font-normal">berantai dgn</span> ${s.s2}</span><button onclick="window.padamSubjekSerentak(${idx})" class="text-red-500 font-bold px-2 hover:bg-red-50 rounded admin-only">X</button></div>`;
-            });
-            if(document.getElementById('senaraiSubjekSerentak')) document.getElementById('senaraiSubjekSerentak').innerHTML = hRen || '<p class="text-[10px] text-slate-400 italic">Tiada rantaian subjek dicipta.</p>';
-
-            // Render Kekangan Subjek Spesifik
-            let kSub = window.appState.kekangan?.subjek || {}; let hSub = '';
-            for(let sub in kSub) {
-                let k = kSub[sub]; let badges = [];
-                if(k.akhir) badges.push('<span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded border border-blue-200">Akhir</span>');
-                if(k.double) badges.push('<span class="bg-indigo-100 text-indigo-700 px-1 py-0.5 rounded border border-indigo-200">Double</span>');
-                if(k.robin) badges.push('<span class="bg-emerald-100 text-emerald-700 px-1 py-0.5 rounded border border-emerald-200">R-Robin</span>');
-                if(k.berat) badges.push('<span class="bg-red-100 text-red-700 px-1 py-0.5 rounded border border-red-200">Berat</span>');
-                
-                hSub += `<div class="bg-white border p-3 rounded-lg shadow-sm relative group"><button onclick="window.padamKekanganSubjek('${sub}')" class="absolute top-1 right-1 text-red-500 font-bold px-2 hidden group-hover:block hover:bg-red-50 rounded admin-only">X</button><div class="font-bold text-[11px] text-slate-800 mb-1.5">${sub}</div><div class="flex flex-wrap gap-1 text-[8px]">${badges.join('')||'<span class="text-slate-400">Tiada (Biasa)</span>'}</div></div>`;
-            }
-            if(document.getElementById('senaraiKekanganSubjek')) document.getElementById('senaraiKekanganSubjek').innerHTML = hSub || '<p class="text-[10px] text-slate-400 col-span-full italic">Tiada spesifikasi sifat subjek.</p>';
-
-            window.paparSenaraiAgihan();
-        };
-
-
-        // --- ADVANCED 9-DIMENSION AI GENERATOR (THE BEAST) ---
+        // --- ENJIN JADUAL AI ---
         window.janaAI = function() {
             let c = document.getElementById('paparanJadualContainer');
-            c.innerHTML = `<div class="text-center py-16 animate-modal"><div class="animate-spin text-5xl mb-4">⚙</div><h3 class="font-bold text-indigo-700 text-lg mb-1">Menganalisis 9 Dimensi Kekangan Matriks...</h3><p class="text-xs text-slate-500 font-mono">Fasa 1: Strict Check | Fasa 2: Fallback Assignment</p></div>`;
+            
+            // Failsafe 1: Mesti ada data tugas
+            let allTasks = [];
+            (window.appState.agihan||[]).forEach(ag => {
+                (ag.tugas||[]).forEach(t => { allTasks.push({ guruId: ag.guruId, namaGuru: ag.namaGuru, subjek: t.subjek, kelas: t.kelas, waktu: t.waktu }); });
+            });
+            if(allTasks.length === 0) {
+                c.innerHTML = `<div class="bg-red-50 p-8 rounded-xl border-2 border-red-200 text-center text-red-700 w-3/4 mx-auto shadow-inner"><div class="text-4xl mb-2">🛑</div><h3 class="font-bold text-lg mb-1">Jadual Tidak Dapat Dijana</h3><p class="text-xs">Tiada data agihan tugas (Lesson Grid) dijumpai untuk mana-mana kelas. Sila isi "Lesson Grid" di Tab 2 terlebih dahulu.</p></div>`;
+                window.showToast("Ralat: Data Lesson Grid kosong.", "error"); return;
+            }
+
+            c.innerHTML = `<div class="text-center py-16 animate-modal"><div class="animate-spin text-5xl mb-4">⚙</div><h3 class="font-bold text-indigo-700 text-lg mb-1">Enjin Matriks Sedang Berfikir...</h3><p class="text-xs text-slate-500 font-mono">Menilai kekangan guru, subjek & bilik.</p></div>`;
             
             setTimeout(() => {
-                let jK={}, jG={}; 
-                let hl=['Isnin','Selasa','Rabu','Khamis','Jumaat'];
-                let m = window.appState.masaSekolah || { hari: {Isnin:{slot:10, rehat:5}, Selasa:{slot:10, rehat:5}, Rabu:{slot:10, rehat:5}, Khamis:{slot:10, rehat:5}, Jumaat:{slot:6, rehat:3}} }; 
+                let jK={}, jG={}; let hl=['Isnin','Selasa','Rabu','Khamis','Jumaat']; let m = window.appState.masaSekolah; 
                 let KEKANGAN = window.appState.kekangan || {};
-                let maxHarian = KEKANGAN.global?.maxHarian || 7;
-                let maxTurut = KEKANGAN.global?.maxTurut || 4;
-                
-                // Initialize Matrix
-                (window.appState.kelas||[]).forEach(k => { jK[k]={}; hl.forEach(h=>jK[k][h]=new Array(m.hari[h].slot).fill(null)); });
-                (window.appState.guru||[]).forEach(g => { jG[g.id]={}; hl.forEach(h=>jG[g.id][h]=new Array(m.hari[h].slot).fill(null)); });
-                
-                // 1. HARD CONSTRAINT: Fill Fixed Events (Perhimpunan dll)
-                (KEKANGAN.waktuTetap || []).forEach(w => {
-                    let hSlotIndex = w.waktu - 1; // 0-indexed
-                    if(hl.includes(w.hari)) {
-                        (window.appState.kelas||[]).forEach(k => {
-                            if(jK[k] && hSlotIndex < m.hari[w.hari].slot) {
-                                jK[k][w.hari][hSlotIndex] = { subjek: w.nama, guru: "R-TETAP", isFixed: true };
-                            }
-                        });
-                    }
-                });
-
-                // Prep tasks
-                let allTasks = [];
-                (window.appState.agihan||[]).forEach(ag => {
-                    (ag.tugas||[]).forEach(t => {
-                        allTasks.push({ guruId: ag.guruId, namaGuru: ag.namaGuru, subjek: t.subjek, kelas: t.kelas, waktu: t.waktu });
-                    });
-                });
-
-                // Prioritize tasks (Hardest first: Serentak > Double > Berat > Normal)
+                let maxHarian = KEKANGAN.global?.maxHarian || 7; let maxTurut = KEKANGAN.global?.maxTurut || 4;
                 let subjekSifat = KEKANGAN.subjek || {};
                 let serentakList = (KEKANGAN.serentak || []).reduce((acc, val) => acc.concat([val.s1, val.s2]), []);
                 
+                (window.appState.kelas||[]).forEach(k => { jK[k]={}; hl.forEach(h=>jK[k][h]=new Array(m.hari[h].slot).fill(null)); });
+                (window.appState.guru||[]).forEach(g => { jG[g.id]={}; hl.forEach(h=>jG[g.id][h]=new Array(m.hari[h].slot).fill(null)); });
+                
+                // HARD: Fixed Events
+                (KEKANGAN.waktuTetap || []).forEach(w => { let hSlotIndex = w.waktu - 1; if(hl.includes(w.hari)) { (window.appState.kelas||[]).forEach(k => { if(jK[k] && hSlotIndex < m.hari[w.hari].slot) jK[k][w.hari][hSlotIndex] = { subjek: w.nama, guru: "R-TETAP", isFixed: true }; }); } });
+
+                // Sort: Hardest constraints first
                 allTasks.sort((a,b) => {
                     let scoreA = 0; let scoreB = 0;
-                    if(serentakList.includes(a.subjek)) scoreA += 100;
-                    if(serentakList.includes(b.subjek)) scoreB += 100;
-                    if(subjekSifat[a.subjek]?.double) scoreA += 50;
-                    if(subjekSifat[b.subjek]?.double) scoreB += 50;
-                    if(subjekSifat[a.subjek]?.berat) scoreA += 20;
-                    if(subjekSifat[b.subjek]?.berat) scoreB += 20;
+                    if(serentakList.includes(a.subjek)) scoreA += 100; if(serentakList.includes(b.subjek)) scoreB += 100;
+                    if(subjekSifat[a.subjek]?.double) scoreA += 50; if(subjekSifat[b.subjek]?.double) scoreB += 50;
+                    if(subjekSifat[a.subjek]?.berat) scoreA += 20; if(subjekSifat[b.subjek]?.berat) scoreB += 20;
                     return scoreB - scoreA;
                 });
 
-                // Algorithm Core (Pass 1: Strict, Pass 2: Relaxed)
-                function solveMatrix(isStrictPass) {
+                function solveMatrix(isStrictPass, taskList) {
                     let unplaced = [];
-                    allTasks.forEach(task => {
-                        let wRem = task.waktu;
-                        let k = subjekSifat[task.subjek] || {};
-                        let gId = task.guruId; let kls = task.kelas;
-                        let startDay = Math.floor(Math.random() * hl.length); // random start for round robin spread
-                        
-                        // Check if it's part of a concurrent pair
+                    taskList.forEach(task => {
+                        let wRem = task.waktu; let k = subjekSifat[task.subjek] || {}; let gId = task.guruId; let kls = task.kelas;
+                        let startDay = Math.floor(Math.random() * hl.length);
                         let concurrentPair = (KEKANGAN.serentak || []).find(s => s.s1 === task.subjek || s.s2 === task.subjek);
                         let partnerTask = null;
-                        if(concurrentPair) {
-                            let partnerSub = (concurrentPair.s1 === task.subjek) ? concurrentPair.s2 : concurrentPair.s1;
-                            partnerTask = allTasks.find(t => t.kelas === kls && t.subjek === partnerSub);
-                            // Avoid double placing if partner already placed (handled implicitly by free slot check)
-                        }
+                        if(concurrentPair) { let partnerSub = (concurrentPair.s1 === task.subjek) ? concurrentPair.s2 : concurrentPair.s1; partnerTask = allTasks.find(t => t.kelas === kls && t.subjek === partnerSub); }
 
                         let placementAttempts = 0;
-                        while(wRem > 0 && placementAttempts < 25) { // 25 limit avoids infinity
-                            placementAttempts++;
-                            let placed = false;
-                            
+                        while(wRem > 0 && placementAttempts < 25) {
+                            placementAttempts++; let placed = false;
                             for(let d=0; d<hl.length; d++) {
-                                let dayIdx = (startDay + d) % hl.length; let h = hl[dayIdx]; let hSlot = m.hari[h].slot;
-                                let rehatIdx = m.hari[h].rehat;
-
-                                // Slot Scan Order (If 'Akhir', start from back. Else start from front)
+                                let dayIdx = (startDay + d) % hl.length; let h = hl[dayIdx]; let hSlot = m.hari[h].slot; let rehatIdx = m.hari[h].rehat;
                                 let slotScanOrder = [];
-                                if(k.akhir && isStrictPass) { for(let i=hSlot-1; i>=0; i--) slotScanOrder.push(i); } 
-                                else { for(let i=0; i<hSlot; i++) slotScanOrder.push(i); }
+                                if(k.akhir && isStrictPass) { for(let i=hSlot-1; i>=0; i--) slotScanOrder.push(i); } else { for(let i=0; i<hSlot; i++) slotScanOrder.push(i); }
 
                                 for(let s of slotScanOrder) {
-                                    if(s === rehatIdx) continue; // Skip rehat
-
-                                    // HARD 1: Is Teacher Blocked on this specific day/slot?
+                                    if(s === rehatIdx) continue;
                                     let disekat = (KEKANGAN.sekatanMasa || []).some(sek => sek.guruId === gId && sek.hari === h && (sek.waktu === 'SEMUA' || sek.waktu === (s+1)));
                                     if(disekat) continue;
-
-                                    // Check Availability for Main Task
+                                    
                                     let mainFree = jG[gId] && !jG[gId][h][s] && jK[kls] && !jK[kls][h][s];
                                     if(!mainFree) continue;
 
-                                    // HARD 2: If Concurrent, is partner available?
-                                    if(partnerTask) {
-                                        let pFree = jG[partnerTask.guruId] && !jG[partnerTask.guruId][h][s]; // Note: They share the same class slot!
-                                        if(!pFree) continue; 
-                                    }
+                                    if(partnerTask) { let pFree = jG[partnerTask.guruId] && !jG[partnerTask.guruId][h][s]; if(!pFree) continue; }
 
-                                    // --- SOFT CONSTRAINTS (Only enforced in Pass 1) ---
                                     if(isStrictPass) {
-                                        // Soft 1: Max Daily Load
-                                        let dailyLoad = jG[gId][h].filter(x=>x).length;
-                                        if(dailyLoad >= maxHarian) continue;
-
-                                        // Soft 2: Max Consecutive Load (look back 'maxTurut' slots)
-                                        let consecutive = 0;
-                                        for(let scanS = s-1; scanS >= Math.max(0, s-maxTurut); scanS--) {
-                                            if(scanS !== rehatIdx && jG[gId][h][scanS]) consecutive++; else break;
-                                        }
+                                        let dailyLoad = jG[gId][h].filter(x=>x).length; if(dailyLoad >= maxHarian) continue;
+                                        let consecutive = 0; for(let scanS = s-1; scanS >= Math.max(0, s-maxTurut); scanS--) { if(scanS !== rehatIdx && jG[gId][h][scanS]) consecutive++; else break; }
                                         if(consecutive >= maxTurut) continue;
-
-                                        // Soft 3: Avoid Heavy Back-to-Back for Class
-                                        if(k.berat) {
-                                            let prevHeavy = s>0 && jK[kls][h][s-1] && subjekSifat[jK[kls][h][s-1].subjek]?.berat;
-                                            let nextHeavy = s<hSlot-1 && jK[kls][h][s+1] && subjekSifat[jK[kls][h][s+1].subjek]?.berat;
-                                            if(prevHeavy || nextHeavy) continue;
-                                        }
+                                        if(k.berat) { let prevHeavy = s>0 && jK[kls][h][s-1] && subjekSifat[jK[kls][h][s-1]?.subjek]?.berat; let nextHeavy = s<hSlot-1 && jK[kls][h][s+1] && subjekSifat[jK[kls][h][s+1]?.subjek]?.berat; if(prevHeavy || nextHeavy) continue; }
                                     }
 
-                                    // --- PLACEMENT LOGIC ---
-                                    // Check if we need (and have room for) Double Period
                                     let placeDouble = false;
                                     if(k.double && wRem >= 2 && s+1 < hSlot && (s+1) !== rehatIdx) {
                                         let nextFree = !jG[gId][h][s+1] && !jK[kls][h][s+1];
-                                        if(partnerTask) {
-                                            if(nextFree && !jG[partnerTask.guruId][h][s+1]) placeDouble = true;
-                                        } else {
-                                            if(nextFree) placeDouble = true;
-                                        }
+                                        if(partnerTask) { if(nextFree && !jG[partnerTask.guruId][h][s+1]) placeDouble = true; } else { if(nextFree) placeDouble = true; }
                                     }
 
-                                    // DO THE PLACEMENT
-                                    jG[gId][h][s] = { subjek: task.subjek, kelas: kls };
-                                    jK[kls][h][s] = { subjek: task.subjek, guru: task.namaGuru };
+                                    jG[gId][h][s] = { subjek: task.subjek, kelas: kls }; jK[kls][h][s] = { subjek: task.subjek, guru: task.namaGuru };
                                     if(partnerTask) { jG[partnerTask.guruId][h][s] = { subjek: partnerTask.subjek, kelas: kls }; }
                                     wRem--; placed = true;
 
                                     if(placeDouble) {
-                                        jG[gId][h][s+1] = { subjek: task.subjek, kelas: kls };
-                                        jK[kls][h][s+1] = { subjek: task.subjek, guru: task.namaGuru };
+                                        jG[gId][h][s+1] = { subjek: task.subjek, kelas: kls }; jK[kls][h][s+1] = { subjek: task.subjek, guru: task.namaGuru };
                                         if(partnerTask) { jG[partnerTask.guruId][h][s+1] = { subjek: partnerTask.subjek, kelas: kls }; }
                                         wRem--;
                                     }
-
-                                    if(k.robin) startDay = dayIdx + 1; // Jump day for round robin
-                                    break; // Break slot loop, move to next assignment logic
+                                    if(k.robin) startDay = dayIdx + 1; break;
                                 }
-                                if(placed && k.robin) break; // Break day loop if round robin
+                                if(placed && k.robin) break;
                             }
                         }
-                        if(wRem > 0 && isStrictPass) unplaced.push({...task, waktu: wRem}); // Save leftovers for Pass 2
+                        if(wRem > 0 && isStrictPass) unplaced.push({...task, waktu: wRem});
+                        // Ultimate fallback: if wRem > 0 and !isStrictPass, it means it's totally impossible due to lack of slots, we just drop the remaining.
                     });
                     return unplaced;
                 }
 
-                // EXECUTE FASA 1 (Ketat)
-                let sisaTugas = solveMatrix(true);
-                
-                // EXECUTE FASA 2 (Kelonggaran Auto - jika ada baki)
-                if(sisaTugas.length > 0) {
-                    allTasks = sisaTugas; // Replace task list with leftovers
-                    solveMatrix(false); // Run without Soft Constraints
-                }
+                let sisaTugas = solveMatrix(true, allTasks);
+                if(sisaTugas.length > 0) { solveMatrix(false, sisaTugas); } // Run Pass 2 (Relaxed) for remaining
                 
                 window.appState.jadual = { status: 'siap', dataKelas: jK, dataGuru: jG, updateTag: Date.now() }; 
                 window.simpanData(true); 
-                window.toggleModePapar(); 
-                document.getElementById('statusJadualFlag').innerHTML = `<span class="text-emerald-600">✅ Berjaya Dijana (Cekap 9-Dimensi)</span>`;
-                window.showToast("Penjadualan Enjin CSE Berjaya!", "success");
-            }, 1200);
+                document.getElementById('statusJadualFlag').innerHTML = `<span class="text-emerald-600">✅ Berjaya Dijana (Cekap)</span>`;
+                window.showToast("Penjadualan Berjaya!", "success");
+                window.toggleModePapar(); // Auto-refresh current view
+            }, 500); // reduced timeout for snappier feel
         };
 
         window.prosesPromptAI = async function() {
             let p = document.getElementById('aiPromptInput').value.trim(); if(!p) return;
             let btn = document.getElementById('btnAiLaksana'); let orgText = btn.innerHTML;
-            btn.innerHTML = "⏳ AI Gemini Sedang Menganalisis..."; btn.disabled = true;
-
-            const apiKey = "AQ.Ab8RN6JZbYJaXxIQzfKvIrro4BXE6UxfYa9BAuY6s67uCTS7eQ"; // User provided valid key
+            btn.innerHTML = "⏳ Gemini Menganalisis..."; btn.disabled = true;
+            const apiKey = "AQ.Ab8RN6JZbYJaXxIQzfKvIrro4BXE6UxfYa9BAuY6s67uCTS7eQ"; 
             try {
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
-                const sysPrompt = "Anda adalah Pembantu Eksekutif Penjadualan Sekolah (Sistem Jadual AI). Analisis masalah pengguna dengan matang. Sentiasa merujuk kepada logik Kesejahteraan Guru (maksimum 4 waktu berturut), sifat kelas serentak, dan sistem 'Constraint Satisfaction'. Beri jawapan bernombor (bullet points), profesional, ringkas, dan praktikal dalam Bahasa Melayu.";
-                const payload = { contents: [{ parts: [{ text: `Masalah Penjadualan Sekolah: "${p}"` }] }], systemInstruction: { parts: [{ text: sysPrompt }] }, generationConfig: { temperature: 0.3 } };
+                const payload = { contents: [{ parts: [{ text: `Isu Penjadualan: "${p}"` }] }], systemInstruction: { parts: [{ text: "Anda pakar logik penjadualan sekolah. Analisis kesan secara matang, terangkan dalam BM profesional." }] }, generationConfig: { temperature: 0.3 } };
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const data = await response.json();
-                if(data.error) throw new Error(data.error.message);
-                
-                const aiReply = data.candidates[0].content.parts[0].text;
-                let dialogHtml = `
-                    <div class="mb-4 text-[11px] font-bold bg-slate-50 p-3 rounded-lg border border-slate-200 shadow-inner">
-                        <span class="text-slate-500">Isu Guru:</span><br>"${p}"
-                    </div>
-                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 p-5 rounded-xl text-xs text-slate-800 whitespace-pre-wrap leading-relaxed shadow-sm">
-                        <div class="flex items-center gap-2 mb-3 border-b border-indigo-100 pb-2">
-                            <span class="text-xl">🤖</span> <span class="font-bold text-indigo-900 text-sm">Analisis Pakar Gemini 1.5 Pro</span>
-                        </div>
-                        ${aiReply}
-                    </div>`;
-                window.customDialog("Analisis Strategi Kepintaran Buatan", dialogHtml, true, () => { document.getElementById('aiPromptInput').value = ""; });
-            } catch (err) { window.customDialog("Ralat Gemini API", `Gagal menghubungi pelayan AI Google. <br><br><b>Kod Ralat:</b> ${err.message}`, false); } 
+                const data = await response.json(); if(data.error) throw new Error(data.error.message);
+                window.customDialog("Analisis Strategi AI", `<div class="bg-indigo-50 border border-indigo-200 p-5 rounded-xl text-xs text-slate-800 whitespace-pre-wrap leading-relaxed shadow-sm"><b>Analisis:</b>\n\n${data.candidates[0].content.parts[0].text}</div>`, true, () => { document.getElementById('aiPromptInput').value = ""; });
+            } catch (err) { window.customDialog("Ralat Gemini", err.message, false); } 
             finally { btn.innerHTML = orgText; btn.disabled = false; }
         };
 
@@ -1028,23 +718,19 @@
             if(!kls) { c.innerHTML = `<div class="text-center py-16 text-xs text-slate-400 font-bold border-2 border-dashed border-slate-200 rounded-xl w-3/4 mx-auto">Pilih KELAS di bahagian atas untuk mula melihat matriks jadual.</div>`; return; }
             if(!window.appState.jadual || !window.appState.jadual.dataKelas) { c.innerHTML = `<div class="text-center py-16 text-xs font-bold text-amber-500 border-2 border-dashed border-amber-200 bg-amber-50 rounded-xl w-3/4 mx-auto">Sila tekan butang "Jana Matriks" terlebih dahulu.</div>`; return; }
             
-            let data = window.appState.jadual.dataKelas[kls]; 
-            let hRows = ''; let hl = ['Isnin','Selasa','Rabu','Khamis','Jumaat']; let m = window.appState.masaSekolah;
+            let data = window.appState.jadual.dataKelas[kls]; let hRows = ''; let hl = ['Isnin','Selasa','Rabu','Khamis','Jumaat']; let m = window.appState.masaSekolah;
             
             hl.forEach(h => {
                 let slots = data[h] || []; let sHTML = ''; let rehat = m.hari[h].rehat;
                 for(let i=0; i<m.hari[h].slot; i++) {
                     if(i === rehat) sHTML += `<div class="bg-slate-200 text-slate-500 font-black border-r border-b flex items-center justify-center min-w-[40px] text-[9px] uppercase tracking-widest shadow-inner" style="writing-mode: vertical-rl; transform: rotate(180deg);">Rehat</div>`;
                     let petak = slots[i];
-                    if(petak) { 
-                        let bgClass = petak.isFixed ? 'bg-teal-50 hover:bg-teal-100 border-teal-200 text-teal-800' : 'bg-white hover:bg-indigo-50 border-slate-100';
-                        sHTML += `<div class="flex-1 border-r border-b flex flex-col items-center justify-center p-2 min-w-[95px] ${bgClass} text-center transition relative group"><span class="font-bold text-[11px] leading-tight mb-1">${petak.subjek}</span><span class="text-[9px] opacity-75">${petak.guru}</span></div>`; 
-                    } 
+                    if(petak) { sHTML += `<div class="flex-1 border-r border-b flex flex-col items-center justify-center p-2 min-w-[95px] ${petak.isFixed?'bg-teal-50':'bg-white hover:bg-indigo-50'} text-center transition"><span class="font-bold text-[11px] leading-tight mb-1">${petak.subjek}</span><span class="text-[9px] opacity-75">${petak.guru}</span></div>`; } 
                     else { sHTML += `<div class="flex-1 border-r border-b flex flex-col items-center justify-center p-2 min-w-[95px] bg-slate-50 text-center"><span class="text-[9px] text-slate-300 font-bold">- KOSONG -</span></div>`; }
                 }
                 hRows += `<tr><td class="p-3 font-bold bg-indigo-50 border-r border-b text-center text-xs w-24 text-indigo-900 uppercase tracking-wide shadow-sm">${h}</td><td class="p-0"><div class="flex h-full w-full">${sHTML}</div></td></tr>`;
             });
-            c.innerHTML = `<div class="w-full overflow-x-auto border-2 border-indigo-100 rounded-xl shadow-lg"><table class="w-full text-left bg-white min-w-[700px]"><thead class="bg-indigo-600 text-white"><th class="p-2 text-center text-[10px] uppercase font-bold tracking-wider" colspan="2">Paparan Matriks Kelas: ${kls}</th></thead><tbody>${hRows}</tbody></table></div>`;
+            c.innerHTML = `<div class="w-full overflow-x-auto border-2 border-indigo-100 rounded-xl shadow-lg"><table class="w-full text-left bg-white min-w-[700px]"><thead class="bg-indigo-600 text-white"><th class="p-2 text-center text-[10px] uppercase font-bold tracking-wider" colspan="2">Paparan Kelas: ${kls}</th></thead><tbody>${hRows}</tbody></table></div>`;
         };
 
         window.renderJadualGuru = function() {
@@ -1052,9 +738,8 @@
             if(!gid) { c.innerHTML = `<div class="text-center py-16 text-xs text-slate-400 font-bold border-2 border-dashed border-slate-200 rounded-xl w-3/4 mx-auto">Pilih GURU di bahagian atas untuk mula melihat matriks jadual.</div>`; return; }
             if(!window.appState.jadual || !window.appState.jadual.dataGuru) { c.innerHTML = `<div class="text-center py-16 text-xs font-bold text-amber-500 border-2 border-dashed border-amber-200 bg-amber-50 rounded-xl w-3/4 mx-auto">Sila tekan butang "Jana Matriks" terlebih dahulu.</div>`; return; }
             
-            let data = window.appState.jadual.dataGuru[gid]; 
-            let hRows = ''; let hl = ['Isnin','Selasa','Rabu','Khamis','Jumaat']; let m = window.appState.masaSekolah;
-            let namaGuru = (window.appState.guru||[]).find(g=>g.id===gid)?.nama || "Guru";
+            let data = window.appState.jadual.dataGuru[gid]; let hRows = ''; let hl = ['Isnin','Selasa','Rabu','Khamis','Jumaat']; let m = window.appState.masaSekolah;
+            let nGuru = (window.appState.guru||[]).find(g=>g.id===gid)?.nama || "Guru";
             
             hl.forEach(h => {
                 let slots = data[h] || []; let sHTML = ''; let rehat = m.hari[h].rehat;
@@ -1066,96 +751,90 @@
                 }
                 hRows += `<tr><td class="p-3 font-bold bg-indigo-50 border-r border-b text-center text-xs w-24 text-indigo-900 uppercase tracking-wide shadow-sm">${h}</td><td class="p-0"><div class="flex h-full w-full">${sHTML}</div></td></tr>`;
             });
-            c.innerHTML = `<div class="w-full overflow-x-auto border-2 border-indigo-100 rounded-xl shadow-lg"><table class="w-full text-left bg-white min-w-[700px]"><thead class="bg-indigo-800 text-white"><th class="p-2 text-center text-[10px] uppercase font-bold tracking-wider" colspan="2">Paparan Matriks Guru: ${namaGuru}</th></thead><tbody>${hRows}</tbody></table></div>`;
+            c.innerHTML = `<div class="w-full overflow-x-auto border-2 border-indigo-100 rounded-xl shadow-lg"><table class="w-full text-left bg-white min-w-[700px]"><thead class="bg-indigo-800 text-white"><th class="p-2 text-center text-[10px] uppercase font-bold tracking-wider" colspan="2">Paparan Guru: ${nGuru}</th></thead><tbody>${hRows}</tbody></table></div>`;
+        };
+
+        // --- BINDINGS ---
+        window.kemasKiniUI = function() {
+            if(document.getElementById('countGuru')) document.getElementById('countGuru').innerText = (window.appState.guru||[]).length;
+            if(document.getElementById('countKelas')) document.getElementById('countKelas').innerText = (window.appState.kelas||[]).length;
+            if(document.getElementById('countSubjek')) document.getElementById('countSubjek').innerText = (window.appState.subjek||[]).length;
+            
+            let gOpts = '<option value="">-- Pilih Guru --</option>' + (window.appState.guru||[]).map(g=>`<option value="${g.id}">${g.nama} (${g.kod})</option>`).join('');
+            ['paparGuruSelect', 'k_sekatan_guru'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerHTML = gOpts; });
+
+            let kOpts = '<option value="">-- Pilih Kelas --</option>' + (window.appState.kelas||[]).map(k=>`<option value="${k}">${k}</option>`).join('');
+            ['paparKelasSelect', 'gridKelasSelect'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerHTML = kOpts; });
+            
+            let sOpts = '<option value="">-- Pilih Subjek --</option>' + (window.appState.subjek||[]).map(s=>`<option value="${s}">${s}</option>`).join('');
+            ['k_s_subjek', 'k_serentak_1', 'k_serentak_2'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerHTML = sOpts; });
+            
+            if(window.appState.kekangan && window.appState.kekangan.global) {
+                if(document.getElementById('cfg_max_turut')) document.getElementById('cfg_max_turut').value = window.appState.kekangan.global.maxTurut || 4;
+                if(document.getElementById('cfg_max_harian')) document.getElementById('cfg_max_harian').value = window.appState.kekangan.global.maxHarian || 7;
+            }
+
+            let hTetap = ''; (window.appState.kekangan?.waktuTetap || []).forEach((w, idx) => { hTetap += `<div class="bg-white border p-2 rounded flex justify-between items-center shadow-sm"><span class="text-[10px] font-bold text-teal-900">${w.nama} <span class="bg-teal-50 px-1 border text-teal-600 rounded">${w.hari} (Wkt ${w.waktu})</span></span><button onclick="window.padamWaktuTetap(${idx})" class="text-red-500 font-bold px-2 hover:bg-red-50 rounded admin-only">X</button></div>`; });
+            if(document.getElementById('senaraiWaktuTetap')) document.getElementById('senaraiWaktuTetap').innerHTML = hTetap || '<p class="text-[10px] text-slate-400 italic">Tiada acara rasmi.</p>';
+
+            let hSek = ''; (window.appState.kekangan?.sekatanMasa || []).forEach((s, idx) => { let guru = (window.appState.guru||[]).find(g => g.id === s.guruId); hSek += `<div class="bg-white border p-2 rounded flex justify-between items-center shadow-sm"><span class="text-[10px] font-bold text-red-900 w-3/4 truncate">${guru?guru.nama:'N/A'} <span class="bg-red-50 px-1 border text-red-600 rounded">${s.hari} ${s.waktu==='SEMUA'?'(Semua)':'(Wkt '+s.waktu+')'}</span></span><button onclick="window.padamSekatanGuru(${idx})" class="text-red-500 font-bold px-2 hover:bg-red-50 rounded admin-only">X</button></div>`; });
+            if(document.getElementById('senaraiSekatanGuru')) document.getElementById('senaraiSekatanGuru').innerHTML = hSek || '<p class="text-[10px] text-slate-400 italic">Tiada sekatan guru.</p>';
+
+            let hRen = ''; (window.appState.kekangan?.serentak || []).forEach((s, idx) => { hRen += `<div class="bg-white border p-2 rounded flex justify-between items-center shadow-sm"><span class="text-[10px] font-bold text-purple-900">${s.s1} <span class="text-slate-400 font-normal">berantai dgn</span> ${s.s2}</span><button onclick="window.padamSubjekSerentak(${idx})" class="text-red-500 font-bold px-2 hover:bg-red-50 rounded admin-only">X</button></div>`; });
+            if(document.getElementById('senaraiSubjekSerentak')) document.getElementById('senaraiSubjekSerentak').innerHTML = hRen || '<p class="text-[10px] text-slate-400 italic">Tiada rantaian subjek.</p>';
+
+            let kSub = window.appState.kekangan?.subjek || {}; let hSub = '';
+            for(let sub in kSub) {
+                let k = kSub[sub]; let badges = [];
+                if(k.akhir) badges.push('<span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded border border-blue-200">Akhir</span>');
+                if(k.double) badges.push('<span class="bg-indigo-100 text-indigo-700 px-1 py-0.5 rounded border border-indigo-200">Double</span>');
+                if(k.robin) badges.push('<span class="bg-emerald-100 text-emerald-700 px-1 py-0.5 rounded border border-emerald-200">R-Robin</span>');
+                if(k.berat) badges.push('<span class="bg-red-100 text-red-700 px-1 py-0.5 rounded border border-red-200">Berat</span>');
+                hSub += `<div class="bg-white border p-3 rounded-lg shadow-sm relative group"><button onclick="window.padamKekanganSubjek('${sub}')" class="absolute top-1 right-1 text-red-500 font-bold px-2 hidden group-hover:block hover:bg-red-50 rounded admin-only">X</button><div class="font-bold text-[11px] text-slate-800 mb-1.5">${sub}</div><div class="flex flex-wrap gap-1 text-[8px]">${badges.join('')||'<span class="text-slate-400">Tiada</span>'}</div></div>`;
+            }
+            if(document.getElementById('senaraiKekanganSubjek')) document.getElementById('senaraiKekanganSubjek').innerHTML = hSub || '<p class="text-[10px] text-slate-400 col-span-full italic">Tiada spesifikasi subjek.</p>';
+
+            window.paparSenaraiAgihan();
+            
+            // Re-render lesson grid if a class was previously selected
+            if(document.getElementById('gridKelasSelect')?.value) window.renderLessonGrid();
         };
 
         window.kemasKiniAksesAdmin = function() {
             let role = 'guest'; let email = "";
-            if(window.currentUser) {
-                email = window.currentUser.email || "";
-                let adminList = window.appState.admins || [MASTER_EMAIL];
-                if(adminList.includes(email)) role = 'admin';
-                else if(email.endsWith('@moe-dl.edu.my')) role = 'user';
-            }
+            if(window.currentUser) { email = window.currentUser.email || ""; let adminList = window.appState.admins || [MASTER_EMAIL]; if(adminList.includes(email)) role = 'admin'; else if(email.endsWith('@moe-dl.edu.my')) role = 'user'; }
             document.body.className = document.body.className.replace(/role-\w+/g, '').trim() + ' role-' + role;
-            
-            if(role === 'admin') {
-                document.getElementById('userName').innerHTML = "👑 Master Admin"; document.getElementById('userEmail').innerText = email; 
-                document.getElementById('readOnlyBanner').classList.add('hidden');
-            } else if(role === 'user') {
-                document.getElementById('userName').innerHTML = "👨‍🏫 Guru (DELIMa)"; document.getElementById('userEmail').innerText = email;
-                document.getElementById('readOnlyBanner').classList.add('hidden');
-            } else {
-                document.getElementById('userName').innerHTML = "Status Tetamu"; document.getElementById('userEmail').innerText = "Mod Pandang Sahaja";
-                document.getElementById('readOnlyBanner').classList.remove('hidden');
-            }
+            if(role === 'admin') { document.getElementById('userName').innerHTML = "👑 Master Admin"; document.getElementById('userEmail').innerText = email; document.getElementById('readOnlyBanner').classList.add('hidden'); } 
+            else if(role === 'user') { document.getElementById('userName').innerHTML = "👨‍🏫 Guru (DELIMa)"; document.getElementById('userEmail').innerText = email; document.getElementById('readOnlyBanner').classList.add('hidden'); } 
+            else { document.getElementById('userName').innerHTML = "Status Tetamu"; document.getElementById('userEmail').innerText = "Mod Pandang Sahaja"; document.getElementById('readOnlyBanner').classList.remove('hidden'); }
         };
     </script>
 
-    <!-- FIREBASE DB BINDING (PRODUCTION) -->
+    <!-- FIREBASE (PRODUCTION) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyBbH3sUXVouonVnFK4kJ0dZjPb32eZNPvo",
-            authDomain: "makrove6-ef560.firebaseapp.com",
-            databaseURL: "https://makrove6-ef560-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "makrove6-ef560",
-            storageBucket: "makrove6-ef560.firebasestorage.app",
-            messagingSenderId: "708835673590",
-            appId: "1:708835673590:web:e2d2cf66664bb2c4b173d7",
-            measurementId: "G-55Q2BCEXE5"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyBbH3sUXVouonVnFK4kJ0dZjPb32eZNPvo", authDomain: "makrove6-ef560.firebaseapp.com", databaseURL: "https://makrove6-ef560-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "makrove6-ef560", storageBucket: "makrove6-ef560.firebasestorage.app", messagingSenderId: "708835673590", appId: "1:708835673590:web:e2d2cf66664bb2c4b173d7", measurementId: "G-55Q2BCEXE5" };
         try {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const db = getDatabase(app);
-
+            const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getDatabase(app);
             window.firebaseDB = db; window.firebaseSet = set; window.firebaseRef = ref;
-            
             onAuthStateChanged(auth, async (user) => {
                 window.currentUser = user;
                 if(user) {
-                    document.getElementById('authBtnText').innerText = "Log Keluar (DELIMa)";
+                    document.getElementById('authBtnText').innerText = "Log Keluar";
                     try {
                         const snapshot = await get(child(ref(db), `jadual_data_v1`));
                         if (snapshot.exists()) {
-                            window.allProfiles = snapshot.val();
-                            window.currentProfileId = localStorage.getItem('skb_current_v5') || Object.keys(window.allProfiles)[0];
-                            window.appState = window.allProfiles[window.currentProfileId];
-                            
-                            // Auto heal missing arrays when fetching from db
-                            if(!window.appState.kekangan) window.appState.kekangan = {};
-                            if(!window.appState.kekangan.subjek) window.appState.kekangan.subjek = {};
-                            if(!window.appState.kekangan.sekatanMasa) window.appState.kekangan.sekatanMasa = [];
-                            if(!window.appState.kekangan.serentak) window.appState.kekangan.serentak = [];
-                            if(!window.appState.kekangan.waktuTetap) window.appState.kekangan.waktuTetap = [];
-                            if(!window.appState.kekangan.global) window.appState.kekangan.global = { maxHarian: 7, maxTurut: 4 };
-
-                            window.simpanDataLokalSahaja(); window.renderProfileSwitcher(); window.kemasKiniUI();
-                            window.showToast("Data Awan Berjaya Disegerakkan! ☁️", "success");
+                            window.allProfiles = snapshot.val(); window.currentProfileId = localStorage.getItem('skb_current_v6') || Object.keys(window.allProfiles)[0]; window.appState = window.allProfiles[window.currentProfileId];
+                            window.simpanDataLokalSahaja(); window.renderProfileSwitcher(); window.kemasKiniUI(); window.showToast("Data Awan Berjaya Disegerakkan! ☁️", "success");
                         } else { window.simpanData(true); }
-                    } catch(e) { 
-                        window.customDialog("Ralat Akses Pangkalan Data", `Akses Firebase disekat. Sila kemas kini 'Rules' Firebase.<br><br><b>Mesej:</b> ${e.message}`, false); 
-                    }
-                } else { 
-                    document.getElementById('authBtnText').innerText = "Log Masuk Awan"; 
-                }
+                    } catch(e) { window.customDialog("Ralat Pangkalan Data", e.message, false); }
+                } else { document.getElementById('authBtnText').innerText = "Log Masuk DELIMa"; }
                 window.kemasKiniAksesAdmin();
             });
-
-            window.handleAuthClick = async function() {
-                if (window.currentUser) { await signOut(auth); window.showToast("Log keluar berjaya."); } 
-                else {
-                    const provider = new GoogleAuthProvider();
-                    try { await signInWithPopup(auth, provider); } 
-                    catch (e) { window.customDialog("Ralat Log Masuk", e.message, false); }
-                }
-            };
-        } catch (e) { console.error("Firebase init failed", e); }
+            window.handleAuthClick = async function() { if (window.currentUser) { await signOut(auth); } else { const provider = new GoogleAuthProvider(); try { await signInWithPopup(auth, provider); } catch (e) { window.customDialog("Ralat Log Masuk", e.message, false); } } };
+        } catch (e) { console.error("Firebase fail", e); }
     </script>
 </body>
 </html>
