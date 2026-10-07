@@ -435,7 +435,50 @@
 
         window.tambahData = function(jenis) {
             if(jenis === 'guru') { let n = document.getElementById('inputGuru').value.trim(); let k = document.getElementById('inputKodGuru').value.trim().toUpperCase(); if(!n || !k) return; if(!window.appState.guru) window.appState.guru=[]; window.appState.guru.push({id: 'g_'+Date.now(), nama: n, kod: k}); document.getElementById('inputGuru').value = ""; document.getElementById('inputKodGuru').value = ""; window.simpanData(true); }
-            else if(jenis === 'kelas') { let text = document.getElementById('inputKelas').value.trim(); if(!text) return; if(!window.appState.kelas) window.appState.kelas=[]; if(!window.appState.kelas.includes(text)) window.appState.kelas.push(text); document.getElementById('inputKelas').value = ""; window.simpanData(true); }
+            else if(jenis === 'kelas') {
+                let text = document.getElementById('inputKelas').value.trim(); 
+                if(!text) return; 
+                if(!window.appState.kelas) window.appState.kelas=[]; 
+                
+                let newClasses = [];
+                // Mengesan formula sempang (Contoh: Tahun 1 - 6 Amanah)
+                let rangeMatch = text.match(/^(.*?)\s*(\d+)\s*-\s*(\d+)\s*(.*?)$/);
+                
+                if (rangeMatch) {
+                    let prefix = rangeMatch[1].trim(); 
+                    let start = parseInt(rangeMatch[2]); 
+                    let end = parseInt(rangeMatch[3]); 
+                    let suffix = rangeMatch[4].trim();
+                    
+                    // Elak loop infiniti jika typo nombor terlalu besar
+                    if (start <= end && (end - start) <= 30) {
+                        for (let i = start; i <= end; i++) {
+                            newClasses.push(((prefix ? prefix + " " : "") + i + (suffix ? " " + suffix : "")).trim());
+                        }
+                    } else {
+                        newClasses.push(text); // Jika salah logik, simpan seperti biasa
+                    }
+                } 
+                // Mengesan formula koma (Contoh: 1A, 2B, 3C)
+                else if (text.includes(',')) {
+                    text.split(',').forEach(c => { if(c.trim()) newClasses.push(c.trim()); });
+                } 
+                else { 
+                    newClasses.push(text); 
+                }
+
+                let addedCount = 0;
+                newClasses.forEach(c => {
+                    if(!window.appState.kelas.includes(c)) {
+                        window.appState.kelas.push(c);
+                        addedCount++;
+                    }
+                });
+
+                document.getElementById('inputKelas').value = ""; 
+                window.simpanData(true); 
+                if(addedCount > 0) window.showToast(`${addedCount} kelas berjaya ditambah!`, "success");
+            }
             else if(jenis === 'subjek') { let s = document.getElementById('inputSubjek').value.trim(); if(!s) return; if(!window.appState.subjek) window.appState.subjek=[]; if(!window.appState.subjek.includes(s)) window.appState.subjek.push(s); document.getElementById('inputSubjek').value = ""; window.simpanData(true); }
         };
         window.janaSubjekSK = function() { const subs = ["Bahasa Melayu", "Bahasa Inggeris", "Matematik", "Sains", "Pendidikan Islam", "Pendidikan Moral", "Sejarah", "Pendidikan Jasmani", "Pendidikan Kesihatan", "Reka Bentuk dan Teknologi", "Pendidikan Seni Visual", "Pendidikan Muzik"]; let added = 0; if(!window.appState.subjek) window.appState.subjek = []; let ex = window.appState.subjek.map(s => s.toLowerCase().trim()); subs.forEach(s => { if(!ex.includes(s.toLowerCase())) { window.appState.subjek.push(s); added++; } }); if(added > 0) window.simpanData(true); window.showToast(`${added} subjek SK dimuatkan!`); };
