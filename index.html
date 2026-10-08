@@ -477,7 +477,14 @@
             });
             window.customDialog(`Senarai ${jenis.toUpperCase()}`, h + `</ul></div>`);
         };
-        window.padamData = function(j, i) { window.appState[j].splice(i,1); window.simpanData(true); window.paparSenarai(j); };
+        
+        window.padamData = function(j, i) { 
+            window.customDialog("Pengesahan Padam", "Adakah anda pasti untuk memadam rekod ini?", true, () => {
+                window.appState[j].splice(i,1); 
+                window.simpanData(true); 
+                window.paparSenarai(j); 
+            });
+        };
 
         window.susunKelas = function(arah) {
             if(!window.appState.kelas || window.appState.kelas.length === 0) return window.showToast("Tiada rekod kelas untuk disusun.", "error");
@@ -547,7 +554,13 @@
             window.renderTugasList(sub, sID);
         };
         
-        window.padamTugasTemp = function(sub, sID, idx) { window.tempAgihan[sub].splice(idx, 1); window.renderTugasList(sub, sID); };
+        window.padamTugasTemp = function(sub, sID, idx) { 
+            window.customDialog("Pengesahan Padam", "Adakah anda pasti untuk memadam penetapan tugas ini?", true, () => {
+                window.tempAgihan[sub].splice(idx, 1); 
+                window.renderTugasList(sub, sID); 
+            });
+        };
+        
         window.kemaskiniTugasTemp = function(sub, sID, idx, newWkt) { window.tempAgihan[sub][idx].waktu = parseInt(newWkt); };
 
         window.renderTugasList = function(sub, sID) {
@@ -620,7 +633,16 @@
             window.appState.kekangan.subjek[subjek] = { akhir, double, robin };
             window.simpanData(true); window.kemasKiniUI();
         };
-        window.padamKekanganSubjek = function(sub) { if(window.appState.kekangan.subjek[sub]) { delete window.appState.kekangan.subjek[sub]; window.simpanData(true); window.kemasKiniUI(); } };
+        
+        window.padamKekanganSubjek = function(sub) { 
+            window.customDialog("Pengesahan Padam", `Adakah anda pasti untuk memadam syarat bagi subjek ${sub}?`, true, () => {
+                if(window.appState.kekangan.subjek[sub]) { 
+                    delete window.appState.kekangan.subjek[sub]; 
+                    window.simpanData(true); 
+                    window.kemasKiniUI(); 
+                } 
+            });
+        };
 
         window.tambahSekatanGuru = function() {
             let gid = document.getElementById('k_sekatan_guru').value; let h = document.getElementById('k_sekatan_hari').value; let w = parseInt(document.getElementById('k_sekatan_waktu').value);
@@ -628,7 +650,16 @@
             if(!window.appState.kekangan.sekatanMasa) window.appState.kekangan.sekatanMasa = [];
             window.appState.kekangan.sekatanMasa.push({ guruId: gid, hari: h, waktu: w }); window.simpanData(true); window.kemasKiniUI();
         };
-        window.padamSekatanGuru = function(idx) { if(window.appState.kekangan.sekatanMasa) { window.appState.kekangan.sekatanMasa.splice(idx, 1); window.simpanData(true); window.kemasKiniUI(); } };
+        
+        window.padamSekatanGuru = function(idx) { 
+            window.customDialog("Pengesahan Padam", "Adakah anda pasti untuk memadam sekatan waktu guru ini?", true, () => {
+                if(window.appState.kekangan.sekatanMasa) { 
+                    window.appState.kekangan.sekatanMasa.splice(idx, 1); 
+                    window.simpanData(true); 
+                    window.kemasKiniUI(); 
+                } 
+            });
+        };
 
         // --- AI ENJIN JADUAL ---
         window.janaAI = function() {
