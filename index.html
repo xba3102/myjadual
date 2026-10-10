@@ -1309,7 +1309,7 @@
     <!-- FIREBASE (PRODUCTION READY v11.6.1 FIRESTORE) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // Mematuhi protokol pemboleh ubah persekitaran (Global Environment Variables)
@@ -1327,79 +1327,83 @@
             const auth = getAuth(app);
             const db = getFirestore(app);
 
-            // Tulis ganti (Override) fungsi simpanData untuk dipautkan secara spesifik ke FIRESTORE
+            // Tulis ganti (Override) fungsi simpanData
             window.simpanData = async function(showMsg = true) {
                 window.allProfiles[window.currentProfileId] = window.appState;
                 window.simpanDataLokalSahaja();
                 window.kemasKiniUI();
 
-                if (auth.currentUser) {
-                    try {
-                        // Laluan berstruktur ketat (Strict Paths) yang diwajibkan untuk Firebase Firestore
-                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sistemJadual', 'allProfilesData');
-                        await setDoc(docRef, window.allProfiles);
-                        if(showMsg) window.showToast("Data diselamatkan ke Awan (Firestore)!", "success");
-                    } catch(e) {
-                        console.error(e);
-                        window.customDialog("Ralat Menyimpan", "Firestore Error: " + e.message, false);
-                    }
+                // PENTING: Pengawal operasi (Guard). Elakkan tulis data jika belum disahkan.
+                if (!auth.currentUser) return; 
+
+                try {
+                    // Laluan berstruktur ketat (Strict Paths) yang diwajibkan
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sistemJadual', 'allProfilesData');
+                    await setDoc(docRef, window.allProfiles);
+                    if(showMsg) window.showToast("Data diselamatkan ke Awan (Firestore)!", "success");
+                } catch(e) {
+                    console.error(e);
+                    window.customDialog("Ralat Menyimpan", "Firestore Error: " + e.message, false);
                 }
             };
             
-            // Permulaan (Initialization) Auth mengikut arahan token kustom
-            async function initAuth() {
+            // FUNGSI UTAMA: Aliran berurutan (Tunggu log masuk selesai sepenuhnya, barulah baca data)
+            async function mulakanSistemAwan() {
                 try {
-                    if (typeof __initial_auth_token !== 'undefined') {
+                    // 1. Lakukan Log Masuk dan tunggu (await) ia selesai
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
                         await signInAnonymously(auth);
                     }
-                } catch (e) { console.error("Firebase Auth Error:", e); }
-            }
-            
-            onAuthStateChanged(auth, async (user) => {
-                window.currentUser = user;
-                if(user) {
-                    document.getElementById('authBtnText').innerText = "Log Keluar Awan";
-                    try {
-                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sistemJadual', 'allProfilesData');
-                        const docSnap = await getDoc(docRef);
-                        
-                        if (docSnap.exists()) {
-                            window.allProfiles = docSnap.data();
-                            
-                            let savedId = localStorage.getItem('skb_current_v4');
-                            if (savedId && window.allProfiles[savedId]) {
-                                window.currentProfileId = savedId;
-                            } else {
-                                window.currentProfileId = Object.keys(window.allProfiles)[0];
-                            }
-                            
-                            window.appState = window.allProfiles[window.currentProfileId];
-                            
-                            if(!window.appState.masaSekolah) {
-                                window.appState.masaSekolah = { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20, hari: { Isnin:{slot:10, rehat:5}, Selasa:{slot:10, rehat:5}, Rabu:{slot:10, rehat:5}, Khamis:{slot:10, rehat:5}, Jumaat:{slot:6, rehat:3} }};
-                            }
-                            if(!window.appState.agihan) window.appState.agihan = [];
-                            if(!window.appState.uasa) window.appState.uasa = { status: null, dataKelas: {}, dataGuru: {}, statistik: {} };
-                            
-                            window.simpanDataLokalSahaja(); window.renderProfileSwitcher(); window.kemasKiniUI();
-                            window.showToast("Data Awan Berjaya Disegerakkan! ☁️", "success");
-                        } else { 
-                            window.simpanData(true); 
-                        }
-                    } catch(e) { 
-                        console.error(e);
-                        window.customDialog("Ralat Akses Firestore", `Akses gagal. Pastikan konfigurasi pangkalan data adalah betul.<br><br><b>Mesej:</b> ${e.message}`, false); 
-                    }
-                } else { 
-                    document.getElementById('authBtnText').innerText = "Log Masuk Awan"; 
-                }
-                window.kemasKiniAksesAdmin();
-            });
+                    
+                    window.currentUser = auth.currentUser;
+                    
+                    // Jika gagal disahkan, batalkan fungsi membaca (Guard)
+                    if (!window.currentUser) return;
 
-            // Mulakan proses pendaftaran Auth secara automatik
-            initAuth();
+                    document.getElementById('authBtnText').innerText = "Log Keluar Awan";
+                    window.kemasKiniAksesAdmin();
+                    
+                    // 2. HANYA selepas pengesahan berjaya, panggil pangkalan data Firestore
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sistemJadual', 'allProfilesData');
+                    const docSnap = await getDoc(docRef);
+                        
+                    if (docSnap.exists()) {
+                        window.allProfiles = docSnap.data();
+                        
+                        let savedId = localStorage.getItem('skb_current_v4');
+                        if (savedId && window.allProfiles[savedId]) {
+                            window.currentProfileId = savedId;
+                        } else {
+                            window.currentProfileId = Object.keys(window.allProfiles)[0];
+                        }
+                        
+                        window.appState = window.allProfiles[window.currentProfileId];
+                        
+                        // Menampal sebarang data kosong (Fallback)
+                        if(!window.appState.masaSekolah) {
+                            window.appState.masaSekolah = { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20, hari: { Isnin:{slot:10, rehat:5}, Selasa:{slot:10, rehat:5}, Rabu:{slot:10, rehat:5}, Khamis:{slot:10, rehat:5}, Jumaat:{slot:6, rehat:3} }};
+                        }
+                        if(!window.appState.agihan) window.appState.agihan = [];
+                        if(!window.appState.uasa) window.appState.uasa = { status: null, dataKelas: {}, dataGuru: {}, statistik: {} };
+                        
+                        window.simpanDataLokalSahaja(); 
+                        window.renderProfileSwitcher(); 
+                        window.kemasKiniUI();
+                        window.showToast("Data Awan Berjaya Disegerakkan! ☁️", "success");
+                    } else { 
+                        window.simpanData(true); 
+                    }
+                } catch(e) { 
+                    console.error("Ralat Akses Firestore:", e);
+                    window.customDialog("Ralat Akses Pangkalan Data", `Sistem dihalang membaca data. Hal ini mungkin kerana ralat sambungan.<br><br><b>Mesej:</b> ${e.message}`, false); 
+                    window.kemasKiniAksesAdmin();
+                }
+            }
+
+            // Jalankan sambungan awan secara selamat
+            mulakanSistemAwan();
 
             window.handleAuthClick = async function() {
                 if (window.currentUser) { 
