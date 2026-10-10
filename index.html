@@ -869,11 +869,10 @@
             let btn = document.getElementById('btnAiLaksana'); let orgText = btn.innerHTML;
             btn.innerHTML = "⏳ Gemini Berfikir..."; btn.disabled = true;
 
-            const rawKey = "AQ.Ab8RN6IOPV7RIouhr-MzGgBYJgjrDXDvuTl9lUNab_5C45Y0JQ"; 
+            const apiKey = "AQ.Ab8RN6JJyelbeD9oELaHgnuhUWb6rWWTBX7JE2iJYh3b6zM4RA"; 
             try {
-                // DIKEMAS KINI: Menghantar kunci terus ke dalam URL seperti dalam fail e-RPH
-                const apiKey = rawKey.trim();
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${encodeURIComponent(apiKey)}`;
+                // DIKEMAS KINI: Menghantar kunci terus ke dalam URL
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
                 const sysPrompt = "Anda adalah Pakar AI Penjadualan Sekolah Organisasi. Analisis isu jadual secara klinikal dan berikan penyelesaian matang yang merujuk kepada logik algoritma Round-Robin, keseimbangan tenaga guru, dan sekatan waktu (Hard Constraint).";
                 const payload = { contents: [{ parts: [{ text: `Isu Jadual Sekolah: "${p}"` }] }], systemInstruction: { parts: [{ text: sysPrompt }] }, generationConfig: { temperature: 0.3 } };
                 
@@ -884,16 +883,18 @@
                 });
                 
                 const data = await response.json();
-                if(data.error) throw new Error(data.error.message);
-                const aiReply = data.candidates[0].content.parts[0].text;
-                let dialogHtml = `<div class="mb-4 text-xs font-bold bg-slate-50 p-3 rounded border border-slate-200 shadow-inner">🔍 Isu Dikemukakan:<br>"${p}"</div><div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-200 p-5 rounded-xl text-xs text-slate-800 whitespace-pre-wrap leading-relaxed shadow-sm">🤖 <b>Saranan Kepintaran Gemini 1.5 Pro:</b>\n\n${aiReply}</div>`;
-                window.customDialog("Tindakan Gemini 1.5 Pro AI", dialogHtml, true, () => { document.getElementById('aiPromptInput').value = ""; });
-            } catch (err) { window.customDialog("Ralat Gemini API", err.message, false); } 
-            finally { btn.innerHTML = orgText; btn.disabled = false; }
-        };
+            if(data.error) throw new Error(data.error.message);
+            
+            const aiReply = data.candidates[0].content.parts[0].text;
+            let dialogHtml = `<div class="mb-4 text-xs font-bold bg-slate-50 p-3 rounded border border-slate-200 shadow-inner">🔍 Isu Dikemukakan:<br>"${p}"</div><div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-200 p-5 rounded-xl text-xs text-slate-800 whitespace-pre-wrap leading-relaxed shadow-sm">🤖 <b>Saranan Kepintaran AI:</b>\n\n${aiReply}</div>`;
+            window.customDialog("Tindakan AI", dialogHtml, true, () => { document.getElementById('aiPromptInput').value = ""; });
+        } catch (err) { window.customDialog("Ralat Gemini API", err.message, false); } 
+        finally { btn.innerHTML = orgText; btn.disabled = false; }
+    };
 
-        window.toggleModePapar = function() {
-            let mode = document.getElementById('paparJenisMode').value;
+    // --- PAPARAN JADUAL UI ---
+    window.toggleModePapar = function() {
+        let mode = document.getElementById('paparJenisMode').value;
             document.getElementById('wrapperPaparKelas').classList.add('hidden'); document.getElementById('wrapperPaparGuru').classList.add('hidden');
             if(mode === 'kelas') { document.getElementById('wrapperPaparKelas').classList.remove('hidden'); window.renderJadualKelas(); }
             else if(mode === 'guru') { document.getElementById('wrapperPaparGuru').classList.remove('hidden'); window.renderJadualGuru(); }
@@ -1293,7 +1294,7 @@
             document.body.className = document.body.className.replace(/role-\w+/g, '').trim() + ' role-' + role;
             
             if(role === 'admin') {
-                document.getElementById('userName').innerHTML = "👑 Admin Sekolah"; document.getElementById('userEmail').innerText = email; 
+                document.getElementById('userName').innerHTML = "👑 Admin Sekolah"; document.getElementById('userEmail').innerText = email || "Pentadbir Awan"; 
                 document.getElementById('readOnlyBanner').classList.add('hidden');
             } else if(role === 'user') {
                 document.getElementById('userName').innerHTML = "👨‍🏫 Guru Awam"; document.getElementById('userEmail').innerText = email;
@@ -1305,38 +1306,67 @@
         };
     </script>
 
-    <!-- FIREBASE (PRODUCTION READY) -->
+    <!-- FIREBASE (PRODUCTION READY v11.6.1 FIRESTORE) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        const firebaseConfig = {
+        // Mematuhi protokol pemboleh ubah persekitaran (Global Environment Variables)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'jadual-sk-bikang';
+        
+        const fallbackConfig = {
             apiKey: "AIzaSyBbH3sUXVouonVnFK4kJ0dZjPb32eZNPvo",
             authDomain: "makrove6-ef560.firebaseapp.com",
-            databaseURL: "https://makrove6-ef560-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "makrove6-ef560",
-            storageBucket: "makrove6-ef560.firebasestorage.app",
-            messagingSenderId: "708835673590",
-            appId: "1:708835673590:web:e2d2cf66664bb2c4b173d7",
-            measurementId: "G-55Q2BCEXE5"
+            projectId: "makrove6-ef560"
         };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : fallbackConfig;
 
         try {
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
-            const db = getDatabase(app);
+            const db = getFirestore(app);
 
-            window.firebaseDB = db; window.firebaseSet = set; window.firebaseRef = ref;
+            // Tulis ganti (Override) fungsi simpanData untuk dipautkan secara spesifik ke FIRESTORE
+            window.simpanData = async function(showMsg = true) {
+                window.allProfiles[window.currentProfileId] = window.appState;
+                window.simpanDataLokalSahaja();
+                window.kemasKiniUI();
+
+                if (auth.currentUser) {
+                    try {
+                        // Laluan berstruktur ketat (Strict Paths) yang diwajibkan untuk Firebase Firestore
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sistemJadual', 'allProfilesData');
+                        await setDoc(docRef, window.allProfiles);
+                        if(showMsg) window.showToast("Data diselamatkan ke Awan (Firestore)!", "success");
+                    } catch(e) {
+                        console.error(e);
+                        window.customDialog("Ralat Menyimpan", "Firestore Error: " + e.message, false);
+                    }
+                }
+            };
+            
+            // Permulaan (Initialization) Auth mengikut arahan token kustom
+            async function initAuth() {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined') {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (e) { console.error("Firebase Auth Error:", e); }
+            }
             
             onAuthStateChanged(auth, async (user) => {
                 window.currentUser = user;
                 if(user) {
-                    document.getElementById('authBtnText').innerText = "Log Keluar";
+                    document.getElementById('authBtnText').innerText = "Log Keluar Awan";
                     try {
-                        const snapshot = await get(child(ref(db), `jadual_data_v1`));
-                        if (snapshot.exists()) {
-                            window.allProfiles = snapshot.val();
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sistemJadual', 'allProfilesData');
+                        const docSnap = await getDoc(docRef);
+                        
+                        if (docSnap.exists()) {
+                            window.allProfiles = docSnap.data();
                             
                             let savedId = localStorage.getItem('skb_current_v4');
                             if (savedId && window.allProfiles[savedId]) {
@@ -1351,29 +1381,35 @@
                                 window.appState.masaSekolah = { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20, hari: { Isnin:{slot:10, rehat:5}, Selasa:{slot:10, rehat:5}, Rabu:{slot:10, rehat:5}, Khamis:{slot:10, rehat:5}, Jumaat:{slot:6, rehat:3} }};
                             }
                             if(!window.appState.agihan) window.appState.agihan = [];
-                            if(!window.appState.uasa) window.appState.uasa = { kertas: [], jadualPengawas: {}, statistik: {} };
+                            if(!window.appState.uasa) window.appState.uasa = { status: null, dataKelas: {}, dataGuru: {}, statistik: {} };
                             
                             window.simpanDataLokalSahaja(); window.renderProfileSwitcher(); window.kemasKiniUI();
                             window.showToast("Data Awan Berjaya Disegerakkan! ☁️", "success");
-                        } else { window.simpanData(true); }
+                        } else { 
+                            window.simpanData(true); 
+                        }
                     } catch(e) { 
-                        window.customDialog("Ralat Akses Pangkalan Data", `Akses Firebase disekat. Pastikan Rules Firebase cikgu ditukar kepada <b>auth != null</b>.<br><br><b>Mesej:</b> ${e.message}`, false); 
+                        console.error(e);
+                        window.customDialog("Ralat Akses Firestore", `Akses gagal. Pastikan konfigurasi pangkalan data adalah betul.<br><br><b>Mesej:</b> ${e.message}`, false); 
                     }
                 } else { 
-                    document.getElementById('authBtnText').innerText = "Log Masuk DELIMa"; 
+                    document.getElementById('authBtnText').innerText = "Log Masuk Awan"; 
                 }
                 window.kemasKiniAksesAdmin();
             });
 
+            // Mulakan proses pendaftaran Auth secara automatik
+            initAuth();
+
             window.handleAuthClick = async function() {
-                if (window.currentUser) { await signOut(auth); window.showToast("Log keluar berjaya."); } 
-                else {
-                    const provider = new GoogleAuthProvider();
-                    try { await signInWithPopup(auth, provider); } 
-                    catch (e) { window.customDialog("Ralat Log Masuk", e.message, false); }
+                if (window.currentUser) { 
+                    await signOut(auth); 
+                    window.showToast("Log keluar berjaya."); 
+                } else { 
+                    window.showToast("Sistem ini dihubungkan secara automatik melalui persekitaran awan.", "info"); 
                 }
             };
-        } catch (e) { console.error("Ralat awalan Firebase", e); }
+        } catch (e) { console.error("Ralat awalan Firebase Firestore", e); }
     </script>
 </body>
 </html>
