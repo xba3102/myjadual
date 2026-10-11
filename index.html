@@ -416,7 +416,7 @@
         window.appState = {}; 
         window.tempAgihan = {};
         window.currentUser = null;
-        window.uasaSelectedSasaran = ["Semua"]; // Menyimpan pilihan pelbagai sasaran
+        window.uasaSelectedSasaran = ["Semua"]; 
         
         const MASTER_EMAIL = 'sekolah-7608@moe-dl.edu.my';
 
@@ -446,7 +446,6 @@
             window.currentProfileId = (savedCurrent && window.allProfiles[savedCurrent]) ? savedCurrent : Object.keys(window.allProfiles)[0];
             window.appState = window.allProfiles[window.currentProfileId];
             
-            // PELINDUNG STRUKTUR DATA
             if(!window.appState.kekangan) window.appState.kekangan = { subjek: {}, sekatanMasa: [] };
             if(!window.appState.kekangan.sekatanMasa) window.appState.kekangan.sekatanMasa = [];
             if(!window.appState.masaSekolah) window.appState.masaSekolah = { mulaPagi: "07:30", mulaPetang: "13:00", tempohSlot: 30, tempohRehat: 20, hari: { Isnin:{slot:10, rehat:5}, Selasa:{slot:10, rehat:5}, Rabu:{slot:10, rehat:5}, Khamis:{slot:10, rehat:5}, Jumaat:{slot:6, rehat:3} } };
@@ -459,7 +458,6 @@
             
             window.renderProfileSwitcher(); window.kemasKiniUI(); window.kemasKiniAksesAdmin(); 
             
-            // Klik luar untuk tutup dropdown UASA
             document.addEventListener('click', function(event) {
                 const container = document.getElementById('uasaSasaranContainer');
                 const menu = document.getElementById('uasaDropdownMenu');
@@ -481,7 +479,8 @@
             window.kemasKiniUI();
 
             if (window.currentUser && window.firebaseDB && window.firebaseSet && window.firebaseRef) {
-                window.firebaseSet(window.firebaseRef(window.firebaseDB, 'jadual_data_v1'), window.allProfiles)
+                // FIXED BUG: 'jadual_data_v1' is now 'jadual_skbikang', 'data_v1' (Even number of segments!)
+                window.firebaseSet(window.firebaseRef(window.firebaseDB, 'jadual_skbikang', 'data_v1'), window.allProfiles)
                 .then(() => { if(showMsg) window.showToast("Data diselamatkan ke Awan (Firebase)!", "success"); })
                 .catch((e) => { console.error(e); window.customDialog("Ralat Menyimpan", "Firebase: " + e.message, false); });
             }
