@@ -802,16 +802,15 @@
 
             const apiKey = "AQ.Ab8RN6JJyelbeD9oELaHgnuhUWb6rWWTBX7JE2iJYh3b6zM4RA".trim();
             try {
-                // Fetch Gemini bypassing OAuth error using x-goog-api-key header
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent`;
+                // Memasukkan API Key terus ke dalam URL (Penyelesaian Ralat OAuth)
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
                 const sysPrompt = "Anda adalah Pakar AI Penjadualan Sekolah. Jawab dalam Bahasa Melayu secara profesional.";
                 const payload = { contents: [{ parts: [{ text: `Isu atau Arahan: "${p}"` }] }], systemInstruction: { parts: [{ text: sysPrompt }] }, generationConfig: { temperature: 0.3 } };
                 
                 const response = await fetch(apiUrl, { 
                     method: 'POST', 
                     headers: { 
-                        'Content-Type': 'application/json',
-                        'x-goog-api-key': apiKey 
+                        'Content-Type': 'application/json'
                     }, 
                     body: JSON.stringify(payload) 
                 });
