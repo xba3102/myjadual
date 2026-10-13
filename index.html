@@ -800,10 +800,11 @@
             let btn = document.getElementById('btnAiLaksana'); let orgText = btn.innerHTML;
             btn.innerHTML = "⏳ AI Berfikir..."; btn.disabled = true;
 
-            const apiKey = "AQ.Ab8RN6JJyelbeD9oELaHgnuhUWb6rWWTBX7JE2iJYh3b6zM4RA".trim();
+            // MENGGUNAKAN AI TERBINA DALAM: Kosongkan API Key, sistem akan uruskannya secara automatik
+            const apiKey = ""; 
             try {
-                // Memasukkan API Key terus ke dalam URL (Penyelesaian Ralat OAuth)
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
+                // Tukar kepada model terbina dalam yang serasi tanpa ralat OAuth
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
                 const sysPrompt = "Anda adalah Pakar AI Penjadualan Sekolah. Jawab dalam Bahasa Melayu secara profesional.";
                 const payload = { contents: [{ parts: [{ text: `Isu atau Arahan: "${p}"` }] }], systemInstruction: { parts: [{ text: sysPrompt }] }, generationConfig: { temperature: 0.3 } };
                 
@@ -822,8 +823,8 @@
                 
                 const data = await response.json();
                 const aiReply = data.candidates[0].content.parts[0].text;
-                let dialogHtml = `<div class="mb-4 text-xs font-bold bg-slate-50 p-3 rounded border shadow-inner">🔍 Isu Dikemukakan:<br>"${p}"</div><div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-200 p-5 rounded-xl text-xs text-slate-800 whitespace-pre-wrap leading-relaxed shadow-sm">🤖 <b>Saranan Gemini 1.5 Pro:</b>\n\n${aiReply}</div>`;
-                window.customDialog("Tindakan Gemini 1.5 Pro AI", dialogHtml, true, () => { document.getElementById('aiPromptInput').value = ""; });
+                let dialogHtml = `<div class="mb-4 text-xs font-bold bg-slate-50 p-3 rounded border shadow-inner">🔍 Isu Dikemukakan:<br>"${p}"</div><div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-200 p-5 rounded-xl text-xs text-slate-800 whitespace-pre-wrap leading-relaxed shadow-sm">🤖 <b>Saranan Gemini 3 Flash AI:</b>\n\n${aiReply}</div>`;
+                window.customDialog("Tindakan Gemini AI", dialogHtml, true, () => { document.getElementById('aiPromptInput').value = ""; });
             } catch (err) { window.customDialog("Ralat Gemini API", err.message, false); } 
             finally { btn.innerHTML = orgText; btn.disabled = false; }
         };
