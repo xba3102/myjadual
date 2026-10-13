@@ -421,6 +421,26 @@
             };
         }
 
+        window.renderProfileSwitcher = function() {
+            let sel = document.getElementById('headerProfileSelect');
+            if(!sel) return;
+            let html = '';
+            for(let key in window.allProfiles) {
+                let p = window.allProfiles[key];
+                let nama = (p && p.sekolah && p.sekolah.nama) ? p.sekolah.nama : 'Sekolah';
+                html += `<option value="${key}">${nama}</option>`;
+            }
+            sel.innerHTML = html;
+            sel.value = window.currentProfileId;
+            
+            if(window.appState && window.appState.sekolah) {
+                let headerName = document.getElementById('headerSchoolName');
+                if(headerName) headerName.innerText = window.appState.sekolah.nama || "Sistem Jadual Pintar AI";
+                let tetapanName = document.getElementById('tetapan_nama_sekolah');
+                if(tetapanName) tetapanName.value = window.appState.sekolah.nama || "";
+            }
+        };
+
         window.onload = function() {
             let savedProfiles = localStorage.getItem('skb_profiles_v10');
             let savedCurrent = localStorage.getItem('skb_current_v10');
