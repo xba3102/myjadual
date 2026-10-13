@@ -228,7 +228,7 @@
                         <span class="text-xl">🤖</span>
                         <div>
                             <h3 class="font-bold text-sm">Pembantu AI (Gemini 1.5 Pro)</h3>
-                            <p class="text-[10px] text-purple-200">Kunci API disokong melalui URL fetch untuk memintas ralat OAuth.</p>
+                            <p class="text-[10px] text-purple-200">Kunci API AQ. disokong melalui header HTTP x-goog-api-key secara automatik.</p>
                         </div>
                     </div>
                     <div class="flex gap-2 relative z-10">
@@ -425,7 +425,17 @@
             let savedProfiles = localStorage.getItem('skb_profiles_v10');
             let savedCurrent = localStorage.getItem('skb_current_v10');
 
-            if (savedProfiles) { try { window.allProfiles = JSON.parse(savedProfiles); } catch(e) { window.allProfiles = { 'p1': createDefaultProfile('SK Bikang') }; } } 
+            if (savedProfiles) { 
+                try { 
+                    let parsed = JSON.parse(savedProfiles);
+                    // Failsafe: Ensure it's an object with keys
+                    if(parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+                        window.allProfiles = parsed;
+                    } else {
+                        throw new Error("Empty profiles object");
+                    }
+                } catch(e) { window.allProfiles = { 'p1': createDefaultProfile('SK Bikang') }; } 
+            } 
             else { window.allProfiles = { 'p1': createDefaultProfile('SK Bikang') }; }
 
             window.currentProfileId = (savedCurrent && window.allProfiles[savedCurrent]) ? savedCurrent : Object.keys(window.allProfiles)[0];
@@ -443,7 +453,15 @@
             });
         };
 
-        window.simpanDataLokalSahaja = function() { localStorage.setItem('skb_profiles_v10', JSON.stringify(window.allProfiles)); localStorage.setItem('skb_current_v10', window.currentProfileId); };
+        window.simpanDataLokalSahaja = function() { 
+            // Failsafe before saving
+            if(!window.allProfiles || Object.keys(window.allProfiles).length === 0) {
+                window.allProfiles = { 'p1': createDefaultProfile('SK Bikang') };
+                window.currentProfileId = 'p1';
+            }
+            localStorage.setItem('skb_profiles_v10', JSON.stringify(window.allProfiles)); 
+            localStorage.setItem('skb_current_v10', window.currentProfileId); 
+        };
         
         window.simpanData = async function(showMsg = true) {
             window.allProfiles[window.currentProfileId] = window.appState;
@@ -451,7 +469,6 @@
 
             if (window.currentUser && window.firebaseDB && window.firebaseSet && window.firebaseDoc) {
                 try {
-                    // Corrected Firestore path: Even number of segments (Database, Collection, Document)
                     const docRef = window.firebaseDoc(window.firebaseDB, 'jadual_skbikang', 'data_v1');
                     await window.firebaseSet(docRef, window.allProfiles);
                     if(showMsg) window.showToast("Data diselamatkan ke Awan!", "success");
@@ -502,6 +519,7 @@
                 delete window.allProfiles[window.currentProfileId]; window.currentProfileId = Object.keys(window.allProfiles)[0]; window.appState = window.allProfiles[window.currentProfileId]; window.simpanData(true); window.renderProfileSwitcher(); window.kemasKiniUI(); window.showToast("Berjaya dipadam.", "success");
             });
         };
+        
         window.muatTurunSandaran = function() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.allProfiles, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "sandaran_sk_" + new Date().toISOString().slice(0,10) + ".json");
@@ -540,6 +558,7 @@
                 if(!window.appState.subjek.includes(s)) window.appState.subjek.push(s); document.getElementById('inputSubjek').value = ""; window.simpanData(true);
             }
         };
+        
         window.janaSubjekSK = function() {
             const subs = ["Bahasa Melayu", "Bahasa Inggeris", "Matematik", "Sains", "Pendidikan Islam", "Pendidikan Moral", "Sejarah", "Pendidikan Jasmani", "Pendidikan Kesihatan", "Reka Bentuk dan Teknologi", "Pendidikan Seni Visual", "Pendidikan Muzik"];
             const sinonim = { "english": "Bahasa Inggeris", "bi": "Bahasa Inggeris", "bm": "Bahasa Melayu", "pai": "Pendidikan Islam", "rbt": "Reka Bentuk dan Teknologi" };
@@ -612,6 +631,7 @@
                 </div>`;
             }); container.innerHTML = html; window.appState.subjek.forEach((sub, idx) => { if(window.tempAgihan[sub]) window.renderTugasList(sub, "sub_" + idx); });
         };
+        
         window.toggleSubjekPane = function(sub, sID) {
             let isChk = document.getElementById(`chk_${sID}`).checked; let pane = document.getElementById(`pane_${sID}`); let card = document.getElementById(`card_${sID}`);
             if (isChk) { pane.classList.remove('hidden'); card.classList.add('bg-indigo-50', 'border-indigo-200'); card.classList.remove('bg-white', 'border-slate-200'); if(!window.tempAgihan[sub]) window.tempAgihan[sub] = []; window.renderTugasList(sub, sID); } 
@@ -640,6 +660,7 @@
             if(exIdx >= 0) window.appState.agihan[exIdx] = { guruId: gId, namaGuru: guru.nama, sesi: sesiGuru, tugas: tugasAkhir }; else window.appState.agihan.push({ guruId: gId, namaGuru: guru.nama, sesi: sesiGuru, tugas: tugasAkhir });
             window.simpanData(true); window.showToast("Agihan direkodkan.", "success"); window.paparSenaraiAgihan();
         };
+        
         window.paparSenaraiAgihan = function() {
             let el = document.getElementById('senaraiAgihan'); if(!el) return;
             if(!window.appState.agihan || window.appState.agihan.length === 0) { el.innerHTML = `<p class="text-xs text-slate-400 col-span-full">Belum ada.</p>`; return; }
@@ -759,18 +780,18 @@
             let btn = document.getElementById('btnAiLaksana'); let orgText = btn.innerHTML;
             btn.innerHTML = "⏳ AI Berfikir..."; btn.disabled = true;
 
-            const apiKey = "AQ.Ab8RN6IOPV7RIouhr-MzGgBYJgjrDXDvuTl9lUNab_5C45Y0JQ".trim(); 
+            const apiKey = "AQ.Ab8RN6JJyelbeD9oELaHgnuhUWb6rWWTBX7JE2iJYh3b6zM4RA".trim();
             try {
-                // FIXED: Use the correct header for the AQ. key format
+                // Fetch Gemini bypassing OAuth error using x-goog-api-key header
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent`;
-                const sysPrompt = "Anda adalah Pakar AI Penjadualan Sekolah. Jawab dalam Bahasa Melayu secara profesional. Jika diminta untuk memberi ucapan, rujuk kepada contoh yang bersesuaian jika perlu.";
+                const sysPrompt = "Anda adalah Pakar AI Penjadualan Sekolah. Jawab dalam Bahasa Melayu secara profesional.";
                 const payload = { contents: [{ parts: [{ text: `Isu atau Arahan: "${p}"` }] }], systemInstruction: { parts: [{ text: sysPrompt }] }, generationConfig: { temperature: 0.3 } };
                 
                 const response = await fetch(apiUrl, { 
                     method: 'POST', 
                     headers: { 
                         'Content-Type': 'application/json',
-                        'x-goog-api-key': apiKey // Must use this header, NOT Authorization: Bearer
+                        'x-goog-api-key': apiKey 
                     }, 
                     body: JSON.stringify(payload) 
                 });
@@ -1082,7 +1103,6 @@
             let role = 'guest'; let email = "";
             if(window.currentUser) {
                 email = window.currentUser.email || ""; 
-                // Enable full admin access for any logged-in user to ensure smooth editing
                 role = 'admin'; 
             }
             document.body.className = document.body.className.replace(/role-\w+/g, '').trim() + ' role-' + role;
@@ -1105,10 +1125,16 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // COMPLETE FIREBASE CONFIG (Required for successful initialization)
         const firebaseConfig = {
             apiKey: "AIzaSyBbH3sUXVouonVnFK4kJ0dZjPb32eZNPvo",
             authDomain: "makrove6-ef560.firebaseapp.com",
+            databaseURL: "https://makrove6-ef560-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "makrove6-ef560",
+            storageBucket: "makrove6-ef560.firebasestorage.app",
+            messagingSenderId: "708835673590",
+            appId: "1:708835673590:web:e2d2cf66664bb2c4b173d7",
+            measurementId: "G-55Q2BCEXE5"
         };
 
         try {
@@ -1126,22 +1152,27 @@
                     if(document.getElementById('authBtnText')) document.getElementById('authBtnText').innerText = "Log Keluar";
                     try {
                         const docSnap = await getDoc(doc(db, "jadual_skbikang", "data_v1"));
-                        if (docSnap.exists()) {
-                            window.allProfiles = docSnap.data();
+                        let awanData = docSnap.exists() ? docSnap.data() : null;
+                        
+                        // Failsafe: Pastikan awanData valid dan bukan kosong
+                        if (awanData && Object.keys(awanData).length > 0 && awanData[Object.keys(awanData)[0]].sekolah) {
+                            window.allProfiles = awanData;
                             let savedId = localStorage.getItem('skb_current_v10'); 
                             window.currentProfileId = (savedId && window.allProfiles[savedId]) ? savedId : Object.keys(window.allProfiles)[0]; 
                             window.appState = window.allProfiles[window.currentProfileId];
                             
                             window.initAppStates();
-                            
                             window.simpanDataLokalSahaja(); window.renderProfileSwitcher(); window.kemasKiniUI(); 
                             window.showToast("Data Awan Firestore Berjaya Disegerakkan! ☁️", "success");
                         } else { 
+                            // Awan kosong, push local data ke awan
                             window.simpanData(true); 
                         }
                     } catch(e) { 
                         console.error("Firestore Error:", e);
                         window.showToast("Ralat menyegerak data. Sila semak rules pangkalan data.", "error"); 
+                        // Kekalkan UI berjalan walaupun error
+                        window.renderProfileSwitcher(); window.kemasKiniUI();
                     }
                 } else {
                     if(document.getElementById('authBtnText')) document.getElementById('authBtnText').innerText = "Log Masuk DELIMa";
