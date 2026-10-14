@@ -1021,7 +1021,8 @@
             btn.innerHTML = "⏳ AI Berfikir..."; btn.disabled = true;
 
             try {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
+                // Diperbaharui kepada gemini-1.5-flash yang aktif dan disokong sepenuhnya oleh v1beta
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 const sysPrompt = "Anda adalah Pakar AI Penjadualan Sekolah. Jawab dalam Bahasa Melayu secara profesional, ringkas dan berikan tips jadual round-robin.";
                 const payload = { contents: [{ parts: [{ text: `Isu Jadual Sekolah: "${p}"` }] }], systemInstruction: { parts: [{ text: sysPrompt }] }, generationConfig: { temperature: 0.3 } };
                 
@@ -1038,7 +1039,7 @@
                 
                 const data = await response.json();
                 const aiReply = data.candidates[0].content.parts[0].text;
-                let dialogHtml = `<div class="mb-4 text-xs font-bold bg-slate-50 p-3 rounded border shadow-inner">🔍 Isu Dikemukakan:<br>"${p}"</div><div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-200 p-5 rounded-xl text-xs text-slate-800 whitespace-pre-wrap leading-relaxed shadow-sm">🤖 <b>Saranan Gemini 1.5 Pro:</b>\n\n${aiReply}</div>`;
+                let dialogHtml = `<div class="mb-4 text-xs font-bold bg-slate-50 p-3 rounded border shadow-inner">🔍 Isu Dikemukakan:<br>"${p}"</div><div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-200 p-5 rounded-xl text-xs text-slate-800 whitespace-pre-wrap leading-relaxed shadow-sm">🤖 <b>Saranan Gemini 1.5 Flash:</b>\n\n${aiReply}</div>`;
                 window.customDialog("Tindakan Gemini AI", dialogHtml, true, () => { document.getElementById('aiPromptInput').value = ""; });
             } catch (err) { 
                 window.customDialog("Ralat Gemini API", err.message, false); 
@@ -1047,8 +1048,30 @@
             }
         };
 
-        window.toggleUasaSasaranMenu = function() { const menu = document.getElementById('uasaDropdownMenu'); menu.classList.toggle('hidden'); menu.classList.toggle('flex'); };
-        window.kemaskiniUasaSasaranLabel = function() { const label = document.getElementById('uasaDropdownLabel'); if (window.uasaSelectedSasaran.includes("Semua")) { label.innerText = "Semua Tingkatan/Tahun ▼"; } else if (window.uasaSelectedSasaran.length === 0) { label.innerText = "-- Pilih Sasaran -- ▼"; } else { label.innerText = window.uasaSelectedSasaran.join(', ') + " ▼"; } };
+        window.toggleUasaSasaranMenu = function() {
+            const menu = document.getElementById('uasaDropdownMenu');
+            if (menu) {
+                if (menu.classList.contains('hidden')) {
+                    menu.classList.remove('hidden');
+                    menu.classList.add('flex');
+                } else {
+                    menu.classList.add('hidden');
+                    menu.classList.remove('flex');
+                }
+            }
+        };
+        
+        window.kemaskiniUasaSasaranLabel = function() {
+            const labelBtn = document.getElementById('uasaDropdownLabel');
+            if (labelBtn) {
+                if (window.uasaSelectedSasaran.length === 0) {
+                    labelBtn.innerHTML = '-- Pilih Sasaran -- <span class="text-[9px]">▼</span>';
+                } else {
+                    labelBtn.innerHTML = window.uasaSelectedSasaran.join(', ') + ' <span class="text-[9px]">▼</span>';
+                }
+            }
+        };
+
         window.kemaskiniUasaSasaranCheckboxes = function() { document.querySelectorAll('.uasa-sasaran-cb').forEach(cb => { if (window.uasaSelectedSasaran.includes(cb.value) || (window.uasaSelectedSasaran.includes('Semua') && cb.value === 'Semua')) { cb.checked = true; } else { cb.checked = false; } }); window.kemaskiniUasaSasaranLabel(); };
         window.handleUasaSasaranCheck = function(cb) {
             if (cb.value === "Semua") {
@@ -1272,22 +1295,6 @@
             if(document.getElementById('countKelas')) document.getElementById('countKelas').innerText = (window.appState.kelas||[]).length;
             if(document.getElementById('countSubjek')) document.getElementById('countSubjek').innerText = (window.appState.subjek||[]).length;
             
-            if(window.appState.masaSekolah) {
-                if(document.getElementById('masa_mula_pagi')) document.getElementById('masa_mula_pagi').value = window.appState.masaSekolah.mulaPagi || "07:30";
-                if(document.getElementById('masa_mula_petang')) document.getElementById('masa_mula_petang').value = window.appState.masaSekolah.mulaPetang || "13:00";
-                if(document.getElementById('masa_tempoh_slot')) document.getElementById('masa_tempoh_slot').value = window.appState.masaSekolah.tempohSlot || 30;
-                if(document.getElementById('masa_tempoh_rehat')) document.getElementById('masa_tempoh_rehat').value = window.appState.masaSekolah.tempohRehat || 20;
-                
-                let tbodyHari = document.getElementById('tbodyTetapanHari');
-                if(tbodyHari && window.appState.masaSekolah.hari) {
-                    let htmlHari = ''; const senaraiHari = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
-                    senaraiHari.forEach(h => {
-                        let dat = window.appState.masaSekolah.hari[h] || {slot: 10, rehat: 5}; let bgClass = h === 'Jumaat' ? 'bg-amber-50' : (h === 'Rabu' ? 'bg-blue-50' : 'bg-white');
-                        htmlHari += `<tr class="border-b hover:bg-slate-50 transition ${bgClass}"><td class="p-2 text-center font-bold text-slate-700 border-r">${h}</td><td class="p-2 text-center border-r"><input type="number" id="cfg_slot_${h}" value="${dat.slot}" min="1" class="w-16 text-center border border-indigo-200 rounded py-1.5 text-xs font-bold text-indigo-700 shadow-inner admin-only outline-none"></td><td class="p-2 text-center"><input type="number" id="cfg_rehat_${h}" value="${dat.rehat}" min="1" class="w-16 text-center border border-indigo-200 rounded py-1.5 text-xs font-bold text-indigo-700 shadow-inner admin-only outline-none"></td></tr>`;
-                    }); tbodyHari.innerHTML = htmlHari;
-                }
-            }
-
             let gOpts = '<option value="">-- Pilih Guru --</option>' + (window.appState.guru||[]).map(g=>`<option value="${g.id}">${g.nama}</option>`).join('');
             if(document.getElementById('agihanGuru')) document.getElementById('agihanGuru').innerHTML = gOpts;
             if(document.getElementById('paparGuruSelect')) document.getElementById('paparGuruSelect').innerHTML = gOpts;
@@ -1345,13 +1352,17 @@
             }
             document.body.className = document.body.className.replace(/role-\w+/g, '').trim() + ' role-' + role;
             if(role === 'admin') { 
-                document.getElementById('userName').innerHTML = "👑 Admin Sistem"; 
-                document.getElementById('userEmail').innerText = email; 
+                let uName = document.getElementById('userName');
+                if(uName) uName.innerHTML = "👑 Admin Sistem"; 
+                let uEmail = document.getElementById('userEmail');
+                if(uEmail) uEmail.innerText = email; 
                 let banner = document.getElementById('readOnlyBanner');
                 if (banner) banner.classList.add('hidden'); 
             } else { 
-                document.getElementById('userName').innerHTML = "Status Tetamu"; 
-                document.getElementById('userEmail').innerText = "Mod Pandang Sahaja"; 
+                let uName = document.getElementById('userName');
+                if(uName) uName.innerHTML = "Status Tetamu"; 
+                let uEmail = document.getElementById('userEmail');
+                if(uEmail) uEmail.innerText = "Mod Pandang Sahaja"; 
                 let banner = document.getElementById('readOnlyBanner');
                 if (banner) banner.classList.remove('hidden'); 
             }
@@ -1386,7 +1397,8 @@
                 window.kemasKiniAksesAdmin();
                 
                 if(user) {
-                    if(document.getElementById('authBtnText')) document.getElementById('authBtnText').innerText = "Log Keluar";
+                    let authText = document.getElementById('authBtnText');
+                    if(authText) authText.innerText = "Log Keluar";
                     try {
                         const docSnap = await getDoc(doc(db, "jadual_skbikang", "data_v1"));
                         let awanData = docSnap.exists() ? docSnap.data() : null;
@@ -1403,7 +1415,8 @@
                         } else { window.simpanData(true); }
                     } catch(e) { window.showToast("Sila log masuk untuk semak data.", "info"); window.renderProfileSwitcher(); window.kemasKiniUI(); }
                 } else {
-                    if(document.getElementById('authBtnText')) document.getElementById('authBtnText').innerText = "Log Masuk DELIMa";
+                    let authText = document.getElementById('authBtnText');
+                    if(authText) authText.innerText = "Log Masuk DELIMa";
                 }
             });
 
