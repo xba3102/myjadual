@@ -213,8 +213,10 @@
                     <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2 mb-1">📚 Kekangan Khusus Subjek</h3>
                     <div class="bg-slate-50 p-4 rounded-xl border mb-4 shadow-inner">
                         <div class="mb-3"><select id="k_s_subjek" class="w-full md:w-1/2 text-xs border rounded-lg px-3 py-2 font-bold admin-only outline-none shadow-sm"><option value="">-- Pilih Subjek --</option></select></div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                            <label class="flex gap-2 bg-white p-3 rounded-lg border cursor-pointer admin-only hover:bg-slate-50 shadow-sm"><input type="checkbox" id="k_s_akhir" class="w-4 h-4 text-indigo-600 rounded"> <span class="text-[10px] font-bold">Masa Akhir Saja</span></label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                            <label class="flex gap-2 bg-white p-3 rounded-lg border cursor-pointer admin-only hover:bg-slate-50 shadow-sm"><input type="checkbox" id="k_s_pagi_awal" class="w-4 h-4 text-indigo-600 rounded"> <span class="text-[10px] font-bold">Sesi Pagi: Waktu Awal Sahaja (Slot 1-3)</span></label>
+                            <label class="flex gap-2 bg-white p-3 rounded-lg border cursor-pointer admin-only hover:bg-slate-50 shadow-sm"><input type="checkbox" id="k_s_petang_akhir" class="w-4 h-4 text-indigo-600 rounded"> <span class="text-[10px] font-bold">Sesi Petang: Waktu Akhir Sahaja</span></label>
+                            <label class="flex gap-2 bg-white p-3 rounded-lg border cursor-pointer admin-only hover:bg-slate-50 shadow-sm"><input type="checkbox" id="k_s_akhir" class="w-4 h-4 text-indigo-600 rounded"> <span class="text-[10px] font-bold">Semua Sesi: Masa Akhir Sahaja</span></label>
                             <label class="flex gap-2 bg-white p-3 rounded-lg border cursor-pointer admin-only hover:bg-slate-50 shadow-sm"><input type="checkbox" id="k_s_double" class="w-4 h-4 text-indigo-600 rounded"> <span class="text-[10px] font-bold">Wajib Berturut (Double)</span></label>
                             <label class="flex gap-2 bg-white p-3 rounded-lg border cursor-pointer admin-only hover:bg-slate-50 shadow-sm"><input type="checkbox" id="k_s_robin" class="w-4 h-4 text-indigo-600 rounded"> <span class="text-[10px] font-bold">Round-Robin (Agihan)</span></label>
                         </div>
@@ -811,8 +813,16 @@
         window.padamAgihan = function(gId) { window.customDialog("Padam Semua", "Pasti?", true, () => { let idx = window.appState.agihan.findIndex(a => a.guruId === gId); if(idx >= 0) { window.appState.agihan.splice(idx, 1); window.simpanData(true); window.renderAgihanSubjek(); window.paparSenaraiAgihan(); } }); };
 
         window.tambahKekanganSubjek = function() {
-            let subjek = document.getElementById('k_s_subjek').value; let akhir = document.getElementById('k_s_akhir').checked; let double = document.getElementById('k_s_double').checked; let robin = document.getElementById('k_s_robin').checked;
-            if(!subjek) return; if(!window.appState.kekangan.subjek) window.appState.kekangan.subjek = {}; window.appState.kekangan.subjek[subjek] = { akhir, double, robin }; window.simpanData(true); window.kemasKiniUI();
+            let subjek = document.getElementById('k_s_subjek').value; 
+            let akhir = document.getElementById('k_s_akhir').checked; 
+            let pagiAwal = document.getElementById('k_s_pagi_awal').checked;
+            let petangAkhir = document.getElementById('k_s_petang_akhir').checked;
+            let double = document.getElementById('k_s_double').checked; 
+            let robin = document.getElementById('k_s_robin').checked;
+            if(!subjek) return; 
+            if(!window.appState.kekangan.subjek) window.appState.kekangan.subjek = {}; 
+            window.appState.kekangan.subjek[subjek] = { akhir, pagiAwal, petangAkhir, double, robin }; 
+            window.simpanData(true); window.kemasKiniUI();
         };
         window.padamKekanganSubjek = function(sub) { delete window.appState.kekangan.subjek[sub]; window.simpanData(true); window.kemasKiniUI(); };
         window.tambahSekatanGuru = function() {
@@ -865,8 +875,15 @@
                                     
                                     // Semak sekatan masa khusus
                                     let disekat = sekatanMasa.some(sek => sek.guruId === gid && sek.hari === h && sek.waktu === (s+1)); if(disekat) continue;
-                                    // Semak syarat subjek akhir
+                                    
+                                    // Semak syarat subjek akhir umum
                                     if (k.akhir && s !== (hSlot - 1)) continue;
+                                    
+                                    // Semak syarat subjek khusus pagi (Awal Sahaja: Slot 1-3)
+                                    if (k.pagiAwal && ag.sesi === 'pagi' && s > 2) continue;
+                                    
+                                    // Semak syarat subjek khusus petang (Akhir Sahaja: 2 Slot Terakhir)
+                                    if (k.petangAkhir && ag.sesi === 'petang' && s < (hSlot - 2)) continue;
 
                                     // Semak kekangan berturut-turut
                                     let consecutiveCount = 0;
@@ -1020,7 +1037,15 @@
             
             let kSub = window.appState.kekangan?.subjek || {}; let hSub = '';
             for(let sub in kSub) {
-                let k = kSub[sub]; hSub += `<div class="bg-white border p-3 rounded-xl shadow-sm flex justify-between items-start"><div><div class="font-bold text-xs text-slate-800 mb-1">${sub}</div><div class="text-[9px] text-slate-500">${k.akhir?'Masa Akhir, ':''}${k.double?'Double Period, ':''}${k.robin?'Round-Robin':''}</div></div><button onclick="window.padamKekanganSubjek('${sub}')" class="text-red-500 font-bold px-2 admin-only hover:bg-red-50 rounded transition">X</button></div>`;
+                let k = kSub[sub]; 
+                let labels = [];
+                if(k.pagiAwal) labels.push('Pagi:Awal');
+                if(k.petangAkhir) labels.push('Petang:Akhir');
+                if(k.akhir) labels.push('Akhir Saja');
+                if(k.double) labels.push('Double');
+                if(k.robin) labels.push('Round-Robin');
+                
+                hSub += `<div class="bg-white border p-3 rounded-xl shadow-sm flex justify-between items-start"><div><div class="font-bold text-xs text-slate-800 mb-1">${sub}</div><div class="text-[9px] text-slate-500">${labels.join(', ') || 'Tiada'}</div></div><button onclick="window.padamKekanganSubjek('${sub}')" class="text-red-500 font-bold px-2 admin-only hover:bg-red-50 rounded transition">X</button></div>`;
             }
             if(document.getElementById('senaraiKekanganSubjek')) document.getElementById('senaraiKekanganSubjek').innerHTML = hSub || '<p class="text-xs text-slate-400 col-span-full">Tiada kekangan subjek spesifik.</p>';
 
