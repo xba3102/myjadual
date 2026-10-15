@@ -1026,8 +1026,8 @@
             btn.innerHTML = "⏳ AI Berfikir..."; btn.disabled = true;
 
             try {
-                // Diperbaharui kepada gemini-1.5-flash yang aktif dan disokong sepenuhnya oleh v1beta
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                // Diperbaharui menggunakan tag -latest yang lebih stabil untuk pelbagai jenis API Key
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
                 const sysPrompt = "Anda adalah Pakar AI Penjadualan Sekolah. Jawab dalam Bahasa Melayu secara profesional, ringkas dan berikan tips jadual round-robin.";
                 const payload = { contents: [{ parts: [{ text: `Isu Jadual Sekolah: "${p}"` }] }], systemInstruction: { parts: [{ text: sysPrompt }] }, generationConfig: { temperature: 0.3 } };
                 
