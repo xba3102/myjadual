@@ -965,10 +965,16 @@
             btn.innerHTML = "⏳ AI Berfikir..."; btn.disabled = true;
 
             try {
-                // FALLBACK SECURE URL STRUCTURE
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-                const sysPrompt = "Anda adalah Pakar AI Penjadualan Sekolah. Jawab dalam Bahasa Melayu secara profesional, ringkas dan berikan tips jadual round-robin.";
-                const payload = { contents: [{ parts: [{ text: `Isu Jadual Sekolah: "${p}"` }] }], systemInstruction: { parts: [{ text: sysPrompt }] }, generationConfig: { temperature: 0.3 } };
+                // Gunakan model 'gemini-pro' asas yang disokong secara universal oleh semua Kunci API
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+                
+                // Gabungkan arahan AI (System Prompt) terus ke dalam teks pengguna untuk keserasian gemini-pro
+                const gabunganPrompt = "Anda adalah Pakar AI Penjadualan Sekolah. Jawab dalam Bahasa Melayu secara profesional dan berikan tips jadual round-robin.\n\nIsu Jadual Sekolah: \"" + p + "\"";
+                
+                const payload = { 
+                    contents: [{ parts: [{ text: gabunganPrompt }] }],
+                    generationConfig: { temperature: 0.3 }
+                };
                 
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if(!response.ok) { let errData = await response.json(); throw new Error(errData.error?.message || "Ralat API. Sila semak Kunci di Tab 5."); }
