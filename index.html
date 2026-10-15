@@ -975,14 +975,14 @@
                 let validModels = (modelsData.models || []).filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"));
                 if(validModels.length === 0) throw new Error("Tiada model janaan teks yang sah dijumpai untuk Kunci API ini.");
                 
-                // 3. Pilih model terbaik yang ada
+                // 3. Pilih model terbaik yang ada (Dikemas kini ke siri 3.8 mengikut saranan Google)
                 let selectedModel = "";
-                const preferences = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                const preferences = ['gemini-3.8-flash', 'gemini-3-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
                 for(let pref of preferences) {
                     if(validModels.some(m => m.name === `models/${pref}`)) { selectedModel = pref; break; }
                 }
-                // Jika tiada dalam senarai keutamaan, guna sahaja model teks pertama yang ada
-                if(!selectedModel) selectedModel = validModels[0].name.replace('models/', '');
+                // Jika tiada dalam senarai keutamaan, paksa penggunaan gemini-3.8-flash sebagai fallback rasmi
+                if(!selectedModel) selectedModel = 'gemini-3.8-flash';
 
                 // 4. Buat panggilan kepada API
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
