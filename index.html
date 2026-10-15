@@ -965,22 +965,37 @@
             btn.innerHTML = "⏳ AI Berfikir..."; btn.disabled = true;
 
             try {
-                // Gunakan model 'gemini-pro' asas yang disokong secara universal oleh semua Kunci API
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+                // 1. Dapatkan senarai model yang sah untuk API Key ini
+                const modelsUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+                const modelsRes = await fetch(modelsUrl);
+                if(!modelsRes.ok) throw new Error("Gagal menyemak model. Pastikan Kunci API cikgu adalah sah.");
+                const modelsData = await modelsRes.json();
                 
-                // Gabungkan arahan AI (System Prompt) terus ke dalam teks pengguna untuk keserasian gemini-pro
+                // 2. Tapis model yang menyokong fungsi "generateContent"
+                let validModels = (modelsData.models || []).filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"));
+                if(validModels.length === 0) throw new Error("Tiada model janaan teks yang sah dijumpai untuk Kunci API ini.");
+                
+                // 3. Pilih model terbaik yang ada
+                let selectedModel = "";
+                const preferences = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                for(let pref of preferences) {
+                    if(validModels.some(m => m.name === `models/${pref}`)) { selectedModel = pref; break; }
+                }
+                // Jika tiada dalam senarai keutamaan, guna sahaja model teks pertama yang ada
+                if(!selectedModel) selectedModel = validModels[0].name.replace('models/', '');
+
+                // 4. Buat panggilan kepada API
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
                 const gabunganPrompt = "Anda adalah Pakar AI Penjadualan Sekolah. Jawab dalam Bahasa Melayu secara profesional dan berikan tips jadual round-robin.\n\nIsu Jadual Sekolah: \"" + p + "\"";
-                
-                const payload = { 
-                    contents: [{ parts: [{ text: gabunganPrompt }] }],
-                    generationConfig: { temperature: 0.3 }
-                };
+                const payload = { contents: [{ parts: [{ text: gabunganPrompt }] }], generationConfig: { temperature: 0.3 } };
                 
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if(!response.ok) { let errData = await response.json(); throw new Error(errData.error?.message || "Ralat API. Sila semak Kunci di Tab 5."); }
+                if(!response.ok) { let errData = await response.json(); throw new Error(errData.error?.message || "Ralat janaan API."); }
                 
                 const data = await response.json(); const aiReply = data.candidates[0].content.parts[0].text;
-                let dialogHtml = `<div class="mb-4 text-xs font-bold bg-slate-50 p-3 rounded border shadow-inner">🔍 Isu Dikemukakan:<br>"${p}"</div><div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-200 p-5 rounded-xl text-xs text-slate-800 whitespace-pre-wrap leading-relaxed shadow-sm">🤖 <b>Saranan Gemini AI:</b>\n\n${aiReply}</div>`;
+                let dialogHtml = `<div class="mb-4 text-xs font-bold bg-slate-50 p-3 rounded border shadow-inner">🔍 Isu Dikemukakan:<br>"${p}"</div>
+                                  <div class="mb-2 text-[10px] text-slate-400 font-mono flex items-center gap-1"><span>🤖</span> Model Digunakan: ${selectedModel}</div>
+                                  <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-200 p-5 rounded-xl text-xs text-slate-800 whitespace-pre-wrap leading-relaxed shadow-sm">🤖 <b>Saranan Gemini AI:</b>\n\n${aiReply}</div>`;
                 window.customDialog("Tindakan Gemini AI", dialogHtml, true, () => { document.getElementById('aiPromptInput').value = ""; });
             } catch (err) { window.customDialog("Ralat Gemini API", err.message, false); } 
             finally { btn.innerHTML = orgText; btn.disabled = false; }
