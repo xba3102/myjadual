@@ -9,6 +9,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
+        /* Skala UI Kompak (Auto-Zoom Out) */
+        html { font-size: 14px; } /* Mengecilkan keseluruhan saiz Tailwind sebanyak ~12.5% */
+        @media (max-width: 768px) { html { font-size: 16px; } } /* Kekalkan saiz asal di telefon bimbit */
+        @media (min-width: 1536px) { html { font-size: 16px; } } /* Kekalkan saiz asal di skrin gergasi */
+
         @keyframes modalPop { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .animate-modal { animation: modalPop 0.2s ease-out forwards; }
         
