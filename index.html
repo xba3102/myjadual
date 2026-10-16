@@ -409,8 +409,19 @@
         };
 
         window.onload = function() {
+            // Cuba baca data versi baharu dahulu
             let savedProfiles = localStorage.getItem('skb_profiles_v11');
             let savedCurrent = localStorage.getItem('skb_current_v11');
+
+            // SISTEM PEMULIHAN (RECOVERY): Jika data baharu tiada, sedut dari laci versi lama
+            if (!savedProfiles) {
+                savedProfiles = localStorage.getItem('skb_profiles_v4') || localStorage.getItem('skb_profiles_v10') || localStorage.getItem('skb_profiles_v3');
+                savedCurrent = localStorage.getItem('skb_current_v4') || localStorage.getItem('skb_current_v10') || localStorage.getItem('skb_current_v3');
+                
+                if (savedProfiles) {
+                    setTimeout(() => window.showToast("Data lama berjaya dipulihkan & dinaik taraf!", "success"), 1000);
+                }
+            }
 
             if (savedProfiles) { 
                 try { 
@@ -424,6 +435,10 @@
             window.appState = window.allProfiles[window.currentProfileId];
             
             window.initAppStates();
+            
+            // Simpan semula ke dalam laci versi terbaharu
+            window.simpanDataLokalSahaja();
+            
             window.renderProfileSwitcher(); window.kemasKiniUI(); window.kemasKiniAksesAdmin(); 
         };
 
