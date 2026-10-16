@@ -505,6 +505,29 @@
             let nama = document.getElementById('tetapan_nama_sekolah').value.trim(); if(!nama) return; window.appState.sekolah.nama = nama; window.simpanData(true); window.renderProfileSwitcher(); window.showToast("Nama dikemas kini.", "success");
         };
         
+        window.padamProfilSekolah = function() {
+            // Syarat Minimum 1 Profil
+            if(Object.keys(window.allProfiles).length <= 1) {
+                window.customDialog("Tindakan Dihalang", "Sistem mesti mempunyai sekurang-kurangnya <b>satu (1) profil sekolah</b>. Anda tidak dibenarkan memadam profil terakhir ini.", false);
+                return;
+            }
+            
+            let namaSekolah = window.appState.sekolah.nama || "Sekolah ini";
+            // Pop-up Confirmation
+            window.customDialog("Pengesahan Padam Profil", `Adakah anda pasti mahu memadam profil <b>${namaSekolah}</b>?<br><br><span class="text-red-600 font-bold">Perhatian: Semua rekod guru, kelas, data induk dan jadual untuk profil ini akan terhapus secara kekal.</span>`, true, () => {
+                // Padam profil dari objek utama
+                delete window.allProfiles[window.currentProfileId];
+                
+                // Tukar ke profil pertama yang masih wujud
+                window.currentProfileId = Object.keys(window.allProfiles)[0];
+                window.appState = window.allProfiles[window.currentProfileId];
+                
+                // Simpan & Segar Semula (Refresh) UI
+                window.simpanData(false); window.renderProfileSwitcher(); window.kemasKiniUI();
+                window.showToast(`Profil ${namaSekolah} berjaya dipadam.`, "success");
+            });
+        };
+        
         window.simpanApiKey = function() {
             let key = document.getElementById('tetapan_api_key').value.trim();
             if(!key) return window.showToast("Sila masukkan kunci.", "error");
