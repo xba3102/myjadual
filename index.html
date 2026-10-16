@@ -855,5 +855,85 @@
         };
 
     </script>
+
+    <!-- FIREBASE (PRODUCTION READY) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbH3sUXVouonVnFK4kJ0dZjPb32eZNPvo",
+            authDomain: "makrove6-ef560.firebaseapp.com",
+            databaseURL: "https://makrove6-ef560-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "makrove6-ef560",
+            storageBucket: "makrove6-ef560.firebasestorage.app",
+            messagingSenderId: "708835673590",
+            appId: "1:708835673590:web:e2d2cf66664bb2c4b173d7",
+            measurementId: "G-55Q2BCEXE5"
+        };
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getDatabase(app);
+
+            window.firebaseDB = db; 
+            window.firebaseSet = set; 
+            window.firebaseRef = ref;
+            
+            onAuthStateChanged(auth, async (user) => {
+                window.currentUser = user;
+                if(user) {
+                    document.getElementById('authBtnText').innerText = "Log Keluar";
+                    document.getElementById('userName').innerText = user.displayName || "Pentadbir Sekolah";
+                    document.getElementById('userEmail').innerText = user.email || "Disambung ke awan";
+                    try {
+                        const snapshot = await get(child(ref(db), `jadual_data_v11`));
+                        if (snapshot.exists()) {
+                            window.allProfiles = snapshot.val();
+                            
+                            let savedId = localStorage.getItem('skb_current_v11');
+                            if (savedId && window.allProfiles[savedId]) {
+                                window.currentProfileId = savedId;
+                            } else {
+                                window.currentProfileId = Object.keys(window.allProfiles)[0];
+                            }
+                            
+                            window.appState = window.allProfiles[window.currentProfileId];
+                            window.simpanDataLokalSahaja(); 
+                            window.renderProfileSwitcher(); 
+                            window.kemasKiniUI();
+                            window.showToast("Data Awan Berjaya Disegerakkan! ☁️", "success");
+                        } else { 
+                            window.simpanData(true); 
+                        }
+                    } catch(e) { 
+                        window.customDialog("Ralat Akses Pangkalan Data", `Gagal memuat data awan: ${e.message}`, false); 
+                    }
+                } else { 
+                    document.getElementById('authBtnText').innerText = "Log Masuk DELIMa"; 
+                    document.getElementById('userName').innerText = "Status Tetamu";
+                    document.getElementById('userEmail').innerText = "Luar Talian";
+                }
+            });
+
+            window.handleAuthClick = async function() {
+                if (window.currentUser) { 
+                    await signOut(auth); 
+                    window.showToast("Log keluar berjaya."); 
+                } else {
+                    const provider = new GoogleAuthProvider();
+                    try { 
+                        await signInWithPopup(auth, provider); 
+                    } catch (e) { 
+                        window.customDialog("Ralat Log Masuk", e.message, false); 
+                    }
+                }
+            };
+        } catch (e) { 
+            console.error("Ralat awalan Firebase", e); 
+        }
+    </script>
 </body>
 </html>
