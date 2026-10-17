@@ -661,7 +661,7 @@
             }
             document.getElementById('senaraiKekanganSubjek').innerHTML = hs || '<p class="text-xs text-slate-400">Tiada syarat subjek.</p>';
             
-            let sm = window.appState.kekangan.sekatanMasa; let hsm = '';
+            let sm = window.appState.kekangan.sekatanMasa || []; let hsm = '';
             sm.forEach((s, i) => {
                 let nama = (window.appState.guru.find(g=>g.id===s.guruId)||{}).nama;
                 hsm += `<div class="bg-red-50 border border-red-100 p-3 rounded-lg shadow-sm text-xs flex justify-between items-center"><div><b class="text-red-900">${nama}</b><br><span class="text-[0.65rem] text-red-700">${s.hari} - Waktu ${s.waktu}</span></div><button onclick="window.appState.kekangan.sekatanMasa.splice(${i},1); window.simpanData(false); window.renderSenaraiKekangan()" class="text-red-500 font-bold bg-white px-2 py-0.5 rounded border shadow-sm admin-only">X</button></div>`;
@@ -943,10 +943,21 @@
                             let savedId = localStorage.getItem('skb_current_v11');
                             window.currentProfileId = (savedId && window.allProfiles[savedId]) ? savedId : Object.keys(window.allProfiles)[0];
                             window.appState = window.allProfiles[window.currentProfileId];
+                            
+                            // Pelindung Data - Pastikan semua senarai wujud untuk elak ralat forEach
+                            if(!window.appState.kekangan) window.appState.kekangan = { subjek: {}, sekatanMasa: [], bebanGuru: {} };
+                            if(!window.appState.kekangan.bebanGuru) window.appState.kekangan.bebanGuru = {};
+                            if(!window.appState.kekangan.sekatanMasa) window.appState.kekangan.sekatanMasa = [];
+                            if(!window.appState.masaSekolah) window.appState.masaSekolah = { hari: DEFAULT_MASA };
+                            if(!window.appState.agihan) window.appState.agihan = [];
+                            if(!window.appState.guru) window.appState.guru = [];
+                            if(!window.appState.kelas) window.appState.kelas = [];
+                            if(!window.appState.subjek) window.appState.subjek = [];
+
                             window.simpanDataLokalSahaja(); window.renderProfileSwitcher(); window.kemasKiniUI();
                             window.showToast("Data Awan Berjaya Disegerakkan! ☁️", "success");
                         } else { window.simpanData(true); }
-                    } catch(e) { window.customDialog("Ralat Storan Awan", "Akses Firebase Ditolak. Sila semak tetapan Rules Firebase Realtime Database cikgu. Error: " + e.message, false); }
+                    } catch(e) { window.customDialog("Ralat Sistem", "Terdapat masalah memproses atau membaca data awan: " + e.message, false); }
                 } else { 
                     document.getElementById('authBtnText').innerText = "Log Masuk Awan"; 
                     document.getElementById('userName').innerText = "Status Tetamu";
