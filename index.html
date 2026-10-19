@@ -1620,17 +1620,40 @@
                     document.getElementById('authBtnText').innerText = "Log Masuk DELIMa"; 
                 }
                 window.kemasKiniAksesAdmin();
-            });
+            }); // Penutup fungsi onAuthStateChanged
 
-            window.handleAuthClick = async function() {
-                if (window.currentUser) { await signOut(auth); window.showToast("Log keluar berjaya."); } 
-                else {
-                    const provider = new GoogleAuthProvider();
-                    try { await signInWithPopup(auth, provider); } 
-                    catch (e) { window.customDialog("Ralat Log Masuk", e.message, false); }
-                }
-            };
-        } catch (e) { console.error("Ralat awalan Firebase", e); }
+        } catch (e) { 
+            console.error("Ralat awalan Firebase", e); 
+        }
+        
+        // Script to deter casual users from viewing source code or opening dev tools
+        document.addEventListener('keydown', function(event) {
+            // F12 (Developer Tools)
+            if (event.key === 'F12' || event.keyCode === 123) {
+                event.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+I or Cmd+Option+I (Inspector)
+            if ((event.ctrlKey || event.metaKey) && event.shiftKey && (event.key === 'I' || event.key === 'i')) {
+                event.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+J or Cmd+Option+J (Console)
+            if ((event.ctrlKey || event.metaKey) && event.shiftKey && (event.key === 'J' || event.key === 'j')) {
+                event.preventDefault();
+                return false;
+            }
+            // Ctrl+U or Cmd+U (View Page Source)
+            if ((event.ctrlKey || event.metaKey) && (event.key === 'U' || event.key === 'u')) {
+                event.preventDefault();
+                return false;
+            }
+            // Ctrl+S or Cmd+S (Save Page As)
+            if ((event.ctrlKey || event.metaKey) && (event.key === 'S' || event.key === 's')) {
+                event.preventDefault();
+                return false;
+            }
+        });
     </script>
 </body>
 </html>
