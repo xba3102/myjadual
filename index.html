@@ -1087,7 +1087,7 @@
             let btn = document.getElementById('btnAiLaksana'); let orgText = btn.innerHTML;
             btn.innerHTML = "⏳ Gemini Berfikir..."; btn.disabled = true;
 
-            const apiKey = "AQ.Ab8RN6J7XdEfPxdjefzBVw1OeIDoSwjTw6fp2I9Tf6pRoqFUnA"; 
+            const apiKey = window.getApiKey(); 
             try {
                 const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 const sysPrompt = "Anda adalah Pakar AI Penjadualan Sekolah Organisasi. Analisis isu jadual secara klinikal dan berikan penyelesaian matang yang merujuk kepada logik algoritma Round-Robin, keseimbangan tenaga guru, dan sekatan waktu (Hard Constraint).";
