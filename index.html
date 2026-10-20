@@ -479,6 +479,63 @@
             window.simpanData(true); window.renderProfileSwitcher(); window.showToast("Penjenamaan sekolah berjaya disimpan!", "success");
         };
 
+        window.padamProfilSemasa = function() {
+            if(Object.keys(window.allProfiles).length <= 1) {
+                window.customDialog("Tindakan Dihalang", "Sistem memerlukan sekurang-kurangnya SATU profil sekolah untuk beroperasi.");
+                return;
+            }
+            window.customDialog("AMARAN: Padam Profil", `Pasti padam profil <b>${window.appState.sekolah.nama}</b> secara kekal?`, true, () => {
+                delete window.allProfiles[window.currentProfileId];
+                window.currentProfileId = Object.keys(window.allProfiles)[0];
+                window.appState = window.allProfiles[window.currentProfileId];
+                window.simpanData(true); window.renderProfileSwitcher(); window.kemasKiniUI();
+                window.showToast("Profil dipadam.", "success");
+            });
+        };
+
+        window.muatTurunBackup = function() {
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.allProfiles));
+            let dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "Backup_Sistem_Jadual_AI.json");
+            dlAnchorElem.click();
+            window.showToast("Data dimuat turun.", "success");
+        };
+
+        window.muatNaikBackup = function(file) {
+            window.customDialog("Import JSON", "Ini akan menggantikan semua profil sedia ada. Teruskan?", true, () => {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        let imported = JSON.parse(e.target.result);
+                        if(imported && typeof imported === 'object') {
+                            window.allProfiles = imported;
+                            window.currentProfileId = Object.keys(window.allProfiles)[0];
+                            window.appState = window.allProfiles[window.currentProfileId];
+                            window.simpanData(true); window.renderProfileSwitcher(); window.kemasKiniUI();
+                            window.showToast("Data dipulihkan!", "success");
+                        }
+                    } catch(err) { window.showToast("Ralat JSON.", "error"); }
+                };
+                reader.readAsText(file);
+            });
+        };
+
+        window.simpanApiKey = function() {
+            let key = document.getElementById('inputApiKey').value.trim();
+            if(!key) return window.showToast("Sila masukkan kunci API", "error");
+            localStorage.setItem('skb_gemini_api_key', key);
+            window.showToast("API Key berjaya disimpan!", "success");
+        };
+
+        window.getApiKey = function() {
+            let key = localStorage.getItem('skb_gemini_api_key');
+            if(!key || key.trim() === "") {
+                return "AQ.Ab8RN6J7XdEfPxdjefzBVw1OeIDoSwjTw6fp2I9Tf6pRoqFUnA"; // Default / Fallback API Key
+            }
+            return key.trim();
+        };
+
         // --- DATA INDUK ---
         window.tambahData = function(jenis) {
             if(jenis === 'guru') {
