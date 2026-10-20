@@ -376,6 +376,11 @@
             if(!window.appState.subjek) window.appState.subjek = [];
             if(!window.appState.uasa) window.appState.uasa = { status: null, dataKelas: {}, dataGuru: {}, statistik: {} };
             
+            // Papar API Key di ruangan tetapan
+            if(document.getElementById('inputApiKey')) {
+                document.getElementById('inputApiKey').value = localStorage.getItem('skb_gemini_api_key') || "";
+            }
+
             window.renderProfileSwitcher(); window.kemasKiniUI(); window.kemasKiniAksesAdmin(); 
         };
 
