@@ -749,7 +749,8 @@
                 });
 
                 const apiKey = window.getApiKey(); 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
+                // Mengemas kini kepada model gemini-1.5-flash yang aktif dan stabil untuk membaca gambar (OCR)
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 const prompt = "Anda adalah pembantu data sekolah. Analisis fail jadual waktu ini (sama ada ia jadual guru atau jadual kelas). Sila ekstrak maklumat dan senaraikan setiap tugasan mengajar. Keluarkan output dalam format JSON array of objects dengan format tepat: {subjek: 'string', kelas: 'string', waktu: integer}. Abaikan waktu rehat. Sila kira bilangan petak (waktu) dengan betul.";
                 
                 const payload = {
@@ -1414,8 +1415,8 @@
 
             const apiKey = window.getApiKey();
             try {
-                // TUKAR MODEL DI SINI KEPADA PRO-LATEST
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`;
+                // Mengemas kini kepada model gemini-1.5-flash yang aktif pada pelayan v1beta
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 const sysPrompt = "Anda adalah Pakar AI Penjadualan Sekolah Organisasi. Analisis isu jadual secara klinikal dan berikan penyelesaian matang yang merujuk kepada logik algoritma Round-Robin, keseimbangan tenaga guru, dan sekatan waktu (Hard Constraint).";
                 const payload = { contents: [{ parts: [{ text: `Isu Jadual Sekolah: "${p}"` }] }], systemInstruction: { parts: [{ text: sysPrompt }] }, generationConfig: { temperature: 0.3 } };
                 
