@@ -298,13 +298,45 @@
                             <div><label class="text-xs font-bold text-slate-700 block mb-1">Tukar Profil / Tambah Sekolah:</label>
                                 <div class="flex gap-2"><input type="text" id="inputProfilBaru" placeholder="Nama Sekolah Baharu" class="flex-1 text-xs border rounded-lg px-3 py-2 bg-slate-50 admin-only outline-none"><button onclick="window.tambahProfilBaru()" class="bg-emerald-500 hover:bg-emerald-600 transition text-white font-bold text-xs px-4 py-2 rounded-lg admin-only shadow-sm">+ Tambah Profil</button></div>
                             </div>
-                            <div class="border-t pt-4">
+                            <div class="border-t pt-4 mt-4">
                                 <label class="text-xs font-bold text-slate-700 block mb-1">Nama Sistem Semasa:</label>
                                 <div class="flex gap-2">
                                     <input type="text" id="tetapan_nama_sekolah" class="flex-1 text-xs border rounded-lg px-3 py-2 bg-slate-50 admin-only outline-none">
                                     <button onclick="window.simpanProfilSekolah()" class="bg-indigo-600 hover:bg-indigo-700 transition text-white font-bold text-xs px-6 py-2 rounded-lg admin-only shadow-sm">Simpan</button>
                                 </div>
                             </div>
+                            <div class="border-t pt-4 mt-4">
+                                <label class="text-xs font-bold text-slate-700 block mb-1">Tetapan API Key (Gemini AI):</label>
+                                <div class="flex gap-2">
+                                    <input type="password" id="inputApiKey" placeholder="Tampal API Key bermula dengan AQ..." class="flex-1 text-xs border rounded-lg px-3 py-2 bg-slate-50 outline-none admin-only">
+                                    <button onclick="window.simpanApiKey()" class="bg-indigo-600 hover:bg-indigo-700 transition text-white font-bold text-xs px-6 py-2 rounded-lg shadow-sm admin-only">Simpan Kunci</button>
+                                </div>
+                                <p class="text-[9px] text-slate-500 mt-1 italic">Kunci disimpan secara lokal di peranti ini sahaja.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <div class="flex flex-col justify-center items-center p-4 bg-red-50 rounded-xl border border-red-100 shadow-inner admin-only">
+                                <h4 class="text-sm font-bold text-red-700 mb-2">Zon Pemadaman</h4>
+                                <p class="text-[10px] text-red-600 text-center mb-4">Memadam profil akan melenyapkan data fail ini secara kekal.</p>
+                                <button onclick="window.padamProfilSemasa()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-6 py-2 rounded-lg shadow-sm transition">🗑️ Padam Profil Ini</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FUNGSI BACKUP JSON -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 admin-only">
+                    <h3 class="font-bold text-sm text-slate-800 mb-4">💾 Salinan Keselamatan Data (JSON)</h3>
+                    <p class="text-xs text-slate-500 mb-4">Muat turun semua data profil ke dalam komputer anda sebagai langkah berjaga-jaga (Backup).</p>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="window.muatTurunBackup()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow transition flex items-center gap-2">
+                            <span>📥</span> Muat Turun Data (Export JSON)
+                        </button>
+                        <div class="relative overflow-hidden inline-block">
+                            <button class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow transition flex items-center gap-2">
+                                <span>📤</span> Muat Naik Data (Import JSON)
+                            </button>
+                            <input type="file" accept=".json" onchange="if(this.files.length > 0) window.muatNaikBackup(this.files[0])" class="absolute left-0 top-0 w-full h-full opacity-0 cursor-pointer">
                         </div>
                     </div>
                 </div>
